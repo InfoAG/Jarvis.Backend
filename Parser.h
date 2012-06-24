@@ -1,7 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "Framework/Container/SmartList.h"
+#include "../Framework/Container/SmartList.h"
 #include <string>
 #include <map>
 #include "AbstractFunction.h"
@@ -18,7 +18,7 @@ private:
 public:
     Parser();
 
-    CAS::AbstractArithmetic *parse(std::string input);
+    std::unique_ptr<CAS::AbstractArithmetic> parse(std::string input);
 };
 
 #endif //PARSER_H

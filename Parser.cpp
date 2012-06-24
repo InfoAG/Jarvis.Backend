@@ -3,12 +3,12 @@
 
 Parser::Parser()
 {
-    terminals.append(new Three); //placeholder for dynamic class loading
+    terminals.append(new NumberExpression); //placeholder for dynamic class loading
 
-    operators.append(new Addition);
+    operators.append(new AdditionExpression);
 }
 
-CAS::AbstractArithmetic *Parser::parse(std::string input)
+std::unique_ptr<CAS::AbstractArithmetic> Parser::parse(std::string input)
 {
     int ebenencount;
     bool geloescht;
@@ -28,7 +28,7 @@ CAS::AbstractArithmetic *Parser::parse(std::string input)
             }
         }
     } while (geloescht);
-    CAS::AbstractArithmetic *result;
+    std::unique_ptr<CAS::AbstractArithmetic> result;
     for (CAS::SmartList<AbstractTerminal*>::const_iterator it = terminals.begin(); it != terminals.end(); ++it) {
         result = (*it)->parse(input);
         if (result) return result;
