@@ -7,7 +7,7 @@
 class AbstractTerminal
 {
 public:
-    virtual std::unique_ptr<CAS::AbstractArithmetic> parse(std::string) = 0;
+    virtual std::unique_ptr<CAS::AbstractArithmetic> parse(std::string) const = 0;
 };
 
 #endif //ABSTRACTTERMINAL_H
