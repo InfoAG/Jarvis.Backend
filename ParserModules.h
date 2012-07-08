@@ -1,18 +1,18 @@
 #ifndef PARSERMODULES_H
 #define PARSERMODULES_H
 
-#include "AbstractFunction.h"
-#include "AbstractOperator.h"
-#include "AbstractTerminal.h"
-#include "../Framework/Container/LinkedList.h"
+#include "FunctionModule.h"
+#include "OperatorModule.h"
+#include "TerminalModule.h"
+#include "../Framework/Container/SmartList.h"
 
-class ParserModules
+struct ParserModules
 {
-    CAS::LinkedList<std::unique_ptr<AbstractTerminal> > terminals;
-    CAS::LinkedList<std::unique_ptr<AbstractOperator> > operators;
-    CAS::LinkedList<std::unique_ptr<AbstractFunction> > functions;
-public:
-    ParserModules() {};
+    CAS::SmartList<TerminalModule> terminals;
+    CAS::SmartList<OperatorModule> operators;
+    CAS::SmartList<FunctionModule> functions;
+
+    ParserModules &operator+=(const ParserModules &other) { terminals += other.terminals; operators += other.operators; functions += other.functions; return *this; };
 };
 
 #endif //PARSERMODULES_H

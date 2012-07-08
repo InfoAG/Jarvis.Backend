@@ -1,6 +1,6 @@
 #include "DemoModules.h"
 
-NumberExpression::state NumberExpression::delta(state stt, char str) const {
+/*NumberExpression::state NumberExpression::delta(state stt, char str) const {
     switch (stt) {
     case START:
         if (str <= 57 && str >=49) return NFIRST;
@@ -35,4 +35,4 @@ std::unique_ptr<CAS::AbstractArithmetic> NumberExpression::parse(std::string can
     else {
         return std::unique_ptr<CAS::NumberArith>(new CAS::NumberArith(strtod(candidate.c_str(), NULL)));
     }
-}
+}*/

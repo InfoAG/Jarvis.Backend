@@ -1,6 +1,6 @@
 #ifndef DEMOMODULES_H
 #define DEMOMODULES_H
-
+/*
 #include "AbstractOperator.h"
 #include "AbstractTerminal.h"
 #include "../Framework/Arithmetic/Addition.h"
@@ -25,5 +25,5 @@ private:
 public:
     virtual std::unique_ptr<CAS::AbstractArithmetic> parse(std::string candidate) const;
 };
-
+*/
 #endif //DEMOMODULES_H

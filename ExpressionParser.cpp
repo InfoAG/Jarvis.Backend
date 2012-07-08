@@ -1,11 +1,15 @@
 #include "ExpressionParser.h"
 #include "DemoModules.h"
+#include <string>
 
-ExpressionParser::ExpressionParser()
+ExpressionParser::ExpressionParser(const QDir &module_dir)
 {
-    terminals.append(std::unique_ptr<AbstractTerminal>(new NumberExpression)); //placeholder for dynamic class loading
-
-    operators.append(std::unique_ptr<AbstractOperator>(new AdditionExpression));
+    for (const auto &file : module_dir.entryList(QStringList("*.jpkg"), QDir::Files)) {
+        std::string dbg = file.toStdString();
+        ModulePackage *tmp_module = new ModulePackage(new QFile(file)) ;
+        module_pkgs.append(*tmp_module);
+        modules += tmp_module->getModules();
+    }
 }
 
 std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string input)
@@ -31,23 +35,23 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
 
     std::unique_ptr<CAS::AbstractArithmetic> result;
     for (const auto &terminal : modules.terminals) {
-        result = terminal->parse(input);
+        result = terminal.parse(input);
         if (result) return result;
     }
 
     level = 0;
     unsigned int op_pos = 0;
-    std::unique_ptr<AbstractOperator> best_op_match = nullptr;
+    const OperatorModule *best_op_match = nullptr;
 
     for (auto i = input.rbegin(); i != input.rend(); ++i) {
         if (*i == '(' || *i == '[' || *i == '{')  level--;
         else if (*i == ')' || *i == ']' || *i == '}') level++;
         else if (level == 0) {
             for (const auto &it_op : modules.operators) {
-                if (it_op->matches(std::string(1, *i))) {
-                    if (it_op->priority() == 0) return it_op->parse(parse(input.substr(0, input.rend() - i - 1)), parse(input.substr(input.rend() - i, i - input.rbegin())));
-                    else if (best_op_match == nullptr || it_op->priority() < best_op_match->priority()){
-                        best_op_match.reset(it_op.get());
+                if (it_op.matches(std::string(1, *i))) {
+                    if (it_op.priority() == 0) return it_op.parse(parse(input.substr(0, input.rend() - i - 1)), parse(input.substr(input.rend() - i, i - input.rbegin())));
+                    else if (best_op_match == nullptr || it_op.priority() < best_op_match->priority()){
+                        best_op_match = &it_op;
                         op_pos = input.rend() - i - 1;
                     }
                 }
@@ -60,6 +64,6 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
     unsigned int pos_parenthesis = input.find_first_of('(');
     std::string identifier = input.substr(0, pos_parenthesis);
     for (const auto &it_func : modules.functions)
-        if (it_func->matches(identifier)) return it_func->parse(parse(input.substr(pos_parenthesis + 1, input.length() - pos_parenthesis - 1)));
+        if (it_func.matches(identifier)) return it_func.parse(parse(input.substr(pos_parenthesis + 1, input.length() - pos_parenthesis - 1)));
     return nullptr;
 }
