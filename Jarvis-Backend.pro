@@ -1,3 +1,6 @@
+
+QMAKE_CXXFLAGS += -std=c++11
+
 QT       += core network
 QT       -= gui
 
@@ -9,9 +12,9 @@ TEMPLATE = app
 
 #include(../../qt-solutions/qtservice/src/qtservice.pri)
 
-QMAKE_CXXFLAGS += -std=c++11
 
-#LIBS += ../Framework/debug/libJarvis-Framework.a
+
+LIBS += ../../../QtProjects/Jarvis/Framework/Jarvis-Framework/debug/libJarvis-Framework.a
 
 SOURCES += main.cpp \
     JarvisService.cpp \
@@ -19,7 +22,8 @@ SOURCES += main.cpp \
     ExpressionParser.cpp \
     DemoModules.cpp \
     ClientConnection.cpp \
-    ModulePackage.cpp
+    ModulePackage.cpp \
+    Scope.cpp
 
 HEADERS += \
     JarvisService.h \
@@ -34,4 +38,5 @@ HEADERS += \
     ModulePackage.h \
     ParserModules.h \
     ParserModule.h \
-    ClientConnection.h
+    ClientConnection.h \
+    Scope.h

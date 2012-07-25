@@ -1,6 +1,7 @@
 #include "ExpressionParser.h"
 #include "DemoModules.h"
 #include <string>
+#include <QDebug>
 
 ExpressionParser::ExpressionParser(const QDir &module_dir)
 {
@@ -9,6 +10,24 @@ ExpressionParser::ExpressionParser(const QDir &module_dir)
         ModulePackage *tmp_module = new ModulePackage(new QFile(file)) ;
         module_pkgs.append(*tmp_module);
         modules += tmp_module->getModules();
+    }
+    qDebug() << "Parser initialized" << endl;
+    qDebug() << "Package Name\tModule Name\tModule Description";
+    qDebug() << "";
+    for (const auto &modpkg : module_pkgs) {
+        qDebug() << modpkg.name;
+        qDebug() << "\tTerminals:";
+        for (const auto &mod : modpkg.modules.terminals) {
+            qDebug() << "\t\t" << mod.name << "\t" << mod.description;
+        }
+        qDebug() << "\tOperators:";
+        for (const auto &mod : modpkg.modules.operators) {
+            qDebug() << "\t\t" << mod.name << "\t" << mod.description;
+        }
+        qDebug() << "\tFunctions:";
+        for (const auto &mod : modpkg.modules.functions) {
+            qDebug() << "\t\t" << mod.name << "\t" << mod.description;
+        }
     }
 }
 

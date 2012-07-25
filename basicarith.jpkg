@@ -1,0 +1,14 @@
+Addition : Operator
+{
+    description: adds things together
+    lib: D:\Users\Alexander\Documents\gitProjects\Jarvis\Backend\Modules\debug\basicarith.dll
+    matches: +
+    priority: 3
+    associativity: left
+}
+
+Number : Terminal
+{
+    description: just integers
+    lib: D:\Users\Alexander\Documents\gitProjects\Jarvis\Backend\Modules\debug\basicarith.dll
+}

@@ -13,7 +13,7 @@ private:
     FunctionInterface interface;
 
 public:
-    FunctionModule(const ParserModule &parent_pkg, const FunctionInterface &interface) : ParserModule(parent_pkg), interface(interface) {};
+    FunctionModule(const QString &name, const QString &description, const ModulePackage &parent_pkg, const FunctionInterface &interface) : ParserModule(name, description, parent_pkg), interface(interface) {};
 
     inline bool matches(std::string candidate) const { return interface.matches(candidate); };
     inline std::unique_ptr<CAS::AbstractArithmetic> parse(std::unique_ptr<CAS::AbstractArithmetic> arg) const { return interface.parse(std::forward<std::unique_ptr<CAS::AbstractArithmetic>>(arg));};

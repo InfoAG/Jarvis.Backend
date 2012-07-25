@@ -12,7 +12,7 @@ private:
     OperatorInterface interface;
 
 public:
-    OperatorModule(const ParserModule &parent_pkg, const OperatorInterface &interface) : ParserModule(parent_pkg), interface(interface) {};
+    OperatorModule(const QString &name, const QString &description, const ModulePackage &parent_pkg, const OperatorInterface &interface) : ParserModule(name, description, parent_pkg), interface(interface) {};
 
     inline bool matches(std::string candidate) const { return interface.matches(candidate); };
     inline unsigned int priority() const { return interface.priority(); };

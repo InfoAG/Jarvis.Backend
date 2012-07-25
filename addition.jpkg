@@ -1,9 +1,0 @@
-AdditionExpression : Operator
-{
-    description: “adds things together”,
-    lib: “basicarithmetic.jbin”,
-    matches: “+”,
-    priority: 3,
-    associativity: “left”,
-    parse: ! //< bedeutet aus lib laden pl0x
-}

@@ -3,6 +3,8 @@
 
 #include <QFile>
 #include <string>
+#include <map>
+#include <QLibrary>
 #include "ParserModules.h"
 
 class ModulePackage
@@ -12,9 +14,21 @@ public:
 
     const ParserModules &getModules() const { return modules; };
 
-private:
-    std::string name;
+//private:
+    QString name;
     ParserModules modules;
+    enum {
+        HEAD,
+        BRACE,
+        BODY
+    } state = HEAD;
+
+    enum {
+        OPERATOR,
+        FUNCTION,
+        TERMINAL
+    } type;
+
 };
 
 #endif // MODULEPACKAGE_H

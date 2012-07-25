@@ -13,3 +13,6 @@
 
 # Editor junk / autosaves
 *.pro.user*
+Makefile*
+debug/
+release/

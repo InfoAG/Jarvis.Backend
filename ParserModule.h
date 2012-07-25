@@ -8,9 +8,11 @@ class ModulePackage;
 class ParserModule
 {
 public:
-    ParserModule(const ModulePackage &parent_pkg) : parent_pkg(parent_pkg) {};
+    ParserModule(const QString &name, const QString &description, const ModulePackage &parent_pkg) : name(name), description(description), parent_pkg(parent_pkg) {};
 
-private:
+//private:
+    QString name;
+    QString description;
     const ModulePackage &parent_pkg;
 };
 

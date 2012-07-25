@@ -1,0 +1,12 @@
+#ifndef BASICARITH_GLOBAL_H
+#define BASICARITH_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(BASICARITH_LIBRARY)
+#  define BASICARITHSHARED_EXPORT Q_DECL_EXPORT
+#else
+#  define BASICARITHSHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // BASICARITH_GLOBAL_H
