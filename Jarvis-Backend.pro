@@ -40,3 +40,6 @@ HEADERS += \
     ParserModule.h \
     ClientConnection.h \
     Scope.h
+
+OTHER_FILES += \
+    basicarith.jpkg

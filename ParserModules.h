@@ -1,10 +1,10 @@
 #ifndef PARSERMODULES_H
 #define PARSERMODULES_H
 
-#include "FunctionModule.h"
-#include "OperatorModule.h"
-#include "TerminalModule.h"
 #include "../Framework/Container/SmartList.h"
+#include "TerminalModule.h"
+#include "OperatorModule.h"
+#include "FunctionModule.h"
 
 struct ParserModules
 {

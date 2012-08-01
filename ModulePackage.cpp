@@ -45,7 +45,6 @@ ModulePackage::ModulePackage(QFile *file)
                             break;
                         case TERMINAL:
                             modules.terminals.append(TerminalModule(head.at(0), description, *this, (std::unique_ptr<CAS::AbstractArithmetic>(*)(std::string))lib.resolve(head[0] + "_maker")));
-                            qDebug() << lib.errorString();
                             break;
                         }
                         state = HEAD;
@@ -74,6 +73,7 @@ ModulePackage::ModulePackage(QFile *file)
                                 };
                         } else if (key == "lib") {
                             lib.setFileName(value);
+                            std::string dbg = QString(head[0]).toStdString();
                             if (type == OPERATOR) opInter = ((OperatorInterface(*)())QLibrary("D:\\Users\\Alexander\\Documents\\gitProjects\\Jarvis\\Backend\\Modules\\debug\\basicarith.dll").resolve(head[0] + "_maker"))();
                             else if (type == FUNCTION) funcInter = ((FunctionInterface(*)())lib.resolve(head[0] + "_maker"))();
                         }

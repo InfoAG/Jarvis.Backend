@@ -2,10 +2,8 @@
 #define FUNCTIONMODULE_H
 
 #include "../Framework/Arithmetic/AbstractArithmetic.h"
-#include "ParserModule.h"
-#include "FunctionInterface.h"
-#include "ParserModule.h"
 #include <string>
+#include "FunctionInterface.h"
 
 class FunctionModule : public ParserModule
 {

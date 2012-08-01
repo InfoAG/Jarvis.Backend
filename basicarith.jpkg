@@ -3,12 +3,45 @@ Addition : Operator
     description: adds things together
     lib: D:\Users\Alexander\Documents\gitProjects\Jarvis\Backend\Modules\debug\basicarith.dll
     matches: +
-    priority: 3
+    priority: 0
+    associativity: left
+}
+
+Multiplication : Operator
+{
+    description: dude read the name
+    lib: D:\Users\Alexander\Documents\gitProjects\Jarvis\Backend\Modules\debug\basicarith.dll
+    matches: *
+    priority: 1
+    associativity: left
+}
+
+Division : Operator
+{
+    description: dude i'm serious
+    lib: D:\Users\Alexander\Documents\gitProjects\Jarvis\Backend\Modules\debug\basicarith.dll
+    matches: /
+    priority: 1
+    associativity: left
+}
+
+Subtraction : Operator
+{
+    description: are you retarded or something?
+    lib: D:\Users\Alexander\Documents\gitProjects\Jarvis\Backend\Modules\debug\basicarith.dll
+    matches: -
+    priority: 0
     associativity: left
 }
 
 Number : Terminal
 {
     description: just integers
+    lib: D:\Users\Alexander\Documents\gitProjects\Jarvis\Backend\Modules\debug\basicarith.dll
+}
+
+Pi : Terminal
+{
+    description: circles. many of them.
     lib: D:\Users\Alexander\Documents\gitProjects\Jarvis\Backend\Modules\debug\basicarith.dll
 }

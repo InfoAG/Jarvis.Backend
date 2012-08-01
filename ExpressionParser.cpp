@@ -6,7 +6,6 @@
 ExpressionParser::ExpressionParser(const QDir &module_dir)
 {
     for (const auto &file : module_dir.entryList(QStringList("*.jpkg"), QDir::Files)) {
-        std::string dbg = file.toStdString();
         ModulePackage *tmp_module = new ModulePackage(new QFile(file)) ;
         module_pkgs.append(*tmp_module);
         modules += tmp_module->getModules();
@@ -62,17 +61,14 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
     unsigned int op_pos = 0;
     const OperatorModule *best_op_match = nullptr;
 
-    for (auto i = input.rbegin(); i != input.rend(); ++i) {
+    for (std::string::iterator i = input.begin(); i != input.end(); ++i) {
         if (*i == '(' || *i == '[' || *i == '{')  level--;
         else if (*i == ')' || *i == ']' || *i == '}') level++;
         else if (level == 0) {
             for (const auto &it_op : modules.operators) {
-                if (it_op.matches(std::string(1, *i))) {
-                    if (it_op.priority() == 0) return it_op.parse(parse(input.substr(0, input.rend() - i - 1)), parse(input.substr(input.rend() - i, i - input.rbegin())));
-                    else if (best_op_match == nullptr || it_op.priority() < best_op_match->priority()){
-                        best_op_match = &it_op;
-                        op_pos = input.rend() - i - 1;
-                    }
+                if (it_op.matches(std::string(1, *i)) && (best_op_match == nullptr || it_op.priority() < best_op_match->priority() || (it_op.priority() == best_op_match->priority() && it_op.associativity() == OperatorInterface::LEFT))) {
+                    best_op_match = &it_op;
+                    op_pos = i - input.begin();
                 }
             }
         }
@@ -84,5 +80,5 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
     std::string identifier = input.substr(0, pos_parenthesis);
     for (const auto &it_func : modules.functions)
         if (it_func.matches(identifier)) return it_func.parse(parse(input.substr(pos_parenthesis + 1, input.length() - pos_parenthesis - 1)));
-    return nullptr;
+    throw "Error: Could not parse input.";
 }

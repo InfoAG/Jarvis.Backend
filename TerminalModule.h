@@ -2,8 +2,8 @@
 #define TERMINALMODULE_H
 
 #include "../Framework/Arithmetic/AbstractArithmetic.h"
-#include "ParserModule.h"
 #include <string>
+#include "ParserModule.h"
 
 class TerminalModule : public ParserModule
 {

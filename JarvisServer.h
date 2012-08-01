@@ -6,10 +6,10 @@
 #include <QList>
 #include <QMap>
 #include <QDir>
-#include "ExpressionParser.h"
+#include <memory>
 #include "Scope.h"
-
-class ClientConnection;
+#include "ExpressionParser.h"
+#include "ClientConnection.h"
 
 class JarvisServer : public QTcpServer
 {
@@ -17,20 +17,22 @@ class JarvisServer : public QTcpServer
 
 public:
     JarvisServer();
-/*
-    inline void newScope(QString name) { scopes.append(Scope(name));};
-    void sendMsgToScope(QString name) const;
-    void getScopeUsers(QString name) const;
-*/
-    friend class ClientConnection;
+
+    bool login(const QString &name, const QString &pwd) const { qDebug() << name << pwd; return true; };
+    QList<QString> getScopeNames() const { return scopes.keys(); };
+
+    const Scope &enterScope(ClientConnection *client, QString name);
+    void leaveScope(ClientConnection *sender, QString name);
+    void msgToScope(ClientConnection *sender, QString scope, QString msg) const;
+    uint version() const { return settings.value("Version").toUInt(); };
 
 protected:
     void incomingConnection(int socketfd);
 
 private:
     QSettings settings;
-    ExpressionParser *parser;
-    QList<ClientConnection*> clients;
+    std::unique_ptr<ExpressionParser> parser;
+    QList<std::shared_ptr<ClientConnection> > clients;
     QMap<QString, Scope> scopes;
 };
 

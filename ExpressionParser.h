@@ -3,10 +3,10 @@
 
 #include <string>
 #include "../Framework/Container/SmartList.h"
+#include "../Framework/Arithmetic/AbstractArithmetic.h"
 #include <QDir>
-
-#include "ModulePackage.h"
 #include "ParserModules.h"
+#include "ModulePackage.h"
 
 class ExpressionParser
 {
