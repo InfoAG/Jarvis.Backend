@@ -26,8 +26,8 @@ void Scope::sendMsg(const QString &sender, const QString &msg) const
 
 void Scope::addClient(ClientConnection *client)
 {
-    std::for_each(clients.begin(), clients.end(), [&](ClientConnection *client) {
-            client->enterClient(name, client->name());
+    std::for_each(clients.begin(), clients.end(), [&](ClientConnection *it_client) {
+            it_client->enterClient(name, client->name());
         });
     clients.append(client);
 }

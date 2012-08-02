@@ -71,7 +71,7 @@ void ClientConnection::readyRead()
             break;
         case EnterScope:
             if (receiveString(buffer)) {
-                server->enterScope(this, buffer);//.getInitInfo(stream);
+                server->enterScope(this, buffer).getInitInfo(stream);
                 setLoop();
             } else return;
             break;

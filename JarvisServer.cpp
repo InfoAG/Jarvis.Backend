@@ -19,8 +19,8 @@ const Scope &JarvisServer::enterScope(ClientConnection *client, QString name)
 {
     if (! scopes.contains(name)) {
         scopes.insert(name, Scope(name));
-        std::for_each(clients.begin(), clients.end(), [&](const std::shared_ptr<ClientConnection> client) {
-                client->newScope(name);
+        std::for_each(clients.begin(), clients.end(), [&](const std::shared_ptr<ClientConnection> it_client) {
+                if (it_client.get() != client) it_client->newScope(name);
             });
     }
     scopes[name].addClient(client);
