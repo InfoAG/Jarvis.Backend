@@ -10,7 +10,8 @@
 class ModulePackage
 {
 public:
-    ModulePackage(QFile *file);
+    ModulePackage() {}
+    ModulePackage(std::unique_ptr<QFile> file);
 
     const ParserModules &getModules() const { return modules; };
 

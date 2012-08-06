@@ -42,6 +42,8 @@ void ClientConnection::readyRead()
             case 1: connectionState = LeaveScope; break;
             case 2: connectionState = ClientMsg; break;
             case 3: oStream << server->getParser()->getModulePkgs(); break;
+            case 4: connectionState = UnloadPkg; break;
+            case 5: connectionState = LoadPkg; break;
             }
             break;
         case EnterScope:
@@ -65,6 +67,22 @@ void ClientConnection::readyRead()
             if (iStream.status() == QDataStream::Ok) {
                 resetStreamBuf();
                 server->msgToScope(this, buffer, buffer_2);
+                setLoop();
+            } else return;
+            break;
+        case UnloadPkg:
+            iStream >> buffer;
+            if (iStream.status() == QDataStream::Ok) {
+                resetStreamBuf();
+                server->getParser()->unload(buffer);
+                setLoop();
+            } else return;
+            break;
+        case LoadPkg:
+            iStream >> buffer;
+            if (iStream.status() == QDataStream::Ok) {
+                resetStreamBuf();
+                server->getParser()->load(buffer);
                 setLoop();
             } else return;
             break;

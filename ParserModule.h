@@ -12,6 +12,8 @@ class ParserModule
 public:
     ParserModule(const QString &name, const QString &description, const ModulePackage *parent_pkg) : name(name), description(description), parent_pkg(parent_pkg) {};
 
+    bool inPkg(ModulePackage *pkg) const { return parent_pkg == pkg; }
+
     ParserModule &operator=(const ParserModule &other) { name = other.name; description = other.description; parent_pkg = other.parent_pkg; return *this; }
 
 //private:

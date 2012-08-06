@@ -6,28 +6,53 @@
 ExpressionParser::ExpressionParser(const QDir &module_dir)
 {
     for (const auto &file : module_dir.entryList(QStringList("*.jpkg"), QDir::Files)) {
-        ModulePackage *tmp_module = new ModulePackage(new QFile(file)) ;
-        module_pkgs.append(*tmp_module);
-        modules += tmp_module->getModules();
+        load(file);
     }
     qDebug() << "Parser initialized" << endl;
     qDebug() << "Package Name\tModule Name\tModule Description";
     qDebug() << "";
-    for (const auto &modpkg : module_pkgs) {
-        qDebug() << modpkg.name;
+    for (const auto &modpkg : modulePkgs) {
+        qDebug() << modpkg->name;
         qDebug() << "\tTerminals:";
-        for (const auto &mod : modpkg.modules.terminals) {
-            qDebug() << "\t\t" << mod.name << "\t" << mod.description;
+        for (const auto &mod : modpkg->modules.terminals) {
+            qDebug() << "\t\t" << mod.name << "\t" << mod.description << "\t";
         }
         qDebug() << "\tOperators:";
-        for (const auto &mod : modpkg.modules.operators) {
-            qDebug() << "\t\t" << mod.name << "\t" << mod.description;
+        for (const auto &mod : modpkg->modules.operators) {
+            qDebug() << "\t\t" << mod.name << "\t" << mod.description << "\t";
         }
         qDebug() << "\tFunctions:";
-        for (const auto &mod : modpkg.modules.functions) {
-            qDebug() << "\t\t" << mod.name << "\t" << mod.description;
+        for (const auto &mod : modpkg->modules.functions) {
+            qDebug() << "\t\t" << mod.name << "\t" << mod.description << "\t";
         }
     }
+}
+
+void ExpressionParser::unload(const QString &pkgName)
+{
+    auto pkg = std::find_if(modulePkgs.begin(), modulePkgs.end(), [&](const std::shared_ptr<ModulePackage> &it_pkg) {
+            return it_pkg->name == pkgName;
+        });
+    modules.removePkg(pkg->get());
+    modulePkgs.erase(pkg);
+    qDebug() << "UnloadPkg(" << pkgName << ")";
+}
+
+void ExpressionParser::load(const QString &pkgName)
+{
+    auto tmp_module(std::make_shared<ModulePackage>(std::unique_ptr<QFile>(new QFile(pkgName))));
+    modulePkgs.append(tmp_module);
+    modules += tmp_module->getModules();
+    qDebug() << "LoadPkg(" << pkgName << ")";
+}
+
+QVector<ModulePackage> ExpressionParser::getModulePkgs() const
+{
+    QVector<ModulePackage> result(modulePkgs.size());
+    std::transform(modulePkgs.begin(), modulePkgs.end(), result.begin(), [](const std::shared_ptr<ModulePackage> &pkg) {
+            return *pkg;
+        });
+    return result;
 }
 
 std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string input)
@@ -39,9 +64,9 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
         deleted = false;
         if (input.at(0) == '(' && input.at(input.length() - 1) == ')') {
             level = 0;
-            for (const auto i : input) {
-                if (i == '(') level++;
-                else if (i == ')' && --level == -1) break;
+            for (auto it = input.begin() + 1; it != input.end() - 1; ++it) {
+                if (*it == '(') level++;
+                else if (*it == ')' && --level == -1) break;
             }
             if (level != -1) {
                 input.erase(0, 1);

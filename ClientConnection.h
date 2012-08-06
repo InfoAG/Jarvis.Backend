@@ -17,7 +17,9 @@ private:
         Loop,
         EnterScope,
         LeaveScope,
-        ClientMsg
+        ClientMsg,
+        UnloadPkg,
+        LoadPkg
     } connectionState = Virgin;
 
     QTcpSocket socket;

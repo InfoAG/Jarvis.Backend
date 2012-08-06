@@ -21,7 +21,7 @@ public:
 
     bool login(const QString &name, const QString &pwd) const { qDebug() << "ClientLogin(" << name << ", " << pwd << ")"; return true; };
     QList<QString> getScopeNames() const { return scopes.keys(); };
-    const ExpressionParser *getParser() const { return parser.get(); }
+    ExpressionParser *getParser() const { return parser.get(); }
 
     const Scope &enterScope(ClientConnection *client, QString scope);
     void leaveScope(ClientConnection *sender, QString scope);

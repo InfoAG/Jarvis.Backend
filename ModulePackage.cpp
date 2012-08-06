@@ -3,7 +3,7 @@
 //#include "../Framework/Arithmetic/EvalInfo.h"
 #include <QDebug>
 
-ModulePackage::ModulePackage(QFile *file)
+ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
 {
     OperatorInterface opInter;
     FunctionInterface funcInter;

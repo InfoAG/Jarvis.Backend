@@ -13,6 +13,8 @@ struct ParserModules
     QList<OperatorModule> operators;
     QList<FunctionModule> functions;
 
+    void removePkg(ModulePackage *pkg);
+
     ParserModules &operator+=(const ParserModules &other) { terminals += other.terminals; operators += other.operators; functions += other.functions; return *this; }
 };
 

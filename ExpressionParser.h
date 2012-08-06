@@ -11,12 +11,13 @@ class ExpressionParser
 {
 private:
     ParserModules modules;
-    QList<ModulePackage> module_pkgs;
+    QList<std::shared_ptr<ModulePackage> > modulePkgs;
 
 public:
     ExpressionParser(const QDir &module_dir);
-    //ExpressionParser(ParserModules &&modules) : modules(std::forward<ParserModules>(modules)) {};
-    const QList<ModulePackage> &getModulePkgs() const { return module_pkgs; }
+    void unload(const QString &pkgName);
+    void load(const QString &pkgName);
+    QVector<ModulePackage> getModulePkgs() const;
 
     std::unique_ptr<CAS::AbstractArithmetic> parse(std::string input);
 };
