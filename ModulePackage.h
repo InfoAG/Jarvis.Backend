@@ -31,4 +31,6 @@ public:
 
 };
 
+QDataStream &operator<<(QDataStream &stream, const ModulePackage &pkg);
+
 #endif // MODULEPACKAGE_H

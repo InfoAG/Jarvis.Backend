@@ -9,7 +9,8 @@
 #include <memory>
 #include "Scope.h"
 #include "ExpressionParser.h"
-#include "ClientConnection.h"
+
+class ClientConnection;
 
 class JarvisServer : public QTcpServer
 {
@@ -18,13 +19,15 @@ class JarvisServer : public QTcpServer
 public:
     JarvisServer();
 
-    bool login(const QString &name, const QString &pwd) const { qDebug() << name << pwd; return true; };
+    bool login(const QString &name, const QString &pwd) const { qDebug() << "ClientLogin(" << name << ", " << pwd << ")"; return true; };
     QList<QString> getScopeNames() const { return scopes.keys(); };
+    const ExpressionParser *getParser() const { return parser.get(); }
 
-    const Scope &enterScope(ClientConnection *client, QString name);
-    void leaveScope(ClientConnection *sender, QString name);
+    const Scope &enterScope(ClientConnection *client, QString scope);
+    void leaveScope(ClientConnection *sender, QString scope);
     void msgToScope(ClientConnection *sender, QString scope, QString msg) const;
     uint version() const { return settings.value("Version").toUInt(); };
+    void disconnected(ClientConnection *client);
 
 protected:
     void incomingConnection(int socketfd);

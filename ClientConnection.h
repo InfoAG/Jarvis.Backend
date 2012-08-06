@@ -4,57 +4,51 @@
 #include <QTcpSocket>
 #include <QDataStream>
 #include <QString>
+#include "JarvisServer.h"
 
-class JarvisServer;
-
-class ClientConnection : public QTcpSocket
+class ClientConnection : public QObject
 {
     Q_OBJECT
 
 private:
     enum {
         Virgin,
-        AuthType,
-        UserName,
-        Password,
+        Auth,
         Loop,
         EnterScope,
         LeaveScope,
-        ClientMsgScope,
         ClientMsg
-    } state = Virgin;
+    } connectionState = Virgin;
 
-    enum {
-        StringSize,
-        String
-    } stringReceiveState = StringSize;
-
-    QDataStream stream;
+    QTcpSocket socket;
     JarvisServer *server;
+    QDataStream iStream, oStream, sendQueueStream;
     QString _name;
     QString buffer;
+    QByteArray streamBuf;
     quint32 nextBlockSize;
     quint8 type;
     QByteArray sendQueue;
-    QDataStream sendQueueStream;
 
-    void setLoop() { state = Loop; dispatchQueue(); }
-    void addedToQueue() { if (state == Loop) dispatchQueue(); }
-    void dispatchQueue() { write(sendQueue); sendQueue.clear(); sendQueueStream.device()->reset(); }
-    bool receiveString(QString &dest);
+    void setLoop() { connectionState = Loop; dispatchQueue(); }
+    void addedToQueue() { if (connectionState == Loop) dispatchQueue(); }
+    void dispatchQueue() { socket.write(sendQueue); sendQueue.clear(); sendQueueStream.device()->reset(); }
+    quint8 pop_front() { quint8 result(streamBuf.at(0)); streamBuf.remove(0, 1); return result; }
+    void resetStreamBuf() { streamBuf.remove(0, iStream.device()->pos()); }
 
 public:
-    ClientConnection(JarvisServer *server);
+    ClientConnection(JarvisServer *server, int socketfd);
 
     QString name() const { return _name; };
     void sendMsg(const QString &scope, const QString &sender, const QString &msg) { sendQueueStream << static_cast<quint8>(4) << scope << sender << msg; addedToQueue(); };
     void newScope(const QString &name) { sendQueueStream << static_cast<quint8>(3) << name; addedToQueue(); };
     void enterClient(const QString &scope, const QString &name) { sendQueueStream << static_cast<quint8>(0) << scope << name; addedToQueue(); }
     void leaveClient(const QString &scope, const QString &name) { sendQueueStream << static_cast<quint8>(5) << scope << name; addedToQueue(); }
+    QHostAddress getAddress() const { return socket.peerAddress(); }
 
 private slots:
     void readyRead();
-    void disconnected() {};
+    void disconnected() { server->disconnected(this); }
 };
 
 #endif // CLIENTCONNECTION_H

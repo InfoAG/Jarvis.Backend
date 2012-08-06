@@ -38,13 +38,13 @@ ModulePackage::ModulePackage(QFile *file)
                     if (line == "}") {
                         switch (type) {
                         case OPERATOR:
-                            modules.operators.append(OperatorModule(head.at(0), description, *this, opInter));
+                            modules.operators.append(OperatorModule(head.at(0), description, this, opInter));
                             break;
                         case FUNCTION:
-                            modules.functions.append(FunctionModule(head.at(0), description, *this, funcInter));
+                            modules.functions.append(FunctionModule(head.at(0), description, this, funcInter));
                             break;
                         case TERMINAL:
-                            modules.terminals.append(TerminalModule(head.at(0), description, *this, (std::unique_ptr<CAS::AbstractArithmetic>(*)(std::string))lib.resolve(head[0] + "_maker")));
+                            modules.terminals.append(TerminalModule(head.at(0), description, this, (std::unique_ptr<CAS::AbstractArithmetic>(*)(std::string))lib.resolve(head[0] + "_maker")));
                             break;
                         }
                         state = HEAD;
@@ -82,4 +82,10 @@ ModulePackage::ModulePackage(QFile *file)
             }
         }
     }
+}
+
+QDataStream &operator<<(QDataStream &stream, const ModulePackage &pkg)
+{
+    stream << pkg.name << pkg.modules;
+    return stream;
 }

@@ -1,4 +1,5 @@
 #include "JarvisServer.h"
+#include "ClientConnection.h"
 #include <iostream>
 
 JarvisServer::JarvisServer() : settings("InfoAG", "Jarvis.Server")
@@ -7,41 +8,45 @@ JarvisServer::JarvisServer() : settings("InfoAG", "Jarvis.Server")
     settings.setValue("Version", 1);
     listen(QHostAddress::Any, 4200);
     parser = std::unique_ptr<ExpressionParser>(new ExpressionParser(QDir(settings.value("ModulePath").toString())));
-    /*
-    std::string input;
-    for (;;) {
-        std::cin >> input;
-        std::cout << parser->parse(input)->eval(CAS::EvalInfo())->getString() << std::endl;
-    }*/
 }
 
-const Scope &JarvisServer::enterScope(ClientConnection *client, QString name)
+const Scope &JarvisServer::enterScope(ClientConnection *client, QString scope)
 {
-    if (! scopes.contains(name)) {
-        scopes.insert(name, Scope(name));
-        std::for_each(clients.begin(), clients.end(), [&](const std::shared_ptr<ClientConnection> it_client) {
-                if (it_client.get() != client) it_client->newScope(name);
+    if (! scopes.contains(scope)) {
+        scopes.insert(scope, Scope(scope, parser.get()));
+        std::for_each(clients.begin(), clients.end(), [&](const std::shared_ptr<ClientConnection> &it_client) {
+                if (it_client.get() != client) it_client->newScope(scope);
             });
     }
-    scopes[name].addClient(client);
-    return scopes[name];
+    scopes[scope].addClient(client);
+    qDebug() << "ClientEnterScope(" << client->name() << ", " << scope << ")";
+    return scopes[scope];
 }
 
-void JarvisServer::leaveScope(ClientConnection *sender, QString name)
+void JarvisServer::leaveScope(ClientConnection *sender, QString scope)
 {
-    scopes[name].removeClient(sender);
+    scopes[scope].removeClient(sender);
+    qDebug() << "ClientLeaveScope(" << sender->name() << ", " << scope << ")";
 }
 
 void JarvisServer::msgToScope(ClientConnection *sender, QString scope, QString msg) const
 {
-    qDebug() << sender->name() << scope << msg;
     scopes[scope].sendMsg(sender->name(), msg);
-    scopes[scope].sendMsg("Jarvis", QString::fromStdString(parser->parse(msg.toStdString())->eval(CAS::EvalInfo())->getString()));
+    //scopes[scope].sendMsg("Jarvis", QString::fromStdString(parser->parse(msg.toStdString())->eval(CAS::EvalInfo())->getString()));
+    qDebug() << "MsgToScope(" << sender->name() << ", " << scope << ", " << msg << ")";
+}
+
+void JarvisServer::disconnected(ClientConnection *client)
+{
+    QList<Scope> scopeValues = scopes.values();
+    std::for_each(scopeValues.begin(), scopeValues.end(), [&](Scope &scope) { scope.removeClient(client); });
+    clients.erase(std::find_if(clients.begin(), clients.end(), [&](const std::shared_ptr<ClientConnection> &it_client) { return it_client.get() == client; }));
+    qDebug() << "ClientDisconnect(" << client->name() << ")";
 }
 
 void JarvisServer::incomingConnection(int socketfd)
 {
-    auto connection = std::shared_ptr<ClientConnection>(new ClientConnection(this));
-    connection->setSocketDescriptor(socketfd);
-    clients.append(connection);
+    auto client = std::shared_ptr<ClientConnection>(new ClientConnection(this, socketfd), std::mem_fun(&QObject::deleteLater));
+    clients.append(client);
+    qDebug() << "NewConnection(" << client->getAddress().toString() << ")";
 }

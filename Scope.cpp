@@ -1,7 +1,8 @@
 #include "Scope.h"
+#include "ClientConnection.h"
 
 void Scope::getInitInfo(QDataStream &stream) const
-{
+{   
     stream << static_cast<quint32>(clients.length());
     std::for_each(clients.begin(), clients.end(), [&](ClientConnection *client) {
             stream << client->name();
@@ -19,8 +20,10 @@ void Scope::removeClient(ClientConnection *client)
 
 void Scope::sendMsg(const QString &sender, const QString &msg) const
 {
+    QString evalRes = QString::fromStdString(parser->parse(msg.toStdString())->eval(scope_info)->getString());
     std::for_each(clients.begin(), clients.end(), [&](ClientConnection *client) {
             client->sendMsg(name, sender, msg);
+            client->sendMsg(name, "Jarvis", evalRes);
         });
 }
 

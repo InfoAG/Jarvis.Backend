@@ -23,7 +23,9 @@ SOURCES += main.cpp \
     DemoModules.cpp \
     ClientConnection.cpp \
     ModulePackage.cpp \
-    Scope.cpp
+    Scope.cpp \
+    ParserModules.cpp \
+    ParserModule.cpp
 
 HEADERS += \
     JarvisService.h \
