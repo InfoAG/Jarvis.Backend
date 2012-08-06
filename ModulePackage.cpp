@@ -74,7 +74,7 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
                         } else if (key == "lib") {
                             lib.setFileName(value);
                             std::string dbg = QString(head[0]).toStdString();
-                            if (type == OPERATOR) opInter = ((OperatorInterface(*)())QLibrary("D:\\Users\\Alexander\\Documents\\gitProjects\\Jarvis\\Backend\\Modules\\debug\\basicarith.dll").resolve(head[0] + "_maker"))();
+                            if (type == OPERATOR) opInter = ((OperatorInterface(*)())lib.resolve(head[0] + "_maker"))();
                             else if (type == FUNCTION) funcInter = ((FunctionInterface(*)())lib.resolve(head[0] + "_maker"))();
                         }
                     }
