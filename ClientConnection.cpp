@@ -47,6 +47,7 @@ void ClientConnection::readyRead()
             case 2: connectionState = ClientMsg; break;
             case 3: connectionState = LoadPkg; break;
             case 4: connectionState = UnloadPkg; break;
+            case 5: connectionState = DeleteScope; break;
             }
             break;
         case EnterScope: {
@@ -101,6 +102,15 @@ void ClientConnection::readyRead()
                 } else return;
             }
             break;
+        case DeleteScope: {
+                QString scope;
+                iStream >> scope;
+                if (iStream.status() == QDataStream::Ok) {
+                    resetStreamBuf();
+                    connectionState = Loop;
+                    server->deleteScope(scope);
+                }
+            }
         }
         if (socket.bytesAvailable()) streamBuf += socket.readAll();
     } while (! streamBuf.isEmpty());

@@ -28,6 +28,7 @@ public:
     void msgToScope(ClientConnection *sender, QString scope, QString msg) const;
     uint version() const { return settings.value("Version").toUInt(); };
     void disconnected(ClientConnection *client);
+    void deleteScope(const QString &name);
 
 protected:
     void incomingConnection(int socketfd);

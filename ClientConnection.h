@@ -19,7 +19,8 @@ private:
         LeaveScope,
         ClientMsg,
         UnloadPkg,
-        LoadPkg
+        LoadPkg,
+        DeleteScope
     } connectionState = Virgin;
 
     QTcpSocket socket;
@@ -39,6 +40,7 @@ public:
     void newScope(const QString &name) { oStream << static_cast<quint8>(3) << name; };
     void enterClient(const QString &scope, const QString &name) { oStream << static_cast<quint8>(0) << scope << name; }
     void leaveClient(const QString &scope, const QString &name) { oStream << static_cast<quint8>(5) << scope << name; }
+    void deleteScope(const QString &scope) { oStream << static_cast<quint8>(9) << scope; }
     QHostAddress getAddress() const { return socket.peerAddress(); }
 
 private slots:

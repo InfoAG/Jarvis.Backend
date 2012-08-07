@@ -32,7 +32,6 @@ void JarvisServer::leaveScope(ClientConnection *sender, QString scope)
 void JarvisServer::msgToScope(ClientConnection *sender, QString scope, QString msg) const
 {
     scopes[scope].sendMsg(sender->name(), msg);
-    //scopes[scope].sendMsg("Jarvis", QString::fromStdString(parser->parse(msg.toStdString())->eval(CAS::EvalInfo())->getString()));
     qDebug() << "MsgToScope(" << sender->name() << ", " << scope << ", " << msg << ")";
 }
 
@@ -42,6 +41,15 @@ void JarvisServer::disconnected(ClientConnection *client)
     std::for_each(scopeValues.begin(), scopeValues.end(), [&](Scope &scope) { scope.removeClient(client); });
     clients.erase(std::find_if(clients.begin(), clients.end(), [&](const std::shared_ptr<ClientConnection> &it_client) { return it_client.get() == client; }));
     qDebug() << "ClientDisconnect(" << client->name() << ")";
+}
+
+void JarvisServer::deleteScope(const QString &name)
+{
+    std::for_each(clients.begin(), clients.end(), [&](std::shared_ptr<ClientConnection> client) {
+            client->deleteScope(name);
+        });
+    scopes.remove(name);
+    qDebug() << "DeleteScope(" << name << ")";
 }
 
 void JarvisServer::incomingConnection(int socketfd)
