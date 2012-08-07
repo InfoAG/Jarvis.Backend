@@ -5,7 +5,7 @@ QT       += core network
 QT       -= gui
 
 TARGET = Jarvis-Backend
-CONFIG   += console
+CONFIG   += console qtestlib
 CONFIG   -= app_bundle
 
 TEMPLATE = app
@@ -20,7 +20,6 @@ SOURCES += main.cpp \
     JarvisService.cpp \
     JarvisServer.cpp \
     ExpressionParser.cpp \
-    DemoModules.cpp \
     ClientConnection.cpp \
     ModulePackage.cpp \
     Scope.cpp \
@@ -31,7 +30,6 @@ HEADERS += \
     JarvisService.h \
     JarvisServer.h \
     ExpressionParser.h \
-    DemoModules.h \
     FunctionModule.h \
     TerminalModule.h \
     OperatorModule.h \

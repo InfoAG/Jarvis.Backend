@@ -13,8 +13,8 @@ void Scope::getInitInfo(QDataStream &stream) const
 void Scope::removeClient(ClientConnection *client)
 {
     clients.removeOne(client);
-    std::for_each(clients.begin(), clients.end(), [&](ClientConnection *client) {
-            client->leaveClient(name, client->name());
+    std::for_each(clients.begin(), clients.end(), [&](ClientConnection *it_client) {
+            it_client->leaveClient(name, client->name());
         });
 }
 

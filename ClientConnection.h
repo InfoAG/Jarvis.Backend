@@ -24,17 +24,10 @@ private:
 
     QTcpSocket socket;
     JarvisServer *server;
-    QDataStream iStream, oStream, sendQueueStream;
+    QDataStream iStream, oStream;
     QString _name;
-    QString buffer;
     QByteArray streamBuf;
-    quint32 nextBlockSize;
-    quint8 type;
-    QByteArray sendQueue;
 
-    void setLoop() { connectionState = Loop; dispatchQueue(); }
-    void addedToQueue() { if (connectionState == Loop) dispatchQueue(); }
-    void dispatchQueue() { socket.write(sendQueue); sendQueue.clear(); sendQueueStream.device()->reset(); }
     quint8 pop_front() { quint8 result(streamBuf.at(0)); streamBuf.remove(0, 1); return result; }
     void resetStreamBuf() { streamBuf.remove(0, iStream.device()->pos()); }
 
@@ -42,10 +35,10 @@ public:
     ClientConnection(JarvisServer *server, int socketfd);
 
     QString name() const { return _name; };
-    void sendMsg(const QString &scope, const QString &sender, const QString &msg) { sendQueueStream << static_cast<quint8>(4) << scope << sender << msg; addedToQueue(); };
-    void newScope(const QString &name) { sendQueueStream << static_cast<quint8>(3) << name; addedToQueue(); };
-    void enterClient(const QString &scope, const QString &name) { sendQueueStream << static_cast<quint8>(0) << scope << name; addedToQueue(); }
-    void leaveClient(const QString &scope, const QString &name) { sendQueueStream << static_cast<quint8>(5) << scope << name; addedToQueue(); }
+    void sendMsg(const QString &scope, const QString &sender, const QString &msg) { oStream << static_cast<quint8>(4) << scope << sender << msg; };
+    void newScope(const QString &name) { oStream << static_cast<quint8>(3) << name; };
+    void enterClient(const QString &scope, const QString &name) { oStream << static_cast<quint8>(0) << scope << name; }
+    void leaveClient(const QString &scope, const QString &name) { oStream << static_cast<quint8>(5) << scope << name; }
     QHostAddress getAddress() const { return socket.peerAddress(); }
 
 private slots:
