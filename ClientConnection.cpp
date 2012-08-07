@@ -10,9 +10,6 @@ ClientConnection::ClientConnection(JarvisServer *server, int socketfd) : server(
 
 void ClientConnection::readyRead()
 {
-    QString buffer, buffer_2;
-    quint8 byteBuffer;
-
     streamBuf += socket.readAll();
     do {
         iStream.device()->reset();
@@ -87,7 +84,7 @@ void ClientConnection::readyRead()
                 iStream >> pkg;
                 if (iStream.status() == QDataStream::Ok) {
                     resetStreamBuf();
-                    server->getParser()->unload(pkg);
+                    server->unload(pkg);
                     connectionState = Loop;
                 } else return;
             }
@@ -97,7 +94,7 @@ void ClientConnection::readyRead()
                 iStream >> pkg;
                 if (iStream.status() == QDataStream::Ok) {
                     resetStreamBuf();
-                    server->getParser()->load(pkg);
+                    server->load(pkg);
                     connectionState = Loop;
                 } else return;
             }

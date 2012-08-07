@@ -16,7 +16,7 @@ private:
 public:
     ExpressionParser(const QDir &module_dir);
     void unload(const QString &pkgName);
-    void load(const QString &pkgName);
+    std::shared_ptr<ModulePackage> load(const QString &pkgName);
     QVector<ModulePackage> getModulePkgs() const;
 
     std::unique_ptr<CAS::AbstractArithmetic> parse(std::string input);

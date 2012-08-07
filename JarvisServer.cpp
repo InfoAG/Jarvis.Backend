@@ -52,6 +52,24 @@ void JarvisServer::deleteScope(const QString &name)
     qDebug() << "DeleteScope(" << name << ")";
 }
 
+void JarvisServer::unload(const QString &pkgName)
+{
+    parser->unload(pkgName);
+    std::for_each(clients.begin(), clients.end(), [&](std::shared_ptr<ClientConnection> client) {
+            client->unloadPkg(pkgName);
+        });
+    qDebug() << "UnloadPkg(" << pkgName << ")";
+}
+
+void JarvisServer::load(const QString &pkgName)
+{
+    ModulePackage result(*(parser->load(pkgName)));
+    std::for_each(clients.begin(), clients.end(), [&](std::shared_ptr<ClientConnection> client) {
+            client->loadPkg(result);
+        });
+    qDebug() << "LoadPkg(" << pkgName << ")";
+}
+
 void JarvisServer::incomingConnection(int socketfd)
 {
     auto client = std::shared_ptr<ClientConnection>(new ClientConnection(this, socketfd), std::mem_fun(&QObject::deleteLater));

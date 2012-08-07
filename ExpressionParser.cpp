@@ -1,5 +1,4 @@
 #include "ExpressionParser.h"
-#include "DemoModules.h"
 #include <string>
 #include <QDebug>
 
@@ -35,15 +34,14 @@ void ExpressionParser::unload(const QString &pkgName)
         });
     modules.removePkg(pkg->get());
     modulePkgs.erase(pkg);
-    qDebug() << "UnloadPkg(" << pkgName << ")";
 }
 
-void ExpressionParser::load(const QString &pkgName)
+std::shared_ptr<ModulePackage> ExpressionParser::load(const QString &pkgName)
 {
     auto tmp_module(std::make_shared<ModulePackage>(std::unique_ptr<QFile>(new QFile(pkgName))));
     modulePkgs.append(tmp_module);
     modules += tmp_module->getModules();
-    qDebug() << "LoadPkg(" << pkgName << ")";
+    return tmp_module;
 }
 
 QVector<ModulePackage> ExpressionParser::getModulePkgs() const

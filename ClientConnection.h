@@ -41,6 +41,8 @@ public:
     void enterClient(const QString &scope, const QString &name) { oStream << static_cast<quint8>(0) << scope << name; }
     void leaveClient(const QString &scope, const QString &name) { oStream << static_cast<quint8>(5) << scope << name; }
     void deleteScope(const QString &scope) { oStream << static_cast<quint8>(9) << scope; }
+    void unloadPkg(const QString &name) { oStream << static_cast<quint8>(7) << name; }
+    void loadPkg(const ModulePackage &pkg) { oStream << static_cast<quint8>(6) << pkg; }
     QHostAddress getAddress() const { return socket.peerAddress(); }
 
 private slots:

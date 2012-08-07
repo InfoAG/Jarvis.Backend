@@ -29,6 +29,8 @@ public:
     uint version() const { return settings.value("Version").toUInt(); };
     void disconnected(ClientConnection *client);
     void deleteScope(const QString &name);
+    void unload(const QString &pkgName);
+    void load(const QString &pkgName);
 
 protected:
     void incomingConnection(int socketfd);
