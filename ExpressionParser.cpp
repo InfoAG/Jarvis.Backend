@@ -58,7 +58,7 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
     int level;
     bool deleted;
     do {
-        if (input.empty()) return nullptr;
+        if (input.empty()) throw "Error: Could not parse input.";
         deleted = false;
         if (input.at(0) == '(' && input.at(input.length() - 1) == ')') {
             level = 0;

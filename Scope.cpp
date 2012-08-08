@@ -12,19 +12,29 @@ void Scope::getInitInfo(QDataStream &stream) const
 
 void Scope::removeClient(ClientConnection *client)
 {
-    clients.removeOne(client);
-    std::for_each(clients.begin(), clients.end(), [&](ClientConnection *it_client) {
-            it_client->leaveClient(name, client->name());
-        });
+    if (clients.contains(client)) {
+        clients.removeOne(client);
+        std::for_each(clients.begin(), clients.end(), [&](ClientConnection *it_client) {
+                it_client->leaveClient(name, client->name());
+            });
+    }
 }
 
 void Scope::sendMsg(const QString &sender, const QString &msg) const
 {
-    QString evalRes = QString::fromStdString(parser->parse(msg.toStdString())->eval(scope_info)->getString());
     std::for_each(clients.begin(), clients.end(), [&](ClientConnection *client) {
             client->sendMsg(name, sender, msg);
+        });
+    try {
+    QString evalRes = QString::fromStdString(parser->parse(msg.toStdString())->eval(scope_info)->getString());
+    std::for_each(clients.begin(), clients.end(), [&](ClientConnection *client) {
             client->sendMsg(name, "Jarvis", evalRes);
         });
+    } catch (const char *s) {
+        std::for_each(clients.begin(), clients.end(), [&](ClientConnection *client) {
+                      client->sendMsg(name, "Jarvis", "error bro");
+            });
+    }
 }
 
 void Scope::addClient(ClientConnection *client)
