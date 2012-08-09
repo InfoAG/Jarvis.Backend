@@ -5,7 +5,7 @@ QT       += core network
 QT       -= gui
 
 TARGET = Jarvis-Backend
-CONFIG   += console qtestlib
+CONFIG   += console
 CONFIG   -= app_bundle
 
 TEMPLATE = app

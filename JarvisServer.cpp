@@ -53,11 +53,17 @@ void JarvisServer::deleteScope(const QString &name)
 
 void JarvisServer::unload(const QString &pkgName)
 {
-    parser->unload(pkgName);
-    std::for_each(clients.begin(), clients.end(), [&](std::shared_ptr<ClientConnection> client) {
-            client->unloadPkg(pkgName);
-        });
-    qDebug() << "UnloadPkg(" << pkgName << ")";
+    //ugly, compare parser->unload()
+    auto modulePkgs = parser->getModulePkgs();
+    if (std::find_if(modulePkgs.begin(), modulePkgs.end(), [&](const ModulePackage &it_pkg) {
+            return it_pkg.name == pkgName;
+    }) != modulePkgs.end()) {
+        parser->unload(pkgName);
+        std::for_each(clients.begin(), clients.end(), [&](std::shared_ptr<ClientConnection> client) {
+                client->unloadPkg(pkgName);
+            });
+        qDebug() << "UnloadPkg(" << pkgName << ")";
+    }
 }
 
 void JarvisServer::load(const QString &pkgName)
