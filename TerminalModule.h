@@ -1,7 +1,7 @@
 #ifndef TERMINALMODULE_H
 #define TERMINALMODULE_H
 
-#include "../Framework/Arithmetic/AbstractArithmetic.h"
+#include "Arithmetic/AbstractArithmetic.h"
 #include <string>
 #include "ParserModule.h"
 

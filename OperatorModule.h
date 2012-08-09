@@ -1,7 +1,7 @@
 #ifndef OPERATORMODULE_H
 #define OPERATORMODULE_H
 
-#include "../Framework/Arithmetic/AbstractArithmetic.h"
+#include "Arithmetic/AbstractArithmetic.h"
 #include <string>
 #include "OperatorInterface.h"
 

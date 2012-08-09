@@ -4,7 +4,7 @@
 #include <functional>
 #include <string>
 #include <memory>
-#include "../Framework/Arithmetic/AbstractArithmetic.h"
+#include "Arithmetic/AbstractArithmetic.h"
 
 struct OperatorInterface
 {

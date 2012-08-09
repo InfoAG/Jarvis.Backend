@@ -4,7 +4,7 @@
 #include <QString>
 #include <QList>
 #include <memory>
-#include "../Framework/Arithmetic/EvalInfo.h"
+#include "Arithmetic/EvalInfo.h"
 #include "ExpressionParser.h"
 
 class ClientConnection;

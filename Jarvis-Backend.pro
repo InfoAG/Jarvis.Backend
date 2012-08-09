@@ -12,9 +12,8 @@ TEMPLATE = app
 
 #include(../../qt-solutions/qtservice/src/qtservice.pri)
 
-
-
-LIBS += ../../../QtProjects/Jarvis/Framework/Jarvis-Framework/debug/libJarvis-Framework.a
+INCLUDEPATH += ../Framework
+LIBS += $$PWD/../Framework/debug/libJarvis-Framework.a
 
 SOURCES += main.cpp \
     JarvisService.cpp \

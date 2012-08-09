@@ -1,7 +1,7 @@
 #ifndef FUNCTIONMODULE_H
 #define FUNCTIONMODULE_H
 
-#include "../Framework/Arithmetic/AbstractArithmetic.h"
+#include "Arithmetic/AbstractArithmetic.h"
 #include <string>
 #include "FunctionInterface.h"
 

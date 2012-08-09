@@ -1,6 +1,6 @@
 #include "ModulePackage.h"
-//#include "../Framework/Arithmetic/NumberArith.cpp"
-//#include "../Framework/Arithmetic/EvalInfo.h"
+//#include "Arithmetic/NumberArith.cpp"
+//#include "Arithmetic/EvalInfo.h"
 #include <QDebug>
 
 ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
