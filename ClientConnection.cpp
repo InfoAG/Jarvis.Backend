@@ -25,10 +25,10 @@ void ClientConnection::readyRead()
         case Auth: {
                 quint8 newSignup;
                 QString pwd;
-                iStream >> newSignup >> _name >> pwd;
+                iStream >> newSignup >> _nick >> pwd;
                 if (iStream.status() == QDataStream::Ok) {
                     resetStreamBuf();
-                    quint8 success = server->login(_name, pwd);
+                    quint8 success = server->login(_nick, pwd);
                     oStream << success;
                     if (success) {
                         oStream << server->getScopeNames() << server->getParser()->getModulePkgs();

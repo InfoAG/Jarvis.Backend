@@ -1,10 +1,10 @@
-#include "../OperatorInterface.h"
+#include "OperatorInterface.h"
 #include "basicarith_global.h"
-#include "../../Framework/Arithmetic/Addition.h"
-#include "../../Framework/Arithmetic/Subtraction.h"
-#include "../../Framework/Arithmetic/Multiplication.h"
-#include "../../Framework/Arithmetic/Division.h"
-#include "../../Framework/Arithmetic/NumberArith.h"
+#include "Arithmetic/Addition.h"
+#include "Arithmetic/Subtraction.h"
+#include "Arithmetic/Multiplication.h"
+#include "Arithmetic/Division.h"
+#include "Arithmetic/NumberArith.h"
 
 #include <string>
 #include <iostream>

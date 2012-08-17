@@ -13,7 +13,8 @@ TEMPLATE = app
 #include(../../qt-solutions/qtservice/src/qtservice.pri)
 
 INCLUDEPATH += ../Framework
-LIBS += $$PWD/../Framework/debug/libJarvis-Framework.a
+Debug: LIBS += -L$$PWD/../Framework/debug/ -lJarvis-Framework
+Release: LIBS += -L$$PWD/../Framework/release/ -lJarvis-Framework
 
 SOURCES += main.cpp \
     JarvisService.cpp \
@@ -41,4 +42,6 @@ HEADERS += \
     Scope.h
 
 OTHER_FILES += \
-    basicarith.jpkg
+    Modules/basicarith.jpkg \
+    Modules/variables.jpkg \
+    Modules/variables.jpkg

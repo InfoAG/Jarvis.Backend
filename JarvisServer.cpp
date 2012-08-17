@@ -4,9 +4,13 @@
 
 JarvisServer::JarvisServer() : settings("InfoAG", "Jarvis.Server")
 {
-    //listen(QHostAddress::Any, settings.value("Port").toUInt());
-    settings.setValue("Version", 1);
-    listen(QHostAddress::Any, 4200);
+    defaultSetting("Port", 4200);
+    defaultSetting("ModulePath", QCoreApplication::applicationDirPath() + "/../Modules");
+    settings.setValue("ModulePath", QCoreApplication::applicationDirPath() + "/../Modules");
+    qDebug() << QCoreApplication::applicationDirPath() + "/Modules";
+    QCoreApplication::addLibraryPath(settings.value("ModulePath").toString());
+    //settings.setValue("Version", 1);
+    listen(QHostAddress::Any, settings.value("Port").toUInt());
     parser = std::unique_ptr<ExpressionParser>(new ExpressionParser(QDir(settings.value("ModulePath").toString())));
 }
 
@@ -14,39 +18,37 @@ const Scope &JarvisServer::enterScope(ClientConnection *client, QString scope)
 {
     if (! scopes.contains(scope)) {
         scopes.insert(scope, Scope(scope, parser.get()));
-        std::for_each(clients.begin(), clients.end(), [&](const std::shared_ptr<ClientConnection> &it_client) {
-                if (it_client.get() != client) it_client->newScope(scope);
-            });
+        for (const auto &it_client: clients) {
+            if (it_client.get() != client) it_client->newScope(scope);
+        }
     }
     scopes[scope].addClient(client);
-    qDebug() << "ClientEnterScope(" << client->name() << ", " << scope << ")";
+    qDebug() << "ClientEnterScope(" << client->nick() << ", " << scope << ")";
     return scopes[scope];
 }
 
 void JarvisServer::leaveScope(ClientConnection *sender, QString scope)
 {
     scopes[scope].removeClient(sender);
-    qDebug() << "ClientLeaveScope(" << sender->name() << ", " << scope << ")";
+    qDebug() << "ClientLeaveScope(" << sender->nick() << ", " << scope << ")";
 }
 
-void JarvisServer::msgToScope(ClientConnection *sender, QString scope, QString msg) const
+void JarvisServer::msgToScope(ClientConnection *sender, QString scope, QString msg)
 {
-    scopes[scope].sendMsg(sender->name(), msg);
-    qDebug() << "MsgToScope(" << sender->name() << ", " << scope << ", " << msg << ")";
+    scopes[scope].sendMsg(sender->nick(), msg);
+    qDebug() << "MsgToScope(" << sender->nick() << ", " << scope << ", " << msg << ")";
 }
 
 void JarvisServer::disconnected(ClientConnection *client)
 {
-    std::for_each(scopes.begin(), scopes.end(), [&](Scope &scope) { scope.removeClient(client); });
+    for (auto &scope : scopes) scope.removeClient(client);
     clients.erase(std::find_if(clients.begin(), clients.end(), [&](const std::shared_ptr<ClientConnection> &it_client) { return it_client.get() == client; }));
-    qDebug() << "ClientDisconnect(" << client->name() << ")";
+    qDebug() << "ClientDisconnect(" << client->nick() << ")";
 }
 
 void JarvisServer::deleteScope(const QString &name)
 {
-    std::for_each(clients.begin(), clients.end(), [&](std::shared_ptr<ClientConnection> client) {
-            client->deleteScope(name);
-        });
+    for (const auto &client : clients) client->deleteScope(name);
     scopes.remove(name);
     qDebug() << "DeleteScope(" << name << ")";
 }
@@ -56,22 +58,18 @@ void JarvisServer::unload(const QString &pkgName)
     //ugly, compare parser->unload()
     auto modulePkgs = parser->getModulePkgs();
     if (std::find_if(modulePkgs.begin(), modulePkgs.end(), [&](const ModulePackage &it_pkg) {
-            return it_pkg.name == pkgName;
-    }) != modulePkgs.end()) {
+            return it_pkg.name() == pkgName;
+        }) != modulePkgs.end()) {
         parser->unload(pkgName);
-        std::for_each(clients.begin(), clients.end(), [&](std::shared_ptr<ClientConnection> client) {
-                client->unloadPkg(pkgName);
-            });
+        for (const auto &client : clients) client->unloadPkg(pkgName);
         qDebug() << "UnloadPkg(" << pkgName << ")";
     }
 }
 
 void JarvisServer::load(const QString &pkgName)
 {
-    ModulePackage result(*(parser->load(pkgName)));
-    std::for_each(clients.begin(), clients.end(), [&](std::shared_ptr<ClientConnection> client) {
-            client->loadPkg(result);
-        });
+    ModulePackage result(*(parser->load(settings.value("ModulePath").toString() + pkgName)));
+    for (const auto &client : clients) client->loadPkg(result);
     qDebug() << "LoadPkg(" << pkgName << ")";
 }
 

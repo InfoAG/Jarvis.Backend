@@ -3,6 +3,9 @@
 
 #include <functional>
 
+/**
+ * Interface for function parser modules containing function pointers
+ */
 struct FunctionInterface
 {
     std::function<bool(std::string)> matches;

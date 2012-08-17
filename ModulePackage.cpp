@@ -5,12 +5,23 @@
 
 ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
 {
+    enum {
+        HEAD,
+        BRACE,
+        BODY
+    } state = HEAD;
+
+    enum {
+        OPERATOR,
+        FUNCTION,
+        TERMINAL
+    } type;
     OperatorInterface opInter;
     FunctionInterface funcInter;
     QList<QByteArray> head;
     QString description;
     QLibrary lib;
-    name = file->fileName();
+    name_ = file->fileName();
     if (file->open(QFile::ReadOnly)) {
         while (!file->atEnd()) {
             QByteArray line = file->readLine().trimmed();
@@ -86,6 +97,6 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
 
 QDataStream &operator<<(QDataStream &stream, const ModulePackage &pkg)
 {
-    stream << pkg.name << pkg.modules;
+    stream << pkg.name() << pkg.getModules();
     return stream;
 }

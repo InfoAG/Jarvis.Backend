@@ -4,25 +4,25 @@
 
 ExpressionParser::ExpressionParser(const QDir &module_dir)
 {
-    for (const auto &file : module_dir.entryList(QStringList("*.jpkg"), QDir::Files)) {
-        load(file);
+    for (const auto &file : module_dir.entryInfoList(QStringList("*.jpkg"), QDir::Files)) {
+        load(file.absoluteFilePath());
     }
     qDebug() << "Parser initialized" << endl;
     qDebug() << "Package Name\tModule Name\tModule Description";
     qDebug() << "";
     for (const auto &modpkg : modulePkgs) {
-        qDebug() << modpkg->name;
+        qDebug() << modpkg->name();
         qDebug() << "\tTerminals:";
-        for (const auto &mod : modpkg->modules.terminals) {
-            qDebug() << "\t\t" << mod.name << "\t" << mod.description << "\t";
+        for (const auto &mod : modpkg->getModules().terminals) {
+            qDebug() << "\t\t" << mod.name() << "\t" << mod.description() << "\t";
         }
         qDebug() << "\tOperators:";
-        for (const auto &mod : modpkg->modules.operators) {
-            qDebug() << "\t\t" << mod.name << "\t" << mod.description << "\t";
+        for (const auto &mod : modpkg->getModules().operators) {
+            qDebug() << "\t\t" << mod.name() << "\t" << mod.description() << "\t";
         }
         qDebug() << "\tFunctions:";
-        for (const auto &mod : modpkg->modules.functions) {
-            qDebug() << "\t\t" << mod.name << "\t" << mod.description << "\t";
+        for (const auto &mod : modpkg->getModules().functions) {
+            qDebug() << "\t\t" << mod.name() << "\t" << mod.description() << "\t";
         }
     }
 }
@@ -30,15 +30,15 @@ ExpressionParser::ExpressionParser(const QDir &module_dir)
 void ExpressionParser::unload(const QString &pkgName)
 {
     auto pkg = std::find_if(modulePkgs.begin(), modulePkgs.end(), [&](const std::shared_ptr<ModulePackage> &it_pkg) {
-            return it_pkg->name == pkgName;
+            return it_pkg->name() == pkgName;
         });
     modules.removePkg(pkg->get());
     modulePkgs.erase(pkg);
 }
 
-std::shared_ptr<ModulePackage> ExpressionParser::load(const QString &pkgName)
+std::shared_ptr<ModulePackage> ExpressionParser::load(const QString &filePath)
 {
-    auto tmp_module(std::make_shared<ModulePackage>(std::unique_ptr<QFile>(new QFile(pkgName))));
+    auto tmp_module(std::make_shared<ModulePackage>(std::unique_ptr<QFile>(new QFile(filePath))));
     modulePkgs.append(tmp_module);
     modules += tmp_module->getModules();
     return tmp_module;

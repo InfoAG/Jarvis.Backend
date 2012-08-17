@@ -6,6 +6,7 @@
 #include <memory>
 #include "Arithmetic/EvalInfo.h"
 #include "ExpressionParser.h"
+#include "Arithmetic/Assignment.h"
 
 class ClientConnection;
 
@@ -23,7 +24,7 @@ public:
 
     void getInitInfo(QDataStream &stream) const;
     void removeClient(ClientConnection *client);
-    void sendMsg(const QString &sender, const QString &msg) const;
+    void sendMsg(const QString &sender, const QString &msg);
     void addClient(ClientConnection *client);
 
 };

@@ -16,3 +16,4 @@
 Makefile*
 debug/
 release/
+object_script.*

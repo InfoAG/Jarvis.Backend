@@ -1,0 +1,47 @@
+Addition : Operator
+{
+    description: adds things together
+    lib: Modules/basicarith
+    matches: +
+    priority: 1
+    associativity: left
+}
+
+Multiplication : Operator
+{
+    description: dude read the name
+    lib: Modules/basicarith
+    matches: *
+    priority: 2
+    associativity: left
+}
+
+Division : Operator
+{
+    description: dude i'm serious
+    lib: Modules/basicarith
+    matches: /
+    priority: 2
+    associativity: left
+}
+
+Subtraction : Operator
+{
+    description: are you retarded or something?
+    lib: Modules/basicarith
+    matches: -
+    priority: 1
+    associativity: left
+}
+
+Number : Terminal
+{
+    description: just integers
+    lib: Modules/basicarith
+}
+
+Pi : Terminal
+{
+    description: circles. many of them.
+    lib: Modules/basicarith
+}

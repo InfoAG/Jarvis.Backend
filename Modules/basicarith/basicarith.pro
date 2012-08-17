@@ -6,11 +6,21 @@
 
 QT       -= gui #!!! remove core too
 QMAKE_CXXFLAGS += -std=c++11
-LIBS += ../../../../QtProjects/Jarvis/Framework/Jarvis-Framework/debug/libJarvis-Framework.a
+INCLUDEPATH += $$PWD/../../../Framework
+INCLUDEPATH += $$PWD/../../
+
 TARGET = basicarith
 TEMPLATE = lib
-QMAKE_CXXFLAGS += -std=c++11
 DEFINES += BASICARITH_LIBRARY
+
+Release {
+    DESTDIR = $$PWD/../../release/Modules
+    LIBS += -L$$PWD/../../../Framework/release -lJarvis-Framework
+}
+Debug {
+    DESTDIR = $$PWD/../../debug/Modules
+    LIBS += -L$$PWD/../../../Framework/debug -lJarvis-Framework
+}
 
 SOURCES += \
     basicarith.cpp

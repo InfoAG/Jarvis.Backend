@@ -1,0 +1,14 @@
+Variable : Terminal
+{
+    description: variables
+    lib: Modules/variables
+}
+
+Assignment : Operator
+{
+    description: assigns stuff
+    lib: Modules/variables
+    priority: 0
+    associativity: right
+    matches: =
+}
