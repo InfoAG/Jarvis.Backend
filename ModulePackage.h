@@ -6,6 +6,7 @@
 #include <map>
 #include <QLibrary>
 #include "ParserModules.h"
+#include <QFileInfo>
 
 /**
  * Package of parser modules for an ExpressionParser

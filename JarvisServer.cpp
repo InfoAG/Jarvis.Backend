@@ -5,8 +5,8 @@
 JarvisServer::JarvisServer() : settings("InfoAG", "Jarvis.Server")
 {
     defaultSetting("Port", 4200);
-    defaultSetting("ModulePath", QCoreApplication::applicationDirPath() + "/../Modules");
-    settings.setValue("ModulePath", QCoreApplication::applicationDirPath() + "/../Modules");
+    defaultSetting("ModulePath", QCoreApplication::applicationDirPath() + "/../Modules/");
+    settings.setValue("ModulePath", QCoreApplication::applicationDirPath() + "/../Modules/");
     qDebug() << QCoreApplication::applicationDirPath() + "/Modules";
     QCoreApplication::addLibraryPath(settings.value("ModulePath").toString());
     //settings.setValue("Version", 1);
@@ -68,7 +68,7 @@ void JarvisServer::unload(const QString &pkgName)
 
 void JarvisServer::load(const QString &pkgName)
 {
-    ModulePackage result(*(parser->load(settings.value("ModulePath").toString() + pkgName)));
+    ModulePackage result(*(parser->load(settings.value("ModulePath").toString() + pkgName + ".jpkg")));
     for (const auto &client : clients) client->loadPkg(result);
     qDebug() << "LoadPkg(" << pkgName << ")";
 }

@@ -42,6 +42,7 @@ void Scope::sendMsg(const QString &sender, const QString &msg)
 
 void Scope::addClient(ClientConnection *client)
 {
+    if (clients.contains(client)) throw 0;
     for (const auto &it_client : clients) it_client->enterClient(name, client->nick());
     clients.append(client);
 }

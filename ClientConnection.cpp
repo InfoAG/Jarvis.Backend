@@ -49,12 +49,17 @@ void ClientConnection::readyRead()
             break;
         case EnterScope: {
                 quint8 requestID;
-                QString scope;
-                iStream >> requestID >> scope;
+                QString scopeName;
+                Scope scope;
+                iStream >> requestID >> scopeName;
                 if (iStream.status() == QDataStream::Ok){
                     resetStreamBuf();
                     oStream << static_cast<quint8>(8) << requestID;
-                    server->enterScope(this, scope).getInitInfo(oStream);
+                    try {
+                        scope = server->enterScope(this, scopeName);
+                        oStream << static_cast<quint8>(1);
+                        scope.getInitInfo(oStream);
+                    } catch (int) { oStream << static_cast<quint8>(0); }
                     connectionState = Loop;
                 } else return;
             }

@@ -1,7 +1,4 @@
 #include "ModulePackage.h"
-//#include "Arithmetic/NumberArith.cpp"
-//#include "Arithmetic/EvalInfo.h"
-#include <QDebug>
 
 ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
 {
@@ -21,7 +18,7 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
     QList<QByteArray> head;
     QString description;
     QLibrary lib;
-    name_ = file->fileName();
+    name_ = QFileInfo(*file).baseName();
     if (file->open(QFile::ReadOnly)) {
         while (!file->atEnd()) {
             QByteArray line = file->readLine().trimmed();
