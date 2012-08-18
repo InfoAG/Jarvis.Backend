@@ -10,7 +10,7 @@ void Scope::getInitInfo(QDataStream &stream) const
             stream << QString::fromStdString(item.first) << QString::fromStdString(item.second->toString());
     stream << static_cast<quint32>(scope_info.functions.size());
     for (const auto &item : scope_info.functions) {
-        stream << QString::fromStdString(item.first.first) << item.second.first.size();
+        stream << QString::fromStdString(item.first.first) << static_cast<quint32>(item.second.first.size());
         for (const auto &arg : item.second.first) stream << QString::fromStdString(arg);
         stream << QString::fromStdString(item.second.second->toString());
     }
