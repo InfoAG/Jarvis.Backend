@@ -7,6 +7,7 @@
 #include "Arithmetic/EvalInfo.h"
 #include "ExpressionParser.h"
 #include "Arithmetic/Assignment.h"
+#include "Arithmetic/Function.h"
 
 class ClientConnection;
 

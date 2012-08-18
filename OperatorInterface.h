@@ -17,7 +17,7 @@ struct OperatorInterface
     */
 
     std::function<bool(std::string)> matches;
-    std::function<int()> priority;
+    std::function<unsigned int()> priority;
     std::function<AssociativityType()> associativity;
     std::function<std::unique_ptr<CAS::AbstractArithmetic>(std::unique_ptr<CAS::AbstractArithmetic>, std::unique_ptr<CAS::AbstractArithmetic>)> parse;
 };

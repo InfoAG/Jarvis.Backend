@@ -19,7 +19,7 @@ std::unique_ptr<CAS::AbstractArithmetic> parse()
 
 extern "C" {
 
-OperatorInterface BASICARITHSHARED_EXPORT Addition_maker()
+OperatorInterface BASICARITHSHARED_EXPORT Addition_jmodule()
 {
     OperatorInterface oi;
     oi.parse = [](std::unique_ptr<CAS::AbstractArithmetic> first, std::unique_ptr<CAS::AbstractArithmetic> second) {
@@ -28,7 +28,7 @@ OperatorInterface BASICARITHSHARED_EXPORT Addition_maker()
     return oi;
 }
 
-OperatorInterface BASICARITHSHARED_EXPORT Subtraction_maker()
+OperatorInterface BASICARITHSHARED_EXPORT Subtraction_jmodule()
 {
     OperatorInterface oi;
     oi.parse = [](std::unique_ptr<CAS::AbstractArithmetic> first, std::unique_ptr<CAS::AbstractArithmetic> second) {
@@ -37,7 +37,7 @@ OperatorInterface BASICARITHSHARED_EXPORT Subtraction_maker()
     return oi;
 }
 
-OperatorInterface BASICARITHSHARED_EXPORT Multiplication_maker()
+OperatorInterface BASICARITHSHARED_EXPORT Multiplication_jmodule()
 {
     OperatorInterface oi;
     oi.parse = [](std::unique_ptr<CAS::AbstractArithmetic> first, std::unique_ptr<CAS::AbstractArithmetic> second) {
@@ -46,7 +46,7 @@ OperatorInterface BASICARITHSHARED_EXPORT Multiplication_maker()
     return oi;
 }
 
-OperatorInterface BASICARITHSHARED_EXPORT Division_maker()
+OperatorInterface BASICARITHSHARED_EXPORT Division_jmodule()
 {
     OperatorInterface oi;
     oi.parse = [](std::unique_ptr<CAS::AbstractArithmetic> first, std::unique_ptr<CAS::AbstractArithmetic> second) {
@@ -55,7 +55,7 @@ OperatorInterface BASICARITHSHARED_EXPORT Division_maker()
     return oi;
 }
 /*
-OperatorInterface BASICARITHSHARED_EXPORT Exponentiation_maker()
+OperatorInterface BASICARITHSHARED_EXPORT Exponentiation_jmodule()
 {
     OperatorInterface oi;
     oi.parse = [](std::unique_ptr<CAS::AbstractArithmetic> first, std::unique_ptr<CAS::AbstractArithmetic> second) {
@@ -64,7 +64,7 @@ OperatorInterface BASICARITHSHARED_EXPORT Exponentiation_maker()
     return oi;
 }
 */
-std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Number_maker(std::string candidate)
+std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Number_jmodule(const std::string &candidate)
 {
     bool ok;
     int num = QString::fromStdString(candidate).toInt(&ok);
@@ -72,7 +72,7 @@ std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Number_maker(st
     else return nullptr;
 }
 
-std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Pi_maker(std::string candidate)
+std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Pi_jmodule(const std::string &candidate)
 {
     if (candidate == "pi") return std::unique_ptr<CAS::NumberArith>(new CAS::NumberArith(3));
     else return nullptr;

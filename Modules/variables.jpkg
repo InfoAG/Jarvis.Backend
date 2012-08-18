@@ -4,6 +4,13 @@ Variable : Terminal
     lib: Modules/variables
 }
 
+UserFunction : Function
+{
+    description: functions
+    lib: Modules/variables
+    priority: 0
+}
+
 Assignment : Operator
 {
     description: assigns stuff

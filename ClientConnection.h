@@ -88,6 +88,7 @@ public:
      */
     void loadPkg(const ModulePackage &pkg) { oStream << static_cast<quint8>(6) << pkg; }
     void newVariable(const QString &scope, const QString &identifier, const QString &definition) { oStream << static_cast<quint8>(2) << scope << identifier << definition; }
+    void newFunction(const QString &scope, const QString &identifier, const QStringList &arguments, const QString &definition) { oStream << static_cast<quint8>(1) << scope << identifier << arguments << definition; }
     QHostAddress getAddress() const { return socket.peerAddress(); } //!< @return Client address
 
 private slots:

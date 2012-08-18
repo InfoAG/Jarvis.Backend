@@ -81,7 +81,7 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
     }
 
     level = 0;
-    unsigned int op_pos = 0;
+    unsigned int foundPos = 0;
     const OperatorModule *best_op_match = nullptr;
 
     for (std::string::iterator i = input.begin(); i != input.end(); ++i) {
@@ -91,17 +91,45 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
             for (const auto &it_op : modules.operators) {
                 if (it_op.matches(std::string(1, *i)) && (best_op_match == nullptr || it_op.priority() < best_op_match->priority() || (it_op.priority() == best_op_match->priority() && it_op.associativity() == OperatorInterface::LEFT))) {
                     best_op_match = &it_op;
-                    op_pos = i - input.begin();
+                    foundPos = i - input.begin();
                 }
             }
         }
     }
-    if (best_op_match != nullptr)
-        return best_op_match->parse(parse(input.substr(0, op_pos)), parse(input.substr(op_pos + 1, input.length() - op_pos - 1)));
+    //assgnment operator matches for every '=', but parses only if first arg is variable / assignable function.
+    //make sure we don't return nullptr in that case (is there a better way?)
+    if (best_op_match != nullptr) {
+        std::unique_ptr<CAS::AbstractArithmetic> result = best_op_match->parse(parse(input.substr(0, foundPos)), parse(input.substr(foundPos + 1, input.length() - foundPos - 1)));
+        if (result) return result;
+        else throw "Error: Could not parse input.";
+    }
+    if (input.back() != ')') throw "Error: Could not parse input.";
+    std::string::iterator itParenthesis = std::find_if_not(input.begin(), input.end(), isalpha);
+    if (itParenthesis == input.begin() || itParenthesis == input.end() || *itParenthesis != '(') throw "Error: Could not parse input.";
+    foundPos = itParenthesis - input.begin();
+    std::string identifier = input.substr(0, foundPos);
+    std::string argString = input.substr(foundPos + 1, input.length() - foundPos - 2);
+    std::vector<std::shared_ptr<CAS::AbstractArithmetic>> arguments;
+    std::string::const_iterator lastPos = argString.begin();
+    level = 0;
+    for (std::string::const_iterator it = argString.begin(); it != argString.end(); ++it) {
+        if (*it == '(' || *it == '[' || *it == '{')  level--;
+        else if (*it == ')' || *it == ']' || *it == '}') level++;
+        else if (level == 0 && *it == ',') {
+            arguments.push_back(parse(argString.substr(lastPos - argString.begin(), it - lastPos)));
+            lastPos = it + 1;
+        }
+    }
+    if (lastPos != argString.begin()) arguments.push_back(parse(argString.substr(lastPos - argString.begin(), argString.length() - (lastPos - argString.begin()))));
+    else arguments.push_back(parse(argString));
 
-    unsigned int pos_parenthesis = input.find_first_of('(');
-    std::string identifier = input.substr(0, pos_parenthesis);
-    for (const auto &it_func : modules.functions)
-        if (it_func.matches(identifier)) return it_func.parse(parse(input.substr(pos_parenthesis + 1, input.length() - pos_parenthesis - 1)));
+    const FunctionModule *best_func_match = nullptr;
+
+    for (const auto &it_func : modules.functions) {
+        if (it_func.matches(identifier, arguments.size()) && (best_func_match == nullptr || it_func.priority() > best_func_match->priority()))
+            best_func_match = &it_func;
+    }
+    if (best_func_match != nullptr)
+        return best_func_match->parse(identifier, arguments);
     throw "Error: Could not parse input.";
 }

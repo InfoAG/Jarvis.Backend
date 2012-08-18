@@ -52,7 +52,7 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
                             modules.functions.append(FunctionModule(head.at(0), description, this, funcInter));
                             break;
                         case TERMINAL:
-                            modules.terminals.append(TerminalModule(head.at(0), description, this, (std::unique_ptr<CAS::AbstractArithmetic>(*)(std::string))lib.resolve(head[0] + "_maker")));
+                            modules.terminals.append(TerminalModule(head.at(0), description, this, (std::unique_ptr<CAS::AbstractArithmetic>(*)(const std::string &))lib.resolve(head[0] + "_jmodule")));
                             break;
                         }
                         state = HEAD;
@@ -63,15 +63,22 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
                         if (key == "description") {
                             description = value;
                         } else if (key == "matches") {
-                            auto matchfunc = [=](std::string candidate) {
-                                return candidate == value.data();
-                            };
-                            if (type == OPERATOR) opInter.matches = matchfunc;
-                            else if (type == FUNCTION) funcInter.matches = matchfunc;
-                        } else if (type == OPERATOR && key == "priority") {
-                            opInter.priority = [=] {
-                                return value.toInt();
-                            };
+                            if (type == OPERATOR) {
+                                opInter.matches = [=](const std::string &candidate) {
+                                        return candidate == value.data();
+                                    };
+                            } else if (type == FUNCTION) {
+                                QList<QByteArray> matchParts = value.split(',');
+                                funcInter.matches = [=](const std::string &candidate, unsigned int argCount) {
+                                        return candidate == matchParts.at(0).data() && argCount == matchParts.at(1).toUInt();
+                                    };
+                            }
+                        } else if (key == "priority") {
+                            auto priorityFunc = [=] {
+                                    return value.toInt();
+                                };
+                            if (type == OPERATOR) opInter.priority = priorityFunc;
+                            else if (type == FUNCTION) funcInter.priority = priorityFunc;
                         } else if (type == OPERATOR && key == "associativity") {
                             if (value == "left") opInter.associativity = [] {
                                     return OperatorInterface::LEFT;
@@ -82,8 +89,8 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
                         } else if (key == "lib") {
                             lib.setFileName(value);
                             std::string dbg = QString(head[0]).toStdString();
-                            if (type == OPERATOR) opInter = ((OperatorInterface(*)())lib.resolve(head[0] + "_maker"))();
-                            else if (type == FUNCTION) funcInter = ((FunctionInterface(*)())lib.resolve(head[0] + "_maker"))();
+                            if (type == OPERATOR) opInter = ((OperatorInterface(*)())lib.resolve(head[0] + "_jmodule"))();
+                            else if (type == FUNCTION) funcInter = ((FunctionInterface(*)())lib.resolve(head[0] + "_jmodule"))();
                         }
                     }
                 }
