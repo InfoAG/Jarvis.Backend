@@ -13,8 +13,14 @@ TEMPLATE = app
 #include(../../qt-solutions/qtservice/src/qtservice.pri)
 
 INCLUDEPATH += ../Framework
-Debug: LIBS += -L$$PWD/../Framework/debug/ -lJarvis-Framework
-Release: LIBS += -L$$PWD/../Framework/release/ -lJarvis-Framework
+Debug {
+    LIBS += -L$$PWD/../Framework/debug/ -lJarvis-Framework
+    DESTDIR = $$PWD/debug
+}
+Release {
+    LIBS += -L$$PWD/../Framework/release/ -lJarvis-Framework
+    DESTDIR = $$PWD/release
+}
 
 SOURCES += main.cpp \
     JarvisService.cpp \
@@ -43,5 +49,4 @@ HEADERS += \
 
 OTHER_FILES += \
     Modules/basicarith.jpkg \
-    Modules/variables.jpkg \
     Modules/variables.jpkg

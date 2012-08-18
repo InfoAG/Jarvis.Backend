@@ -28,7 +28,8 @@ void Scope::sendMsg(const QString &sender, const QString &msg)
 {
     for (const auto &client : clients) client->sendMsg(name, sender, msg);
     try {
-        std::unique_ptr<CAS::AbstractArithmetic> result = parser->parse(msg.toStdString())->eval(scope_info);
+        std::unique_ptr<CAS::AbstractArithmetic> result = parser->parse(msg.toStdString());
+        QString resultString = QString::fromStdString(result->eval(scope_info)->toString());
         if (result->getType() == CAS::AbstractArithmetic::ASSIGNMENT) {
             CAS::Assignment *ass(static_cast<CAS::Assignment*>(result.get()));
             if (ass->getFirstOp()->getType() == CAS::AbstractArithmetic::VARIABLE) {
@@ -36,6 +37,7 @@ void Scope::sendMsg(const QString &sender, const QString &msg)
                 for (const auto &client : clients)
                         client->newVariable(name, QString::fromStdString(ass->getFirstOp()->toString()), QString::fromStdString(ass->getSecondOp()->toString()));
                 qDebug() << "NewVariable(" << name << ", " << QString::fromStdString(ass->getFirstOp()->toString()) << ", " << QString::fromStdString(ass->getSecondOp()->toString()) << ")";
+                resultString = QString::fromStdString(ass->getSecondOp()->eval(scope_info)->toString());
             } else if (ass->getFirstOp()->getType() == CAS::AbstractArithmetic::FUNCTION) {
                 const CAS::Function *func = static_cast<const CAS::Function*>(ass->getFirstOp());
                 std::vector<std::string> argStrings;
@@ -46,9 +48,9 @@ void Scope::sendMsg(const QString &sender, const QString &msg)
                 for (const auto &client : clients)
                         client->newFunction(name, QString::fromStdString(func->getIdentifier()), argQStrings, QString::fromStdString(ass->getSecondOp()->toString()));
                 qDebug() << "NewFunction(" << name << ", " << QString::fromStdString(func->getIdentifier()) << ", " << argQStrings << ", " <<  QString::fromStdString(ass->getSecondOp()->toString()) << ")";
+                resultString = QString::fromStdString(ass->getSecondOp()->eval(scope_info)->toString());
             }
         }
-        QString resultString(QString::fromStdString(result->toString()));
         for (const auto &client : clients) client->sendMsg(name, "Jarvis", resultString);
     } catch (const char *) {
         for (const auto &client : clients) client->sendMsg(name, "Jarvis", "error bro");

@@ -27,4 +27,3 @@ SOURCES += \
 
 HEADERS +=\
         basicarith_global.h
-
