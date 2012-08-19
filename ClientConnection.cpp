@@ -34,7 +34,10 @@ void ClientConnection::readyRead()
                         oStream << server->getScopeNames() << server->getParser()->getModulePkgs();
                         connectionState = Loop;
                     } else connectionState = Auth;
-                } else return;
+                } else {
+                    iStream.resetStatus();
+                    return;
+                }
             }
             break;
         case Loop:
@@ -61,7 +64,10 @@ void ClientConnection::readyRead()
                         scope.getInitInfo(oStream);
                     } catch (int) { oStream << static_cast<quint8>(0); }
                     connectionState = Loop;
-                } else return;
+                } else {
+                    iStream.resetStatus();
+                    return;
+                }
             }
             break;
         case LeaveScope: {
@@ -71,7 +77,10 @@ void ClientConnection::readyRead()
                     resetStreamBuf();
                     server->leaveScope(this, scope);
                     connectionState = Loop;
-                } else return;
+                } else {
+                    iStream.resetStatus();
+                    return;
+                }
             }
             break;
         case ClientMsg: {
@@ -81,7 +90,10 @@ void ClientConnection::readyRead()
                     resetStreamBuf();
                     server->msgToScope(this, scope, msg);
                     connectionState = Loop;
-                } else return;
+                } else {
+                    iStream.resetStatus();
+                    return;
+                }
             }
             break;
         case UnloadPkg: {
@@ -91,7 +103,10 @@ void ClientConnection::readyRead()
                     resetStreamBuf();
                     server->unload(pkg);
                     connectionState = Loop;
-                } else return;
+                } else {
+                    iStream.resetStatus();
+                    return;
+                }
             }
             break;
         case LoadPkg: {
@@ -101,7 +116,10 @@ void ClientConnection::readyRead()
                     resetStreamBuf();
                     server->load(pkg);
                     connectionState = Loop;
-                } else return;
+                } else {
+                    iStream.resetStatus();
+                    return;
+                }
             }
             break;
         case DeleteScope: {
@@ -111,6 +129,9 @@ void ClientConnection::readyRead()
                     resetStreamBuf();
                     connectionState = Loop;
                     server->deleteScope(scope);
+                } else {
+                    iStream.resetStatus();
+                    return;
                 }
             }
         }

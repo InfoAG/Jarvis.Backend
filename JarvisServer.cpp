@@ -36,8 +36,10 @@ void JarvisServer::leaveScope(ClientConnection *sender, QString scope)
 
 void JarvisServer::msgToScope(ClientConnection *sender, QString scope, QString msg)
 {
-    scopes[scope].sendMsg(sender->nick(), msg);
-    qDebug() << "MsgToScope(" << sender->nick() << ", " << scope << ", " << msg << ")";
+    if (scopes.contains(scope) && scopes[scope].hasClient(sender)) {
+        scopes[scope].sendMsg(sender->nick(), msg);
+        qDebug() << "MsgToScope(" << sender->nick() << ", " << scope << ", " << msg << ")";
+    }
 }
 
 void JarvisServer::disconnected(ClientConnection *client)

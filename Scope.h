@@ -27,7 +27,7 @@ public:
     void removeClient(ClientConnection *client);
     void sendMsg(const QString &sender, const QString &msg);
     void addClient(ClientConnection *client);
-
+    bool hasClient(ClientConnection *candidate) { return clients.contains(candidate); }
 };
 
 #endif //SCOPE_H
