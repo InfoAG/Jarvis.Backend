@@ -9,7 +9,7 @@ QT       += core network
 QT       -= gui
 
 Debug: TARGET = ../../debug/Jarvis-Backend
-Release: TARGET = ../../debug/Jarvis-Backend
+Release: TARGET = ../../release/Jarvis-Backend
 
 CONFIG   += console
 CONFIG   -= app_bundle
