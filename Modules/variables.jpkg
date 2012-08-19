@@ -1,20 +1,20 @@
 Variable : Terminal
 {
     description: variables
-    lib: Modules/variables
+    lib: modules/variables
 }
 
 UserFunction : Function
 {
     description: functions
-    lib: Modules/variables
+    lib: modules/variables
     priority: 0
 }
 
 Assignment : Operator
 {
     description: assigns stuff
-    lib: Modules/variables
+    lib: modules/variables
     priority: 0
     associativity: right
     matches: =

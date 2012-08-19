@@ -1,51 +1,11 @@
+TEMPLATE = subdirs
 
-QMAKE_CXXFLAGS += -std=c++11
+SUBDIRS += modules/basicarith \
+    modules/variables
 
-QT       += core network
-QT       -= gui
+CONFIG += ordered
 
-TARGET = Jarvis-Backend
-CONFIG   += console
-CONFIG   -= app_bundle
-
-TEMPLATE = app
-
-#include(../../qt-solutions/qtservice/src/qtservice.pri)
-
-INCLUDEPATH += ../Framework
-Debug {
-    LIBS += -L$$PWD/../Framework/debug/ -lJarvis-Framework
-    DESTDIR = $$PWD/debug
-}
-Release {
-    LIBS += -L$$PWD/../Framework/release/ -lJarvis-Framework
-    DESTDIR = $$PWD/release
-}
-
-SOURCES += main.cpp \
-    JarvisService.cpp \
-    JarvisServer.cpp \
-    ExpressionParser.cpp \
-    ClientConnection.cpp \
-    ModulePackage.cpp \
-    Scope.cpp \
-    ParserModules.cpp \
-    ParserModule.cpp
-
-HEADERS += \
-    JarvisService.h \
-    JarvisServer.h \
-    ExpressionParser.h \
-    FunctionModule.h \
-    TerminalModule.h \
-    OperatorModule.h \
-    OperatorInterface.h \
-    FunctionInterface.h \
-    ModulePackage.h \
-    ParserModules.h \
-    ParserModule.h \
-    ClientConnection.h \
-    Scope.h
+SUBDIRS += build
 
 OTHER_FILES += \
     Modules/basicarith.jpkg \

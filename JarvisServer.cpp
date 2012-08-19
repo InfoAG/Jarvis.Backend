@@ -5,10 +5,11 @@
 JarvisServer::JarvisServer() : settings("InfoAG", "Jarvis.Server")
 {
     defaultSetting("Port", 4200);
-    defaultSetting("ModulePath", QCoreApplication::applicationDirPath() + "/../Modules/");
-    settings.setValue("ModulePath", QCoreApplication::applicationDirPath() + "/../Modules/");
-    qDebug() << QCoreApplication::applicationDirPath() + "/Modules";
-    QCoreApplication::addLibraryPath(settings.value("ModulePath").toString());
+    defaultSetting("ModulePath", QCoreApplication::applicationDirPath() + "/../modules/");
+    settings.setValue("ModulePath", QCoreApplication::applicationDirPath() + "/../modules/");
+    qDebug() << QCoreApplication::applicationDirPath() + "/modules";
+    QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath() + "/modules");
+    qDebug() << QCoreApplication::libraryPaths();
     //settings.setValue("Version", 1);
     listen(QHostAddress::Any, settings.value("Port").toUInt());
     parser = std::unique_ptr<ExpressionParser>(new ExpressionParser(QDir(settings.value("ModulePath").toString())));

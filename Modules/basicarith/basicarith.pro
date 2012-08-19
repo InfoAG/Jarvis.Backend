@@ -4,26 +4,12 @@
 #
 #-------------------------------------------------
 
-QT       -= gui #!!! remove core too
-QMAKE_CXXFLAGS += -std=c++11
-INCLUDEPATH += $$PWD/../../../Framework
-INCLUDEPATH += $$PWD/../../
+include(../../common.pri)
 
-TARGET = basicarith
-TEMPLATE = lib
 DEFINES += BASICARITH_LIBRARY
-
-Release {
-    DESTDIR = $$PWD/../../release/Modules
-    LIBS += -L$$PWD/../../../Framework/release -lJarvis-Framework
-}
-Debug {
-    DESTDIR = $$PWD/../../debug/Modules
-    LIBS += -L$$PWD/../../../Framework/debug -lJarvis-Framework
-}
 
 SOURCES += \
     basicarith.cpp
 
 HEADERS +=\
-        basicarith_global.h
+    basicarith_global.h

@@ -1,7 +1,7 @@
 Addition : Operator
 {
     description: adds things together
-    lib: Modules/basicarith
+    lib: modules/basicarith
     matches: +
     priority: 1
     associativity: left
@@ -10,7 +10,7 @@ Addition : Operator
 Multiplication : Operator
 {
     description: dude read the name
-    lib: Modules/basicarith
+    lib: modules/basicarith
     matches: *
     priority: 2
     associativity: left
@@ -19,7 +19,7 @@ Multiplication : Operator
 Division : Operator
 {
     description: dude i'm serious
-    lib: Modules/basicarith
+    lib: modules/basicarith
     matches: /
     priority: 2
     associativity: left
@@ -28,7 +28,7 @@ Division : Operator
 Subtraction : Operator
 {
     description: are you retarded or something?
-    lib: Modules/basicarith
+    lib: modules/basicarith
     matches: -
     priority: 1
     associativity: left
@@ -37,11 +37,11 @@ Subtraction : Operator
 Number : Terminal
 {
     description: just integers
-    lib: Modules/basicarith
+    lib: modules/basicarith
 }
 
 Pi : Terminal
 {
     description: circles. many of them.
-    lib: Modules/basicarith
+    lib: modules/basicarith
 }
