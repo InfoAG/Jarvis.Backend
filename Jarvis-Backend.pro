@@ -8,5 +8,5 @@ CONFIG += ordered
 SUBDIRS += build
 
 OTHER_FILES += \
-    Modules/basicarith.jpkg \
-    Modules/variables.jpkg
+    modules/basicarith.jpkg \
+    modules/variables.jpkg
