@@ -8,8 +8,8 @@ QT       += core network
 
 QT       -= gui
 
-Debug: DESTDIR = ../debug/
-Release: DESTDIR = ../release/
+debug: DESTDIR = ../debug/
+release: DESTDIR = ../release/
 
 TARGET = Jarvis-Backend
 
