@@ -9,11 +9,11 @@ QMAKE_CXXFLAGS += -std=c++11
 
 INCLUDEPATH += ../../../Framework
 
-Release {
+release {
     DESTDIR = ../../release/modules/
     LIBS += -L../../../Framework/release -lJarvis-Framework
 }
-Debug {
+debug {
     DESTDIR = ../../debug/modules/
     LIBS += -L../../../Framework/debug -lJarvis-Framework
 }
