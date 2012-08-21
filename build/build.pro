@@ -33,7 +33,9 @@ SOURCES += main.cpp \
     ModulePackage.cpp \
     Scope.cpp \
     ParserModules.cpp \
-    ParserModule.cpp
+    ParserModule.cpp \
+    ../OperatorModule.cpp \
+    ../FunctionModule.cpp
 
 HEADERS += \
     JarvisService.h \

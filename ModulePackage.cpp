@@ -13,6 +13,8 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
         FUNCTION,
         TERMINAL
     } type;
+    OperatorModule::StaticInfo opStatics;
+    FunctionModule::StaticInfo funcStatics;
     OperatorInterface opInter;
     FunctionInterface funcInter;
     QList<QByteArray> head;
@@ -46,10 +48,10 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
                     if (line == "}") {
                         switch (type) {
                         case OPERATOR:
-                            modules.operators.append(OperatorModule(head.at(0), description, this, opInter));
+                            modules.operators.append(OperatorModule(head.at(0), description, this, opInter, opStatics));
                             break;
                         case FUNCTION:
-                            modules.functions.append(FunctionModule(head.at(0), description, this, funcInter));
+                            modules.functions.append(FunctionModule(head.at(0), description, this, funcInter, funcStatics));
                             break;
                         case TERMINAL:
                             modules.terminals.append(TerminalModule(head.at(0), description, this, (std::unique_ptr<CAS::AbstractArithmetic>(*)(const std::string &))lib.resolve(head[0] + "_jmodule")));
@@ -64,28 +66,17 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
                             description = value;
                         } else if (key == "matches") {
                             if (type == OPERATOR) {
-                                opInter.matches = [=](const std::string &candidate) {
-                                        return candidate == value.data();
-                                    };
+                                opStatics.matches = std::make_shared<QString>(value);
                             } else if (type == FUNCTION) {
                                 QList<QByteArray> matchParts = value.split(',');
-                                funcInter.matches = [=](const std::string &candidate, unsigned int argCount) {
-                                        return candidate == matchParts.at(0).data() && argCount == matchParts.at(1).toUInt();
-                                    };
+                                funcStatics.matches = std::make_shared<QPair<QString, unsigned int>>(QString(matchParts.at(0)), matchParts.at(1).toUInt());
                             }
                         } else if (key == "priority") {
-                            auto priorityFunc = [=] {
-                                    return value.toInt();
-                                };
-                            if (type == OPERATOR) opInter.priority = priorityFunc;
-                            else if (type == FUNCTION) funcInter.priority = priorityFunc;
+                            if (type == OPERATOR) opStatics.priority = value.toUInt();
+                            else if (type == FUNCTION) funcStatics.priority = value.toUInt();
                         } else if (type == OPERATOR && key == "associativity") {
-                            if (value == "left") opInter.associativity = [] {
-                                    return OperatorInterface::LEFT;
-                                };
-                            else if (value == "right") opInter.associativity = [] {
-                                    return OperatorInterface::RIGHT;
-                                };
+                            if (value == "left") opStatics.associativity = OperatorInterface::LEFT;
+                            else if (value == "right") opStatics.associativity = OperatorInterface::RIGHT;
                         } else if (key == "lib") {
                             lib.setFileName(value);
                             std::string dbg = QString(head[0]).toStdString();
