@@ -58,6 +58,7 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
     int level;
     bool deleted;
     do {
+        input.erase(std::remove_if(begin(input), end(input), isspace), end(input));
         if (input.empty()) throw "Error: Could not parse input.";
         deleted = false;
         if (input.at(0) == '(' && input.at(input.length() - 1) == ')') {
@@ -96,7 +97,7 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
             }
         }
     }
-    //assgnment operator matches for every '=', but parses only if first arg is variable / assignable function.
+    //assignment operator matches for every '=', but parses only if first arg is variable / assignable function.
     //make sure we don't return nullptr in that case (is there a better way?)
     if (best_op_match != nullptr) {
         std::unique_ptr<CAS::AbstractArithmetic> result = best_op_match->parse(parse(input.substr(0, foundPos)), parse(input.substr(foundPos + 1, input.length() - foundPos - 1)));

@@ -9,12 +9,6 @@
 struct OperatorInterface
 {
     enum AssociativityType { LEFT, RIGHT };
-/*
-    bool (*matches)(std::string);
-    int (*priority)();
-    AssociativityType (*associativity)();
-    std::unique_ptr<CAS::AbstractArithmetic> (*parse)(std::unique_ptr<CAS::AbstractArithmetic>, std::unique_ptr<CAS::AbstractArithmetic>);
-    */
 
     std::function<bool(std::string)> matches;
     std::function<unsigned int()> priority;
