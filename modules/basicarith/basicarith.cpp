@@ -69,14 +69,14 @@ OperatorInterface BASICARITHSHARED_EXPORT Exponentiation_jmodule()
 std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Number_jmodule(const std::string &candidate)
 {
     bool ok;
-    int num = QString::fromStdString(candidate).toInt(&ok);
+    double num = QString::fromStdString(candidate).toDouble(&ok);
     if (ok) return make_unique<CAS::NumberArith>(num);
     else return nullptr;
 }
 
 std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Pi_jmodule(const std::string &candidate)
 {
-    if (candidate == "pi") return make_unique<CAS::NumberArith>(3);
+    if (candidate == "pi") return make_unique<CAS::NumberArith>(3.14159);
     else return nullptr;
 }
 
