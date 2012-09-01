@@ -110,19 +110,19 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
     foundPos = itParenthesis - input.begin();
     std::string identifier = input.substr(0, foundPos);
     std::string argString = input.substr(foundPos + 1, input.length() - foundPos - 2);
-    std::vector<std::shared_ptr<CAS::AbstractArithmetic>> arguments;
+    std::vector<std::unique_ptr<CAS::AbstractArithmetic>> arguments;
     std::string::const_iterator lastPos = argString.begin();
     level = 0;
     for (std::string::const_iterator it = argString.begin(); it != argString.end(); ++it) {
         if (*it == '(' || *it == '[' || *it == '{')  level--;
         else if (*it == ')' || *it == ']' || *it == '}') level++;
         else if (level == 0 && *it == ',') {
-            arguments.push_back(parse(argString.substr(lastPos - argString.begin(), it - lastPos)));
+            arguments.emplace_back(parse(argString.substr(lastPos - argString.begin(), it - lastPos)));
             lastPos = it + 1;
         }
     }
-    if (lastPos != argString.begin()) arguments.push_back(parse(argString.substr(lastPos - argString.begin(), argString.length() - (lastPos - argString.begin()))));
-    else arguments.push_back(parse(argString));
+    if (lastPos != argString.begin()) arguments.emplace_back(parse(argString.substr(lastPos - argString.begin(), argString.length() - (lastPos - argString.begin()))));
+    else arguments.emplace_back(parse(argString));
 
     const FunctionModule *best_func_match = nullptr;
 

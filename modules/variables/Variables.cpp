@@ -19,8 +19,8 @@ std::unique_ptr<CAS::AbstractArithmetic> VARIABLESSHARED_EXPORT Variable_jmodule
 FunctionInterface VARIABLESSHARED_EXPORT UserFunction_jmodule()
 {
     FunctionInterface fi;
-    fi.parse = [](const std::string &identifier, const std::vector<std::shared_ptr<CAS::AbstractArithmetic>> &arguments) {
-            return std::unique_ptr<CAS::AbstractArithmetic>(new CAS::Function(identifier, arguments));
+    fi.parse = [](const std::string &identifier, std::vector<std::unique_ptr<CAS::AbstractArithmetic>> &arguments) {
+            return std::unique_ptr<CAS::AbstractArithmetic>(new CAS::Function(identifier, std::move(arguments)));
         };
     fi.matches = [](const std::string &candidate, unsigned int argCount) {
             return true;

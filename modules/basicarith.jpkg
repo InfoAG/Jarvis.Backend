@@ -34,6 +34,15 @@ Subtraction : Operator
     associativity: left
 }
 
+Exponentiation : Operator
+{
+    description: -.-
+    lib: modules/basicarith
+    matches: ^
+    priority: 3
+    associativity: right
+}
+
 Number : Terminal
 {
     description: just integers

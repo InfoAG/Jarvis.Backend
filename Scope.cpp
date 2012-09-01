@@ -41,7 +41,7 @@ void Scope::sendMsg(const QString &sender, const QString &msg)
             } else if (ass->getFirstOp()->getType() == CAS::AbstractArithmetic::FUNCTION) {
                 const CAS::Function *func = static_cast<const CAS::Function*>(ass->getFirstOp());
                 std::vector<std::string> argStrings;
-                for (const auto &arg : func->getOperands()) argStrings.push_back(arg->toString());
+                for (const auto &arg : func->getOperands()) argStrings.emplace_back(arg->toString());
                 scope_info.functions[std::make_pair(func->getIdentifier(), argStrings.size())] = std::make_pair(argStrings, ass->getSecondOp()->copy());
                 QStringList argQStrings;
                 for (const auto &arg : argStrings) argQStrings.append(QString::fromStdString(arg));

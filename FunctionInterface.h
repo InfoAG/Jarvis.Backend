@@ -9,7 +9,7 @@
 struct FunctionInterface
 {
     std::function<bool(const std::string &, unsigned int)> matches;
-    std::function<std::unique_ptr<CAS::AbstractArithmetic>(const std::string &, const std::vector<std::shared_ptr<CAS::AbstractArithmetic>> &)> parse;
+    std::function<std::unique_ptr<CAS::AbstractArithmetic>(const std::string &, std::vector<std::unique_ptr<CAS::AbstractArithmetic>> &)> parse;
     std::function<unsigned int()> priority;
 };
 

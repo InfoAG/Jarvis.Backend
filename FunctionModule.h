@@ -25,7 +25,7 @@ public:
     FunctionModule(const QString &name, const QString &description, const ModulePackage *parent_pkg, const FunctionInterface &interface, const StaticInfo &statics) : ParserModule(name, description, parent_pkg), interface(interface), statics(statics) {}
 
     bool matches(const std::string &candidate, unsigned int argCount) const;
-    std::unique_ptr<CAS::AbstractArithmetic> parse(const std::string &identifier, const std::vector<std::shared_ptr<CAS::AbstractArithmetic>> &args) const { return interface.parse(identifier, args);}
+    std::unique_ptr<CAS::AbstractArithmetic> parse(const std::string &identifier, std::vector<std::unique_ptr<CAS::AbstractArithmetic>> &args) const { return interface.parse(identifier, args);}
     unsigned int priority() const;
 
     friend QDataStream &operator<<(QDataStream &, const FunctionModule &);
