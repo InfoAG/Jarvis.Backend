@@ -69,7 +69,7 @@ OperatorInterface BASICARITHSHARED_EXPORT Exponentiation_jmodule()
 
 std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Number_jmodule(const std::string &candidate)
 {
-    if (candidate.size() == 1 && candidate.front() == '0') return nullptr;
+    if (candidate.size() != 1 && candidate.front() == '0') return nullptr;
     else {
         if (candidate.find_first_not_of("0123456789") != std::string::npos) return nullptr;
         else return make_unique<CAS::NumberArith>(CAS::Natural(candidate));
