@@ -33,12 +33,12 @@ OperatorInterface VARIABLESSHARED_EXPORT Assignment_jmodule()
     OperatorInterface oi;
     oi.parse = [](std::unique_ptr<CAS::AbstractArithmetic> first, std::unique_ptr<CAS::AbstractArithmetic> second) {
             bool assignableFunction = false;
-            if (first->getType() == CAS::AbstractArithmetic::FUNCTION) {
+            if (first->type() == CAS::AbstractArithmetic::FUNCTION) {
                 assignableFunction = true;
                 for (const auto &arg : static_cast<CAS::Function*>(first.get())->getOperands())
-                    if (arg->getType() != CAS::AbstractArithmetic::VARIABLE) assignableFunction = false;
+                    if (arg->type() != CAS::AbstractArithmetic::VARIABLE) assignableFunction = false;
             }
-            if (assignableFunction || first->getType() == CAS::AbstractArithmetic::VARIABLE)
+            if (assignableFunction || first->type() == CAS::AbstractArithmetic::VARIABLE)
                 return std::unique_ptr<CAS::AbstractArithmetic>(new CAS::Assignment(std::forward<std::unique_ptr<CAS::AbstractArithmetic>>(first), std::forward<std::unique_ptr<CAS::AbstractArithmetic>>(second)));
             else return std::unique_ptr<CAS::AbstractArithmetic>(nullptr);
         };

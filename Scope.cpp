@@ -30,16 +30,16 @@ void Scope::sendMsg(const QString &sender, const QString &msg)
     try {
         std::unique_ptr<CAS::AbstractArithmetic> result = parser->parse(msg.toStdString());
         QString resultString = QString::fromStdString(result->eval(scope_info)->toString());
-        if (result->getType() == CAS::AbstractArithmetic::ASSIGNMENT) {
+        if (result->type() == CAS::AbstractArithmetic::ASSIGNMENT) {
             CAS::Assignment *ass(static_cast<CAS::Assignment*>(result.get()));
-            if (ass->getFirstOp()->getType() == CAS::AbstractArithmetic::VARIABLE) {
+            if (ass->getFirstOp()->type() == CAS::AbstractArithmetic::VARIABLE) {
                 scope_info.variables[ass->getFirstOp()->toString()] =  std::shared_ptr<CAS::AbstractArithmetic>(ass->getSecondOp()->copy());
                 for (const auto &client : clients)
                         client->newVariable(name, QString::fromStdString(ass->getFirstOp()->toString()), QString::fromStdString(ass->getSecondOp()->toString()));
                 qDebug() << "NewVariable(" << name << ", " << QString::fromStdString(ass->getFirstOp()->toString()) << ", " << QString::fromStdString(ass->getSecondOp()->toString()) << ")";
                 resultString = QString::fromStdString(ass->getSecondOp()->eval(scope_info)->toString());
-            } else if (ass->getFirstOp()->getType() == CAS::AbstractArithmetic::FUNCTION) {
-                const CAS::Function *func = static_cast<const CAS::Function*>(ass->getFirstOp());
+            } else if (ass->getFirstOp()->type() == CAS::AbstractArithmetic::FUNCTION) {
+                const CAS::Function *func = static_cast<const CAS::Function*>(ass->getFirstOp().get());
                 std::vector<std::string> argStrings;
                 for (const auto &arg : func->getOperands()) argStrings.emplace_back(arg->toString());
                 scope_info.functions[std::make_pair(func->getIdentifier(), argStrings.size())] = std::make_pair(argStrings, ass->getSecondOp()->copy());
