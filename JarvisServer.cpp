@@ -44,9 +44,9 @@ void JarvisServer::msgToScope(ClientConnection *sender, QString scope, QString m
 
 void JarvisServer::disconnected(ClientConnection *client)
 {
+    qDebug() << "ClientDisconnect(" << client->nick() << ")";
     for (auto &scope : scopes) scope.removeClient(client);
     clients.erase(std::find_if(clients.begin(), clients.end(), [&](const std::shared_ptr<ClientConnection> &it_client) { return it_client.get() == client; }));
-    qDebug() << "ClientDisconnect(" << client->nick() << ")";
 }
 
 void JarvisServer::deleteScope(const QString &name)

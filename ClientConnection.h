@@ -4,6 +4,7 @@
 #include <QTcpSocket>
 #include <QDataStream>
 #include <QString>
+#include <QTimer>
 #include "JarvisServer.h"
 
 /**
@@ -30,7 +31,9 @@ private:
     JarvisServer *server; //!< Parent server
     QDataStream iStream, oStream; //!< Input and output streams for socket
     QString _nick; //!< Client nick
-    QByteArray streamBuf; //!< Stream buffer, needed because QDataStream can fail after stealing all the data from QTcpSocket
+    QByteArray streamBuf; //!< Stream buffer, needed because QDataStream can fail after stealing all the data from QTcpSocket    
+    char pingCount{0};
+    QTimer inactivityTimer;
 
     /**
      * Pop first byte from streamBuf
@@ -46,6 +49,7 @@ public:
      * @param socketfd Socket descriptor
      */
     ClientConnection(JarvisServer *server, int socketfd);
+    ~ClientConnection() { socket.disconnect(); }
 
     QString nick() const { return _nick; }; //!< @return Client nick
     /**
@@ -94,6 +98,7 @@ public:
 private slots:
     void readyRead(); //!< Data available to read from socket
     void disconnected() { server->disconnected(this); } //!< Socket disconnected
+    void timeout();
 };
 
 #endif // CLIENTCONNECTION_H

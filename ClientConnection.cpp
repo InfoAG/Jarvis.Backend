@@ -6,10 +6,14 @@ ClientConnection::ClientConnection(JarvisServer *server, int socketfd) : server(
     socket.setSocketDescriptor(socketfd);
     connect(&socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(&socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    inactivityTimer.setSingleShot(true);
+    connect(&inactivityTimer, SIGNAL(timeout()), SLOT(timeout()));
 }
 
 void ClientConnection::readyRead()
 {
+    pingCount = 0;
+    inactivityTimer.start(30000);
     streamBuf += socket.readAll();
     do {
         iStream.device()->reset();
@@ -48,6 +52,7 @@ void ClientConnection::readyRead()
             case 3: connectionState = LoadPkg; break;
             case 4: connectionState = UnloadPkg; break;
             case 5: connectionState = DeleteScope; break;
+            //case 7: reserved for PONG, inactivityTimer has already been reset at function entry
             }
             break;
         case EnterScope: {
@@ -137,4 +142,15 @@ void ClientConnection::readyRead()
         }
         if (socket.bytesAvailable()) streamBuf += socket.readAll();
     } while (! streamBuf.isEmpty());
+}
+
+void ClientConnection::timeout()
+{
+    if (pingCount == 3) {
+        server->disconnected(this);
+    } else {
+        oStream << static_cast<quint8>(10);
+        pingCount++;
+        inactivityTimer.start(5000);
+    }
 }
