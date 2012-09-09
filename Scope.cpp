@@ -29,28 +29,25 @@ void Scope::sendMsg(const QString &sender, const QString &msg)
     for (const auto &client : clients) client->sendMsg(name, sender, msg);
     try {
         std::unique_ptr<CAS::AbstractArithmetic> result = parser->parse(msg.toStdString());
-        QString resultString = QString::fromStdString(result->eval(scope_info)->toString());
         if (result->type() == CAS::AbstractArithmetic::ASSIGNMENT) {
-            CAS::Assignment *ass(static_cast<CAS::Assignment*>(result.get()));
-            if (ass->getFirstOp()->type() == CAS::AbstractArithmetic::VARIABLE) {
-                scope_info.variables[ass->getFirstOp()->toString()] =  std::shared_ptr<CAS::AbstractArithmetic>(ass->getSecondOp()->copy());
+            if (static_cast<CAS::Assignment*>(result.get())->getFirstOp()->type() == CAS::AbstractArithmetic::VARIABLE) {
+                scope_info.variables[static_cast<CAS::Assignment*>(result.get())->getFirstOp()->toString()] =  std::shared_ptr<CAS::AbstractArithmetic>(static_cast<CAS::Assignment*>(result.get())->getSecondOp()->copy());
                 for (const auto &client : clients)
-                        client->newVariable(name, QString::fromStdString(ass->getFirstOp()->toString()), QString::fromStdString(ass->getSecondOp()->toString()));
-                qDebug() << "NewVariable(" << name << ", " << QString::fromStdString(ass->getFirstOp()->toString()) << ", " << QString::fromStdString(ass->getSecondOp()->toString()) << ")";
-                resultString = QString::fromStdString(ass->getSecondOp()->eval(scope_info)->toString());
-            } else if (ass->getFirstOp()->type() == CAS::AbstractArithmetic::FUNCTION) {
-                const CAS::Function *func = static_cast<const CAS::Function*>(ass->getFirstOp().get());
+                        client->newVariable(name, QString::fromStdString(static_cast<CAS::Assignment*>(result.get())->getFirstOp()->toString()), QString::fromStdString(static_cast<CAS::Assignment*>(result.get())->getSecondOp()->toString()));
+                qDebug() << "NewVariable(" << name << ", " << QString::fromStdString(static_cast<CAS::Assignment*>(result.get())->getFirstOp()->toString()) << ", " << QString::fromStdString(static_cast<CAS::Assignment*>(result.get())->getSecondOp()->toString()) << ")";
+            } else if (static_cast<CAS::Assignment*>(result.get())->getFirstOp()->type() == CAS::AbstractArithmetic::FUNCTION) {
+                const CAS::Function *func = static_cast<const CAS::Function*>(static_cast<CAS::Assignment*>(result.get())->getFirstOp().get());
                 std::vector<std::string> argStrings;
                 for (const auto &arg : func->getOperands()) argStrings.emplace_back(arg->toString());
-                scope_info.functions[std::make_pair(func->getIdentifier(), argStrings.size())] = std::make_pair(argStrings, ass->getSecondOp()->copy());
+                scope_info.functions[std::make_pair(func->getIdentifier(), argStrings.size())] = std::make_pair(argStrings, static_cast<CAS::Assignment*>(result.get())->getSecondOp()->copy());
                 QStringList argQStrings;
                 for (const auto &arg : argStrings) argQStrings.append(QString::fromStdString(arg));
                 for (const auto &client : clients)
-                        client->newFunction(name, QString::fromStdString(func->getIdentifier()), argQStrings, QString::fromStdString(ass->getSecondOp()->toString()));
-                qDebug() << "NewFunction(" << name << ", " << QString::fromStdString(func->getIdentifier()) << ", " << argQStrings << ", " <<  QString::fromStdString(ass->getSecondOp()->toString()) << ")";
-                resultString = QString::fromStdString(ass->getSecondOp()->eval(scope_info)->toString());
+                        client->newFunction(name, QString::fromStdString(func->getIdentifier()), argQStrings, QString::fromStdString(static_cast<CAS::Assignment*>(result.get())->getSecondOp()->toString()));
+                qDebug() << "NewFunction(" << name << ", " << QString::fromStdString(func->getIdentifier()) << ", " << argQStrings << ", " <<  QString::fromStdString(static_cast<CAS::Assignment*>(result.get())->getSecondOp()->toString()) << ")";
             }
         }
+        QString resultString = QString::fromStdString(result->eval(scope_info)->toString());
         for (const auto &client : clients) client->sendMsg(name, "Jarvis", resultString);
     } catch (const char *) {
         for (const auto &client : clients) client->sendMsg(name, "Jarvis", "error bro");
