@@ -74,7 +74,9 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
                         } else if (key == "priority") {
                             if (type == OPERATOR) opStatics.priority = value.toUInt();
                             else if (type == FUNCTION) funcStatics.priority = value.toUInt();
-                        } else if (type == OPERATOR && key == "associativity") {
+                        } else if (key == "needsParseForMatch" && type == OPERATOR)
+                            opStatics.needsParseForMatch = (value == "true") ? true : false;
+                        else if (type == OPERATOR && key == "associativity") {
                             if (value == "left") opStatics.associativity = OperatorInterface::LEFT;
                             else if (value == "right") opStatics.associativity = OperatorInterface::RIGHT;
                         } else if (key == "lib") {

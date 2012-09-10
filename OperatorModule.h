@@ -15,6 +15,7 @@ public:
         std::shared_ptr<QString> matches;
         unsigned int priority;
         OperatorInterface::AssociativityType associativity;
+        bool needsParseForMatch;
     };
 
 private:
@@ -28,6 +29,7 @@ public:
     unsigned int priority() const;
     OperatorInterface::AssociativityType associativity() const;
     std::unique_ptr<CAS::AbstractArithmetic> parse(std::unique_ptr<CAS::AbstractArithmetic> left, std::unique_ptr<CAS::AbstractArithmetic> right) const { return interface.parse(std::forward<std::unique_ptr<CAS::AbstractArithmetic>>(left), std::forward<std::unique_ptr<CAS::AbstractArithmetic>>(right)); }
+    bool needsParseForMatch() const { return statics.needsParseForMatch; }
 
     friend QDataStream &operator<<(QDataStream &, const OperatorModule &);
 };

@@ -5,6 +5,7 @@ Addition : Operator
     matches: +
     priority: 1
     associativity: left
+    needsParseForMatch: true
 }
 
 Multiplication : Operator
@@ -14,6 +15,7 @@ Multiplication : Operator
     matches: *
     priority: 2
     associativity: left
+    needsParseForMatch: true
 }
 
 Division : Operator
@@ -23,6 +25,7 @@ Division : Operator
     matches: /
     priority: 2
     associativity: left
+    needsParseForMatch: true
 }
 
 Subtraction : Operator
@@ -32,6 +35,7 @@ Subtraction : Operator
     matches: -
     priority: 1
     associativity: left
+    needsParseForMatch: true
 }
 
 Exponentiation : Operator
@@ -41,6 +45,7 @@ Exponentiation : Operator
     matches: ^
     priority: 3
     associativity: right
+    needsParseForMatch: true
 }
 
 Number : Terminal

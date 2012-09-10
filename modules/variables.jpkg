@@ -18,4 +18,5 @@ Assignment : Operator
     priority: 0
     associativity: right
     matches: =
+    needsParseForMatch: true
 }

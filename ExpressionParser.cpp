@@ -84,6 +84,7 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
     level = 0;
     unsigned int foundPos = 0;
     const OperatorModule *best_op_match = nullptr;
+    std::unique_ptr<CAS::AbstractArithmetic> parseForMatchResult;
 
     for (std::string::iterator i = input.begin(); i != input.end(); ++i) {
         if (*i == '(' || *i == '[' || *i == '{')  level--;
@@ -91,18 +92,23 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
         else if (level == 0) {
             for (const auto &it_op : modules.operators) {
                 if (it_op.matches(std::string(1, *i)) && (best_op_match == nullptr || it_op.priority() < best_op_match->priority() || (it_op.priority() == best_op_match->priority() && it_op.associativity() == OperatorInterface::LEFT))) {
-                    best_op_match = &it_op;
-                    foundPos = i - input.begin();
+                    if (! it_op.needsParseForMatch()) {
+                        foundPos = i - input.begin();
+                        parseForMatchResult.reset();
+                        best_op_match = &it_op;
+                    } else {
+                        parseForMatchResult = it_op.parse(parse(input.substr(0, i - input.begin())), parse(input.substr(i - input.begin() + 1, input.length() - (i - input.begin()) - 1)));
+                        if (parseForMatchResult)
+                            best_op_match = &it_op;
+                    }
                 }
             }
         }
     }
-    //assignment operator matches for every '=', but parses only if first arg is variable / assignable function.
-    //make sure we don't return nullptr in that case (is there a better way?)
+
     if (best_op_match != nullptr) {
-        std::unique_ptr<CAS::AbstractArithmetic> result = best_op_match->parse(parse(input.substr(0, foundPos)), parse(input.substr(foundPos + 1, input.length() - foundPos - 1)));
-        if (result) return result;
-        else throw "Error: Could not parse input.";
+        if (parseForMatchResult != nullptr) return parseForMatchResult;
+        else return best_op_match->parse(parse(input.substr(0, foundPos)), parse(input.substr(foundPos + 1, input.length() - foundPos - 1)));
     }
     if (input.back() != ')') throw "Error: Could not parse input.";
     std::string::iterator itParenthesis = std::find_if_not(input.begin(), input.end(), isalpha);
