@@ -97,9 +97,13 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
                         parseForMatchResult.reset();
                         best_op_match = &it_op;
                     } else {
-                        parseForMatchResult = it_op.parse(parse(input.substr(0, i - input.begin())), parse(input.substr(i - input.begin() + 1, input.length() - (i - input.begin()) - 1)));
-                        if (parseForMatchResult)
-                            best_op_match = &it_op;
+                        try {
+                            std::unique_ptr<CAS::AbstractArithmetic> tmpResult = it_op.parse(parse(input.substr(0, i - input.begin())), parse(input.substr(i - input.begin() + 1, input.length() - (i - input.begin()) - 1)));
+                            if (tmpResult) {
+                                best_op_match = &it_op;
+                                parseForMatchResult = std::move(tmpResult);
+                            }
+                        } catch (const char *) {}
                     }
                 }
             }

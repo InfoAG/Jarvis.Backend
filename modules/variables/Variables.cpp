@@ -22,7 +22,7 @@ FunctionInterface VARIABLESSHARED_EXPORT UserFunction_jmodule()
     fi.parse = [](const std::string &identifier, std::vector<std::unique_ptr<CAS::AbstractArithmetic>> &arguments) {
             return std::unique_ptr<CAS::AbstractArithmetic>(new CAS::Function(identifier, std::move(arguments)));
         };
-    fi.matches = [](const std::string &candidate, unsigned int argCount) {
+    fi.matches = [](const std::string &, unsigned int) {
             return true;
         };
     return fi;
