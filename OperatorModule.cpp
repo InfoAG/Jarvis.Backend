@@ -27,5 +27,6 @@ QDataStream &operator<<(QDataStream &stream, const OperatorModule &module)
     else stream << static_cast<quint8>(1);
     if (module.interface.associativity == nullptr) stream << static_cast<quint8>(0) << static_cast<quint8>(module.statics.associativity);
     else stream << static_cast<quint8>(1);
+    stream << static_cast<quint8>(module.statics.needsParseForMatch);
     return stream;
 }
