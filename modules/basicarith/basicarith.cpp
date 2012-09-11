@@ -78,7 +78,7 @@ std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Number_jmodule(
 
 std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Pi_jmodule(const std::string &candidate)
 {
-    if (candidate == "pi") return make_unique<CAS::NumberArith>(3.14159);
+    if (candidate == "pi") return make_unique<CAS::NumberArith>(3);
     else return nullptr;
 }
 
