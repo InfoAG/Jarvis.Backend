@@ -77,7 +77,7 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
 
     std::unique_ptr<CAS::AbstractArithmetic> result;
     for (const auto &terminal : modules.terminals) {
-        result = terminal.parse(input);
+        result = terminal.parse(input, std::bind(&ExpressionParser::parse, this, std::placeholders::_1));
         if (result) return result;
     }
 
@@ -119,9 +119,11 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
     if (itParenthesis == input.begin() || itParenthesis == input.end() || *itParenthesis != '(') throw "Error: Could not parse input.";
     foundPos = itParenthesis - input.begin();
     std::string identifier = input.substr(0, foundPos);
-    std::string argString = input.substr(foundPos + 1, input.length() - foundPos - 2);
+    //std::string argString = input.substr(foundPos + 1, input.length() - foundPos - 2);
     std::vector<std::unique_ptr<CAS::AbstractArithmetic>> arguments;
-    std::string::const_iterator lastPos = argString.begin();
+    auto argString = tokenize(input.substr(foundPos + 1, input.length() - foundPos - 2), ",");
+    for (const auto &arg : argString) arguments.emplace_back(parse(arg));
+    /*std::string::const_iterator lastPos = argString.begin();
     level = 0;
     for (std::string::const_iterator it = argString.begin(); it != argString.end(); ++it) {
         if (*it == '(' || *it == '[' || *it == '{')  level--;
@@ -132,7 +134,7 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
         }
     }
     if (lastPos != argString.begin()) arguments.emplace_back(parse(argString.substr(lastPos - argString.begin(), argString.length() - (lastPos - argString.begin()))));
-    else arguments.emplace_back(parse(argString));
+    else arguments.emplace_back(parse(argString));*/
 
     const FunctionModule *best_func_match = nullptr;
 

@@ -35,6 +35,24 @@ public:
     std::shared_ptr<ModulePackage> load(const QString &filePath);
     QVector<ModulePackage> getModulePkgs() const; //!< @return QVector of all module packages
 
+    static std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters)
+    {
+        std::vector<std::string> tokens;
+        int level = 0;
+        auto lastPos = str.cbegin();
+        for (auto it = str.cbegin(); it != str.cend(); ++it) {
+            if (*it == '(' || *it == '[' || *it == '{')  level--;
+            else if (*it == ')' || *it == ']' || *it == '}') level++;
+            else if (level == 0 && delimiters.find_first_of(*it) != std::string::npos) {
+                tokens.emplace_back(str.substr(lastPos - str.begin(), it - lastPos));
+                lastPos = it + 1;
+            }
+        }
+        if (lastPos != str.begin()) tokens.emplace_back(str.substr(lastPos - str.begin(), str.length() - (lastPos - str.begin())));
+        else tokens.emplace_back(str);
+        return tokens;
+    }
+
     /**
      * Parse the input using all loaded packages
      * @param input Input string

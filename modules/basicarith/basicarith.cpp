@@ -6,18 +6,13 @@
 #include "Arithmetic/Division.h"
 #include "Arithmetic/NumberArith.h"
 #include "Arithmetic/Exponentiation.h"
+#include "Arithmetic/Matrix.h"
 #include "Natural.h"
+#include "ExpressionParser.h"
 
 #include <string>
 #include <iostream>
 #include <QString>
-//#pragma weak operator_factory
-//extern std::map<std::string, int> operator_factory;
-/*
-std::unique_ptr<CAS::AbstractArithmetic> parse()
-{
-
-}*/
 
 extern "C" {
 
@@ -67,7 +62,7 @@ OperatorInterface BASICARITHSHARED_EXPORT Exponentiation_jmodule()
     return oi;
 }
 
-std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Number_jmodule(const std::string &candidate)
+std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Number_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractArithmetic>(std::string)>)
 {
     if (candidate.size() != 1 && candidate.front() == '0') return nullptr;
     else {
@@ -76,10 +71,33 @@ std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Number_jmodule(
     }
 }
 
-std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Pi_jmodule(const std::string &candidate)
+std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Pi_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractArithmetic>(std::string)>)
 {
     if (candidate == "pi") return make_unique<CAS::NumberArith>(3);
     else return nullptr;
+}
+
+std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Matrix_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractArithmetic>(std::string)> parseFunc)
+{
+    if (candidate.front() != '[' || candidate.back() != ']') return nullptr;
+
+    std::vector<std::unique_ptr<CAS::AbstractArithmetic>> result;
+    if (candidate.at(1) == '[') {
+        auto lastPos = candidate.cbegin();
+        int level = 0;
+        for (auto it = candidate.cbegin() + 1; it != candidate.cend() - 1; ++it) {
+            if (*it == '(' || *it == '[' || *it == '{')  level--;
+            else if (*it == ')' || *it == ']' || *it == '}') level++;
+            if (level == 0) {
+                result.emplace_back(parseFunc(std::string{lastPos + 1, it + 1}));
+                lastPos = it;
+            }
+        }
+    } else {
+        std::vector<std::string> tokens = ExpressionParser::tokenize(std::string{candidate.cbegin() + 1, candidate.cend() - 1}, ",");
+        for (const auto &token : tokens) result.emplace_back(parseFunc(token));
+    }
+    return make_unique<CAS::Matrix>(std::move(result));
 }
 
 

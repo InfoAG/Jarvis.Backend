@@ -59,3 +59,9 @@ Pi : Terminal
     description: circles. many of them.
     lib: modules/basicarith
 }
+
+Matrix : Terminal
+{
+    description: matrix with arbitrary dimensions
+    lib: modules/basicarith
+}
