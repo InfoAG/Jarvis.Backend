@@ -15,6 +15,8 @@ class ExpressionParser
 private:
     ParserModules modules; //!< Parser modules
     QList<std::shared_ptr<ModulePackage> > modulePkgs; //!< Module packages
+    std::string startLevelChars;
+    std::string endLevelChars;
 
 public:
     /**

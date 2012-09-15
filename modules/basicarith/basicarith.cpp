@@ -81,10 +81,16 @@ std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Matrix_jmodule(
 {
     if (candidate.front() != '[' || candidate.back() != ']') return nullptr;
 
+    int level = 0;
+    for (auto it = candidate.begin() + 1; it != candidate.end() - 1; ++it) {
+        if (*it == '[') level++;
+        else if (*it == ']' && --level == -1) return nullptr;
+    }
+
     std::vector<std::unique_ptr<CAS::AbstractArithmetic>> result;
     if (candidate.at(1) == '[') {
         auto lastPos = candidate.cbegin();
-        int level = 0;
+        level = 0;
         for (auto it = candidate.cbegin() + 1; it != candidate.cend() - 1; ++it) {
             if (*it == '(' || *it == '[' || *it == '{')  level--;
             else if (*it == ')' || *it == ']' || *it == '}') level++;
@@ -97,7 +103,8 @@ std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Matrix_jmodule(
         std::vector<std::string> tokens = ExpressionParser::tokenize(std::string{candidate.cbegin() + 1, candidate.cend() - 1}, ",");
         for (const auto &token : tokens) result.emplace_back(parseFunc(token));
     }
-    return make_unique<CAS::Matrix>(std::move(result));
+    if (result.empty()) return nullptr;
+    else return make_unique<CAS::Matrix>(std::move(result));
 }
 
 
