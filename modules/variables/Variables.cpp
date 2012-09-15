@@ -4,6 +4,7 @@
 #include "Arithmetic/Variable.h"
 #include "Arithmetic/Assignment.h"
 #include "Arithmetic/Function.h"
+#include "Arithmetic/LazyEval.h"
 #include <memory>
 #include "variables_global.h"
 
@@ -43,6 +44,15 @@ OperatorInterface VARIABLESSHARED_EXPORT Assignment_jmodule()
             else return std::unique_ptr<CAS::AbstractArithmetic>(nullptr);
         };
     return oi;
+}
+
+FunctionInterface VARIABLESSHARED_EXPORT LazyEval_jmodule()
+{
+    FunctionInterface fi;
+    fi.parse = [](const std::string &identifier, std::vector<std::unique_ptr<CAS::AbstractArithmetic>> &arguments) {
+            return make_unique<CAS::LazyEval>(std::move(arguments.front()));
+        };
+    return fi;
 }
 
 }
