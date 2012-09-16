@@ -9,6 +9,7 @@
 #include "Arithmetic/Matrix.h"
 #include "Natural.h"
 #include "ExpressionParser.h"
+#include "Arithmetic/Modulo.h"
 
 #include <string>
 #include <iostream>
@@ -107,6 +108,14 @@ std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Matrix_jmodule(
     else return make_unique<CAS::Matrix>(std::move(result));
 }
 
+OperatorInterface BASICARITHSHARED_EXPORT Modulo_jmodule()
+{
+    OperatorInterface oi;
+    oi.parse = [](std::unique_ptr<CAS::AbstractArithmetic> first, std::unique_ptr<CAS::AbstractArithmetic> second) {
+        return make_unique<CAS::Modulo>(std::move(first), std::move(second));
+    };
+    return oi;
+}
 
 }
 

@@ -65,3 +65,13 @@ Matrix : Terminal
     description: matrix with arbitrary dimensions
     lib: modules/basicarith
 }
+
+Modulo : Operator
+{
+    description: modulo
+    lib: modules/basicarith
+    matches: %
+    priority: 2
+    associativity: left
+    needsParseForMatch: false
+}
