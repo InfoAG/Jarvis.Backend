@@ -75,3 +75,19 @@ Modulo : Operator
     associativity: left
     needsParseForMatch: false
 }
+
+Min : Function
+{
+    description: minimum of values
+    lib: modules/basicarith
+    matches: min, 2
+    priority: 1
+}
+
+Max : Function
+{
+    description: maximum of values
+    lib: modules/basicarith
+    matches: max, 2
+    priority: 1
+}

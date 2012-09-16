@@ -49,7 +49,7 @@ OperatorInterface VARIABLESSHARED_EXPORT Assignment_jmodule()
 FunctionInterface VARIABLESSHARED_EXPORT LazyEval_jmodule()
 {
     FunctionInterface fi;
-    fi.parse = [](const std::string &identifier, std::vector<std::unique_ptr<CAS::AbstractArithmetic>> &arguments) {
+    fi.parse = [](const std::string &, std::vector<std::unique_ptr<CAS::AbstractArithmetic>> &arguments) {
             return make_unique<CAS::LazyEval>(std::move(arguments.front()));
         };
     return fi;

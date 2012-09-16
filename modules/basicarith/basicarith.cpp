@@ -8,6 +8,8 @@
 #include "Arithmetic/Exponentiation.h"
 #include "Arithmetic/Matrix.h"
 #include "Natural.h"
+#include "Arithmetic/Min.h"
+#include "Arithmetic/Max.h"
 #include "ExpressionParser.h"
 #include "Arithmetic/Modulo.h"
 
@@ -115,6 +117,24 @@ OperatorInterface BASICARITHSHARED_EXPORT Modulo_jmodule()
         return make_unique<CAS::Modulo>(std::move(first), std::move(second));
     };
     return oi;
+}
+
+FunctionInterface BASICARITHSHARED_EXPORT Min_jmodule()
+{
+    FunctionInterface fi;
+    fi.parse = [](const std::string &, std::vector<std::unique_ptr<CAS::AbstractArithmetic>> &arguments) {
+            return make_unique<CAS::Min>(std::move(arguments.front()), std::move(arguments.at(1)));
+        };
+    return fi;
+}
+
+FunctionInterface BASICARITHSHARED_EXPORT Max_jmodule()
+{
+    FunctionInterface fi;
+    fi.parse = [](const std::string &, std::vector<std::unique_ptr<CAS::AbstractArithmetic>> &arguments) {
+            return make_unique<CAS::Max>(std::move(arguments.front()), std::move(arguments.at(1)));
+        };
+    return fi;
 }
 
 }
