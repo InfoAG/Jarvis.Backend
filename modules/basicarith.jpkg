@@ -91,3 +91,9 @@ Max : Function
     matches: max, 2
     priority: 1
 }
+
+Selection : Terminal
+{
+    description: select cell from matrix
+    lib: modules/basicarith
+}

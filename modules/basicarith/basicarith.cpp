@@ -12,6 +12,7 @@
 #include "Arithmetic/Max.h"
 #include "ExpressionParser.h"
 #include "Arithmetic/Modulo.h"
+#include "Arithmetic/Selection.h"
 
 #include <string>
 #include <iostream>
@@ -135,6 +136,23 @@ FunctionInterface BASICARITHSHARED_EXPORT Max_jmodule()
             return make_unique<CAS::Max>(std::move(arguments.front()), std::move(arguments.at(1)));
         };
     return fi;
+}
+
+std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Selection_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractArithmetic>(std::string)> parseFunc)
+{
+    if (candidate.back() != '}') return nullptr;
+    int level = 0, i = candidate.size() - 2;
+    for (; i != -1; i--) {
+        if (level == 0 && candidate.at(i) == '{') break;
+        else if (candidate.at(i) == '(' || candidate.at(i) == '[' || candidate.at(i) == '{')  level--;
+        else if (candidate.at(i) == ')' || candidate.at(i) == ']' || candidate.at(i) == '}') level++;
+    }
+    if (i == -1) return nullptr;
+    CAS::AbstractArithmetic::Operands selectTokens;
+    std::unique_ptr<CAS::AbstractArithmetic> tmpToken;
+    for (const auto &token : ExpressionParser::tokenize(candidate.substr(i + 1, candidate.length() - i - 2), ","))
+        if (tmpToken = parseFunc(token)) selectTokens.emplace_back(std::move(tmpToken));
+    return make_unique<CAS::Selection>(parseFunc(candidate.substr(0, i)), std::move(selectTokens));
 }
 
 }
