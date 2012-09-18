@@ -13,6 +13,7 @@
 #include "ExpressionParser.h"
 #include "Arithmetic/Modulo.h"
 #include "Arithmetic/Selection.h"
+#include "Arithmetic/Range.h"
 #include "OperatorModule.cpp" //wut
 
 #include <string>
@@ -172,6 +173,24 @@ std::unique_ptr<CAS::AbstractArithmetic> BASICARITHSHARED_EXPORT Selection_jmodu
     for (const auto &token : ExpressionParser::tokenize(candidate.substr(i + 1, candidate.length() - i - 2), ","))
         if (tmpToken = parseFunc(token)) selectTokens.emplace_back(std::move(tmpToken));
     return make_unique<CAS::Selection>(parseFunc(candidate.substr(0, i)), std::move(selectTokens));
+}
+
+FunctionInterface BASICARITHSHARED_EXPORT Range_jmodule()
+{
+    FunctionInterface fi;
+    fi.parse = [](const std::string &, std::vector<std::unique_ptr<CAS::AbstractArithmetic>> &arguments) {
+            return make_unique<CAS::Range>(std::move(arguments.front()), std::move(arguments.at(1)), make_unique<CAS::NumberArith>(1));
+        };
+    return fi;
+}
+
+FunctionInterface BASICARITHSHARED_EXPORT RangeCStep_jmodule()
+{
+    FunctionInterface fi;
+    fi.parse = [](const std::string &, std::vector<std::unique_ptr<CAS::AbstractArithmetic>> &arguments) {
+            return make_unique<CAS::Range>(std::move(arguments.front()), std::move(arguments.at(1)), std::move(arguments.at(2)));
+        };
+    return fi;
 }
 
 }
