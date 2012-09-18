@@ -25,10 +25,10 @@ private:
 public:
     OperatorModule(const QString &name, const QString &description, const ModulePackage *parent_pkg, const OperatorInterface &interface, const StaticInfo &statics) : ParserModule(name, description, parent_pkg), interface(interface), statics(statics) {}
 
-    bool matches(std::string candidate) const;
+    bool matches(const std::string &input, size_t candidatePos, const ExpressionParser &parser) const;
     unsigned int priority() const;
     OperatorInterface::AssociativityType associativity() const;
-    std::unique_ptr<CAS::AbstractArithmetic> parse(std::unique_ptr<CAS::AbstractArithmetic> left, std::unique_ptr<CAS::AbstractArithmetic> right) const { return interface.parse(std::forward<std::unique_ptr<CAS::AbstractArithmetic>>(left), std::forward<std::unique_ptr<CAS::AbstractArithmetic>>(right)); }
+    std::unique_ptr<CAS::AbstractArithmetic> parse(std::unique_ptr<CAS::AbstractArithmetic> left, std::unique_ptr<CAS::AbstractArithmetic> right) const { return interface.parse(std::move(left), std::move(right)); }
     bool needsParseForMatch() const { return statics.needsParseForMatch; }
 
     friend QDataStream &operator<<(QDataStream &, const OperatorModule &);

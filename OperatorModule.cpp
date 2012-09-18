@@ -1,9 +1,9 @@
 #include "OperatorModule.h"
 
-bool OperatorModule::matches(std::string candidate) const
+bool OperatorModule::matches(const std::string &input, size_t candidatePos, const ExpressionParser &parser) const
 {
-    if (interface.matches == nullptr) return candidate == statics.matches->toStdString();
-    else return interface.matches(candidate);
+    if (interface.matches == nullptr) return input.at(candidatePos) == statics.matches->toStdString().front();
+    else return interface.matches(input, candidatePos, parser);
 }
 
 unsigned int OperatorModule::priority() const

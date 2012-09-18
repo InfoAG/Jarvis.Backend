@@ -91,7 +91,7 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
         else if (*i == ')' || *i == ']' || *i == '}') level++;
         else if (level == 0) {
             for (const auto &it_op : modules.operators) {
-                if (it_op.matches(std::string(1, *i)) && (best_op_match == nullptr || it_op.priority() < best_op_match->priority() || (it_op.priority() == best_op_match->priority() && it_op.associativity() == OperatorInterface::LEFT))) {
+                if (it_op.matches(input, i - input.begin(), *this) && (best_op_match == nullptr || it_op.priority() < best_op_match->priority() || (it_op.priority() == best_op_match->priority() && it_op.associativity() == OperatorInterface::LEFT))) {
                     if (! it_op.needsParseForMatch()) {
                         foundPos = i - input.begin();
                         parseForMatchResult.reset();

@@ -36,6 +36,7 @@ public:
      */
     std::shared_ptr<ModulePackage> load(const QString &filePath);
     QVector<ModulePackage> getModulePkgs() const; //!< @return QVector of all module packages
+    const ParserModules &getParserModules() const { return modules; }
 
     static std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters)
     {
