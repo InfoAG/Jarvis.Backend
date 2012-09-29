@@ -8,13 +8,13 @@
 #include <QMap>
 #include <QDir>
 #include <memory>
-#include "Scope.h"
+#include "Room.h"
 #include "ExpressionParser.h"
 
 class ClientConnection;
 
 /**
- * Jarvis server which manages client sessions, accounts, settings, scopes and a the parser
+ * Jarvis server which manages client sessions, accounts, settings, rooms and a the parser
  */
 class JarvisServer : public QTcpServer
 {
@@ -30,40 +30,40 @@ public:
      * @return true if login succeeded
      */
     bool login(const QString &nick, const QString &pwd) const { qDebug() << "ClientLogin(" << nick << ", " << pwd << ")"; return true; };
-    QList<QString> getScopeNames() const { return scopes.keys(); }; //!< @return List of scope names
+    QList<QString> getRoomNames() const { return rooms.keys(); } //!< @return List of room names
     ExpressionParser *getParser() const { return parser.get(); } //!< @return Pointer to server wide parser
 
     /**
-     * Allow client to enter a scope; if no scope exists with this name, create a new one
+     * Allow client to enter a room; if no room exists with this name, create a new one
      * @param client Pointer to ClientConnection object
-     * @param scope Scope name
-     * @return Scope object
+     * @param room Room name
+     * @return Room object
      */
-    const Scope &enterScope(ClientConnection *client, QString scope);
+    const Room *enterRoom(ClientConnection *client, QString room);
     /**
-     * Remove client from scope
+     * Remove client from room
      * @param sender Pointer to ClientConnection object
-     * @param scope Scope name
+     * @param room Room name
      */
-    void leaveScope(ClientConnection *sender, QString scope);
+    void leaveRoom(ClientConnection *sender, QString room);
     /**
-     * Send a message to a scope
+     * Send a message to a room
      * @param sender Pointer to ClientConnection object
-     * @param scope Scope name
+     * @param room Room name
      * @param msg Message string
      */
-    void msgToScope(ClientConnection *sender, QString scope, QString msg);
+    void msgToRoom(ClientConnection *sender, QString room, QString msg);
     uint version() const { return 1; }; //!< @return Server version as specified in settings
     /**
-     * Client disconnected; remove from all scopes
+     * Client disconnected; remove from all rooms
      * @param client Pointer to ClientConnection object
      */
     void disconnected(ClientConnection *client);
     /**
-     * Delete a scope
-     * @param name Scope name
+     * Delete a room
+     * @param name Room name
      */
-    void deleteScope(const QString &name);
+    void deleteRoom(const QString &name);
     /**
      * Unload a parser package
      * @param pkgName Package name
@@ -88,7 +88,7 @@ private:
     QSettings settings; //!< Server settings
     std::unique_ptr<ExpressionParser> parser; //!< Server wide dynamic parser
     QList<std::shared_ptr<ClientConnection> > clients; //!< List of all clients
-    QMap<QString, Scope> scopes; //!< Maps scope object to names
+    QMap<QString, std::shared_ptr<Room>> rooms; //!< Maps room object to names
 };
 
 #endif // JARVISSERVER_H

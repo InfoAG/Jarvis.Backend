@@ -19,12 +19,12 @@ private:
         Virgin,
         Auth,
         Loop,
-        EnterScope,
-        LeaveScope,
+        EnterRoom,
+        LeaveRoom,
         ClientMsg,
         UnloadPkg,
         LoadPkg,
-        DeleteScope
+        DeleteRoom
     } connectionState = Virgin; //!< Connection state
 
     QTcpSocket socket; //!< Socket with client connection
@@ -54,33 +54,33 @@ public:
     QString nick() const { return _nick; }; //!< @return Client nick
     /**
      * Signalize a new message
-     * @param scope Scope name
+     * @param room Room name
      * @param sender Sender name
      * @param msg Message string
      */
-    void sendMsg(const QString &scope, const QString &sender, const QString &msg) { oStream << static_cast<quint8>(4) << scope << sender << msg; };
+    void sendMsg(const QString &room, const QString &sender, const QString &msg) { oStream << static_cast<quint8>(4) << room << sender << msg; };
     /**
-     * Signalize creation of a new scope
-     * @param name Scope name
+     * Signalize creation of a new room
+     * @param name Room name
      */
-    void newScope(const QString &name) { oStream << static_cast<quint8>(3) << name; };
+    void newRoom(const QString &name) { oStream << static_cast<quint8>(3) << name; };
     /**
-     * A client entered one of the observed scopes
-     * @param scope Scope name
+     * A client entered one of the observed rooms
+     * @param room Room name
      * @param name Client name
      */
-    void enterClient(const QString &scope, const QString &name) { oStream << static_cast<quint8>(0) << scope << name; }
+    void enterClient(const QString &room, const QString &name) { oStream << static_cast<quint8>(0) << room << name; }
     /**
-     * A client left one of the observed scopes
-     * @param scope Scope name
+     * A client left one of the observed rooms
+     * @param room Room name
      * @param name Client name
      */
-    void leaveClient(const QString &scope, const QString &name) { oStream << static_cast<quint8>(5) << scope << name; }
+    void leaveClient(const QString &room, const QString &name) { oStream << static_cast<quint8>(5) << room << name; }
     /**
-     * A scope was deleted
-     * @param scope Scope name
+     * A room was deleted
+     * @param room Room name
      */
-    void deleteScope(const QString &scope) { oStream << static_cast<quint8>(9) << scope; }
+    void deleteRoom(const QString &room) { oStream << static_cast<quint8>(9) << room; }
     /**
      * Module package unloaded
      * @param name Package name
@@ -91,8 +91,8 @@ public:
      * @param pkg Package content
      */
     void loadPkg(const ModulePackage &pkg) { oStream << static_cast<quint8>(6) << pkg; }
-    void newVariable(const QString &scope, const QString &identifier, const QString &definition) { oStream << static_cast<quint8>(2) << scope << identifier << definition; }
-    void newFunction(const QString &scope, const QString &identifier, const QStringList &arguments, const QString &definition) { oStream << static_cast<quint8>(1) << scope << identifier << arguments << definition; }
+    void newVariable(const QString &room, const QString &identifier, const QString &definition) { oStream << static_cast<quint8>(2) << room << identifier << definition; }
+    void newFunction(const QString &room, const QString &identifier, const QStringList &arguments, const QString &definition) { oStream << static_cast<quint8>(1) << room << identifier << arguments << definition; }
     QHostAddress getAddress() const { return socket.peerAddress(); } //!< @return Client address
 
 private slots:

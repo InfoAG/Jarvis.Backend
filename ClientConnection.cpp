@@ -35,7 +35,7 @@ void ClientConnection::readyRead()
                     quint8 success = server->login(_nick, pwd);
                     oStream << success;
                     if (success) {
-                        oStream << server->getScopeNames() << server->getParser()->getModulePkgs();
+                        oStream << server->getRoomNames() << server->getParser()->getModulePkgs();
                         connectionState = Loop;
                     } else connectionState = Auth;
                 } else {
@@ -46,27 +46,27 @@ void ClientConnection::readyRead()
             break;
         case Loop:
             switch (pop_front()) {
-            case 0: connectionState = EnterScope; break;
-            case 1: connectionState = LeaveScope; break;
+            case 0: connectionState = EnterRoom; break;
+            case 1: connectionState = LeaveRoom; break;
             case 2: connectionState = ClientMsg; break;
             case 3: connectionState = LoadPkg; break;
             case 4: connectionState = UnloadPkg; break;
-            case 5: connectionState = DeleteScope; break;
+            case 5: connectionState = DeleteRoom; break;
             //case 7: reserved for PONG, inactivityTimer has already been reset at function entry
             }
             break;
-        case EnterScope: {
+        case EnterRoom: {
                 quint8 requestID;
-                QString scopeName;
-                Scope scope;
-                iStream >> requestID >> scopeName;
+                QString roomName;
+                const Room *room;
+                iStream >> requestID >> roomName;
                 if (iStream.status() == QDataStream::Ok){
                     resetStreamBuf();
                     oStream << static_cast<quint8>(8) << requestID;
                     try {
-                        scope = server->enterScope(this, scopeName);
+                        room = server->enterRoom(this, roomName);
                         oStream << static_cast<quint8>(1);
-                        scope.getInitInfo(oStream);
+                        room->getInitInfo(oStream);
                     } catch (int) { oStream << static_cast<quint8>(0); }
                     connectionState = Loop;
                 } else {
@@ -75,12 +75,12 @@ void ClientConnection::readyRead()
                 }
             }
             break;
-        case LeaveScope: {
-                QString scope;
-                iStream >> scope;
+        case LeaveRoom: {
+                QString room;
+                iStream >> room;
                 if (iStream.status() == QDataStream::Ok) {
                     resetStreamBuf();
-                    server->leaveScope(this, scope);
+                    server->leaveRoom(this, room);
                     connectionState = Loop;
                 } else {
                     iStream.resetStatus();
@@ -89,11 +89,11 @@ void ClientConnection::readyRead()
             }
             break;
         case ClientMsg: {
-                QString scope, msg;
-                iStream >> scope >> msg;
+                QString room, msg;
+                iStream >> room >> msg;
                 if (iStream.status() == QDataStream::Ok) {
                     resetStreamBuf();
-                    server->msgToScope(this, scope, msg);
+                    server->msgToRoom(this, room, msg);
                     connectionState = Loop;
                 } else {
                     iStream.resetStatus();
@@ -127,13 +127,13 @@ void ClientConnection::readyRead()
                 }
             }
             break;
-        case DeleteScope: {
-                QString scope;
-                iStream >> scope;
+        case DeleteRoom: {
+                QString room;
+                iStream >> room;
                 if (iStream.status() == QDataStream::Ok) {
                     resetStreamBuf();
                     connectionState = Loop;
-                    server->deleteScope(scope);
+                    server->deleteRoom(room);
                 } else {
                     iStream.resetStatus();
                     return;

@@ -1,0 +1,5 @@
+Scope : Terminal
+{
+    description: scopes
+    lib: modules/flowcontrol
+}

@@ -15,45 +15,45 @@ JarvisServer::JarvisServer() : settings("InfoAG", "Jarvis.Server")
     parser = std::unique_ptr<ExpressionParser>(new ExpressionParser(QDir(settings.value("ModulePath").toString())));
 }
 
-const Scope &JarvisServer::enterScope(ClientConnection *client, QString scope)
+const Room *JarvisServer::enterRoom(ClientConnection *client, QString room)
 {
-    if (! scopes.contains(scope)) {
-        scopes.insert(scope, Scope(scope, parser.get()));
+    if (! rooms.contains(room)) {
+        rooms.insert(room, make_unique<Room>(room, parser.get()));
         for (const auto &it_client: clients) {
-            if (it_client.get() != client) it_client->newScope(scope);
+            if (it_client.get() != client) it_client->newRoom(room);
         }
     }
-    scopes[scope].addClient(client);
-    qDebug() << "ClientEnterScope(" << client->nick() << ", " << scope << ")";
-    return scopes[scope];
+    rooms[room]->addClient(client);
+    qDebug() << "ClientEnterRoom(" << client->nick() << ", " << room << ")";
+    return rooms[room].get();
 }
 
-void JarvisServer::leaveScope(ClientConnection *sender, QString scope)
+void JarvisServer::leaveRoom(ClientConnection *sender, QString room)
 {
-    scopes[scope].removeClient(sender);
-    qDebug() << "ClientLeaveScope(" << sender->nick() << ", " << scope << ")";
+    rooms[room]->removeClient(sender);
+    qDebug() << "ClientLeaveRoom(" << sender->nick() << ", " << room << ")";
 }
 
-void JarvisServer::msgToScope(ClientConnection *sender, QString scope, QString msg)
+void JarvisServer::msgToRoom(ClientConnection *sender, QString room, QString msg)
 {
-    if (scopes.contains(scope) && scopes[scope].hasClient(sender)) {
-        scopes[scope].sendMsg(sender->nick(), msg);
-        qDebug() << "MsgToScope(" << sender->nick() << ", " << scope << ", " << msg << ")";
+    if (rooms.contains(room) && rooms[room]->hasClient(sender)) {
+        rooms[room]->sendMsg(sender->nick(), msg);
+        qDebug() << "MsgToRoom(" << sender->nick() << ", " << room << ", " << msg << ")";
     }
 }
 
 void JarvisServer::disconnected(ClientConnection *client)
 {
     qDebug() << "ClientDisconnect(" << client->nick() << ")";
-    for (auto &scope : scopes) scope.removeClient(client);
+    for (auto &room : rooms) room->removeClient(client);
     clients.erase(std::find_if(clients.begin(), clients.end(), [&](const std::shared_ptr<ClientConnection> &it_client) { return it_client.get() == client; }));
 }
 
-void JarvisServer::deleteScope(const QString &name)
+void JarvisServer::deleteRoom(const QString &name)
 {
-    for (const auto &client : clients) client->deleteScope(name);
-    scopes.remove(name);
-    qDebug() << "DeleteScope(" << name << ")";
+    for (const auto &client : clients) client->deleteRoom(name);
+    rooms.remove(name);
+    qDebug() << "DeleteRoom(" << name << ")";
 }
 
 void JarvisServer::unload(const QString &pkgName)

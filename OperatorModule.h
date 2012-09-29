@@ -1,7 +1,7 @@
 #ifndef OPERATORMODULE_H
 #define OPERATORMODULE_H
 
-#include "Arithmetic/AbstractArithmetic.h"
+#include "Arithmetic/AbstractExpression.h"
 #include <string>
 #include "OperatorInterface.h"
 #include <QString>
@@ -28,7 +28,7 @@ public:
     bool matches(const std::string &input, size_t candidatePos, const ExpressionParser &parser) const;
     unsigned int priority() const;
     OperatorInterface::AssociativityType associativity() const;
-    std::unique_ptr<CAS::AbstractArithmetic> parse(std::unique_ptr<CAS::AbstractArithmetic> left, std::unique_ptr<CAS::AbstractArithmetic> right) const { return interface.parse(std::move(left), std::move(right)); }
+    std::unique_ptr<CAS::AbstractExpression> parse(std::unique_ptr<CAS::AbstractExpression> left, std::unique_ptr<CAS::AbstractExpression> right) const { return interface.parse(std::move(left), std::move(right)); }
     bool needsParseForMatch() const { return statics.needsParseForMatch; }
 
     friend QDataStream &operator<<(QDataStream &, const OperatorModule &);

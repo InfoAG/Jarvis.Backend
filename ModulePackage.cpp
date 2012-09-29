@@ -54,7 +54,7 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
                             modules.functions.append(FunctionModule(head.at(0), description, this, funcInter, funcStatics));
                             break;
                         case TERMINAL:
-                            modules.terminals.append(TerminalModule(head.at(0), description, this, (std::unique_ptr<CAS::AbstractArithmetic>(*)(const std::string &, std::function<std::unique_ptr<CAS::AbstractArithmetic>(std::string)>))lib.resolve(head[0] + "_jmodule")));
+                            modules.terminals.append(TerminalModule(head.at(0), description, this, (std::unique_ptr<CAS::AbstractExpression>(*)(const std::string &, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>))lib.resolve(head[0] + "_jmodule")));
                             break;
                         }
                         state = HEAD;

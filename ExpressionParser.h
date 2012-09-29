@@ -2,7 +2,7 @@
 #define PARSER_H
 
 #include <string>
-#include "Arithmetic/AbstractArithmetic.h"
+#include "Arithmetic/AbstractExpression.h"
 #include <QDir>
 #include "ParserModules.h"
 #include "ModulePackage.h"
@@ -61,7 +61,7 @@ public:
      * @param input Input string
      * @return Pointer to the result tree's root
      */
-    std::unique_ptr<CAS::AbstractArithmetic> parse(std::string input);
+    std::unique_ptr<CAS::AbstractExpression> parse(std::string input);
 };
 
 #endif //PARSER_H

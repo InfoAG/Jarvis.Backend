@@ -53,7 +53,7 @@ QVector<ModulePackage> ExpressionParser::getModulePkgs() const
     return result;
 }
 
-std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string input)
+std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string input)
 {
     int level;
     bool deleted;
@@ -75,7 +75,7 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
         }
     } while (deleted);
 
-    std::unique_ptr<CAS::AbstractArithmetic> result;
+    std::unique_ptr<CAS::AbstractExpression> result;
     for (const auto &terminal : modules.terminals) {
         result = terminal.parse(input, std::bind(&ExpressionParser::parse, this, std::placeholders::_1));
         if (result) return result;
@@ -84,7 +84,7 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
     level = 0;
     unsigned int foundPos = 0;
     const OperatorModule *best_op_match = nullptr;
-    std::unique_ptr<CAS::AbstractArithmetic> parseForMatchResult;
+    std::unique_ptr<CAS::AbstractExpression> parseForMatchResult;
 
     for (std::string::iterator i = input.begin(); i != input.end(); ++i) {
         if (*i == '(' || *i == '[' || *i == '{')  level--;
@@ -98,7 +98,7 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
                         best_op_match = &it_op;
                     } else {
                         try {
-                            std::unique_ptr<CAS::AbstractArithmetic> tmpResult = it_op.parse(parse(input.substr(0, i - input.begin())), parse(input.substr(i - input.begin() + 1, input.length() - (i - input.begin()) - 1)));
+                            std::unique_ptr<CAS::AbstractExpression> tmpResult = it_op.parse(parse(input.substr(0, i - input.begin())), parse(input.substr(i - input.begin() + 1, input.length() - (i - input.begin()) - 1)));
                             if (tmpResult) {
                                 best_op_match = &it_op;
                                 parseForMatchResult = std::move(tmpResult);
@@ -120,7 +120,7 @@ std::unique_ptr<CAS::AbstractArithmetic> ExpressionParser::parse(std::string inp
     foundPos = itParenthesis - input.begin();
     std::string identifier = input.substr(0, foundPos);
     //std::string argString = input.substr(foundPos + 1, input.length() - foundPos - 2);
-    std::vector<std::unique_ptr<CAS::AbstractArithmetic>> arguments;
+    std::vector<std::unique_ptr<CAS::AbstractExpression>> arguments;
     auto argString = tokenize(input.substr(foundPos + 1, input.length() - foundPos - 2), ",");
     for (const auto &arg : argString) arguments.emplace_back(parse(arg));
     /*std::string::const_iterator lastPos = argString.begin();

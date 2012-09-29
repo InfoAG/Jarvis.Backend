@@ -8,8 +8,14 @@ QT       += core network
 
 QT       -= gui
 
-debug: DESTDIR = ../debug/
-release: DESTDIR = ../release/
+release {
+    DESTDIR = ../release/
+    LIBS += -L../../Framework/release -lJarvis-Framework
+}
+debug {
+    DESTDIR = ../release/
+    LIBS += -L../../Framework/debug -lJarvis-Framework
+}
 
 TARGET = Jarvis-Backend
 
@@ -31,11 +37,12 @@ SOURCES += main.cpp \
     ExpressionParser.cpp \
     ClientConnection.cpp \
     ModulePackage.cpp \
-    Scope.cpp \
+    Room.cpp \
     ParserModules.cpp \
     ParserModule.cpp \
-    ../OperatorModule.cpp \
-    ../FunctionModule.cpp
+    OperatorModule.cpp \
+    FunctionModule.cpp \
+    RoomScope.cpp
 
 HEADERS += \
     JarvisService.h \
@@ -50,4 +57,5 @@ HEADERS += \
     ParserModules.h \
     ParserModule.h \
     ClientConnection.h \
-    Scope.h
+    Room.h \
+    RoomScope.h
