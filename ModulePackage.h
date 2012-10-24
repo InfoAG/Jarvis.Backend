@@ -7,6 +7,7 @@
 #include <QLibrary>
 #include "ParserModules.h"
 #include <QFileInfo>
+#include <QTextStream>
 
 /**
  * Package of parser modules for an ExpressionParser

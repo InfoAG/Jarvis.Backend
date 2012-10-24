@@ -31,8 +31,9 @@ public:
     bool hasClient(ClientConnection *candidate) { return clients.contains(candidate); }
 
 private slots:
-    void newVariable(const std::pair<std::string, CAS::Definition> &var);
-    void newFunction(const std::pair<std::string, CAS::FunctionDefinition> &func);
+    void declaredVar(CAS::AbstractExpression::ReturnType type, const std::string &id);
+    void definedVar(const std::string &id, const CAS::VariableDefinition &var);
+    void newFunction(const CAS::FunctionSignature &sig, const CAS::FunctionDefinition &def);
 };
 
 #endif //ROOM_H

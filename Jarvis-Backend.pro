@@ -1,12 +1,13 @@
 TEMPLATE = subdirs
 
-SUBDIRS += modules/basicarith \
-    modules/variables \
-    modules/flowcontrol
+SUBDIRS += build-lib
 
 CONFIG += ordered
 
-SUBDIRS += build
+SUBDIRS += modules/basicarith \
+    modules/variables \
+    modules/flowcontrol \
+    build
 
 OTHER_FILES += \
     modules/basicarith.jpkg \

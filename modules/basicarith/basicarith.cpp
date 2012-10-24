@@ -1,12 +1,12 @@
-#include "OperatorInterface.h"
+#include "BinaryOperatorInterface.h"
 #include "basicarith_global.h"
 #include "Arithmetic/Addition.h"
 #include "Arithmetic/Subtraction.h"
-#include "Arithmetic/Multiplication.h"
+#include "Arithmetic/BinaryMultiplication.h"
 #include "Arithmetic/Division.h"
 #include "Arithmetic/NumberArith.h"
 #include "Arithmetic/Exponentiation.h"
-#include "Arithmetic/Matrix.h"
+#include "Arithmetic/List.h"
 #include "Integer.h"
 #include "Arithmetic/Min.h"
 #include "Arithmetic/Max.h"
@@ -14,7 +14,7 @@
 #include "Arithmetic/Modulo.h"
 #include "Arithmetic/Selection.h"
 #include "Arithmetic/Range.h"
-#include "OperatorModule.cpp" //wut
+#include "BinaryOperatorModule.h" //wut
 
 #include <string>
 #include <iostream>
@@ -22,15 +22,15 @@
 
 extern "C" {
 
-OperatorInterface BASICARITHSHARED_EXPORT Addition_jmodule()
+BinaryOperatorInterface BASICARITHSHARED_EXPORT Addition_jmodule()
 {
-    OperatorInterface oi;
+    BinaryOperatorInterface oi;
     oi.matches = [](const std::string &input, size_t candidatePos, const ExpressionParser &parser) {
         if (input.at(candidatePos) == '+' && candidatePos != 0) {
-            for (const auto &opModule : parser.getParserModules().operators)
-                if (opModule.matches(input, candidatePos - 1, parser)) return false;
-            return true;
-        } else return false;
+            for (const auto &opModule : parser.getParserModules().binaryOperators)
+                if (opModule.matches(input, candidatePos - 1, parser).first) return std::make_pair(false, 0);
+            return std::make_pair(true, 1);
+        } else return std::make_pair(false, 0);
     };
 
     oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
@@ -39,15 +39,15 @@ OperatorInterface BASICARITHSHARED_EXPORT Addition_jmodule()
     return oi;
 }
 
-OperatorInterface BASICARITHSHARED_EXPORT Subtraction_jmodule()
+BinaryOperatorInterface BASICARITHSHARED_EXPORT Subtraction_jmodule()
 {
-    OperatorInterface oi;
+    BinaryOperatorInterface oi;
     oi.matches = [](const std::string &input, size_t candidatePos, const ExpressionParser &parser) {
         if (input.at(candidatePos) == '-' && candidatePos != 0) {
-            for (const auto &opModule : parser.getParserModules().operators)
-                if (opModule.matches(input, candidatePos - 1, parser)) return false;
-            return true;
-        } else return false;
+            for (const auto &opModule : parser.getParserModules().binaryOperators)
+                if (opModule.matches(input, candidatePos - 1, parser).first) return std::make_pair(false, 0);
+            return std::make_pair(true, 1);
+        } else return std::make_pair(false, 0);
     };
 
     oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
@@ -56,18 +56,18 @@ OperatorInterface BASICARITHSHARED_EXPORT Subtraction_jmodule()
     return oi;
 }
 
-OperatorInterface BASICARITHSHARED_EXPORT Multiplication_jmodule()
+BinaryOperatorInterface BASICARITHSHARED_EXPORT Multiplication_jmodule()
 {
-    OperatorInterface oi;
+    BinaryOperatorInterface oi;
     oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
-        return make_unique<CAS::Multiplication>(std::move(first), std::move(second));
+        return make_unique<CAS::BinaryMultiplication>(std::move(first), std::move(second));
     };
     return oi;
 }
 
-OperatorInterface BASICARITHSHARED_EXPORT Division_jmodule()
+BinaryOperatorInterface BASICARITHSHARED_EXPORT Division_jmodule()
 {
-    OperatorInterface oi;
+    BinaryOperatorInterface oi;
     oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
         return make_unique<CAS::Division>(std::move(first), std::move(second));
     };
@@ -75,9 +75,9 @@ OperatorInterface BASICARITHSHARED_EXPORT Division_jmodule()
 }
 
 
-OperatorInterface BASICARITHSHARED_EXPORT Exponentiation_jmodule()
+BinaryOperatorInterface BASICARITHSHARED_EXPORT Exponentiation_jmodule()
 {
-    OperatorInterface oi;
+    BinaryOperatorInterface oi;
     oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
         return make_unique<CAS::Exponentiation>(std::move(first), std::move(second));
     };
@@ -101,7 +101,7 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Pi_jmodule(cons
     else return nullptr;
 }
 
-std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Matrix_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
+std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT List_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
 {
     if (candidate.front() != '[' || candidate.back() != ']') return nullptr;
 
@@ -128,12 +128,12 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Matrix_jmodule(
         for (const auto &token : tokens) result.emplace_back(parseFunc(token));
     }
     if (result.empty()) return nullptr;
-    else return make_unique<CAS::Matrix>(std::move(result));
+    else return make_unique<CAS::List>(std::move(result));
 }
 
-OperatorInterface BASICARITHSHARED_EXPORT Modulo_jmodule()
+BinaryOperatorInterface BASICARITHSHARED_EXPORT Modulo_jmodule()
 {
-    OperatorInterface oi;
+    BinaryOperatorInterface oi;
     oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
         return make_unique<CAS::Modulo>(std::move(first), std::move(second));
     };
@@ -160,10 +160,10 @@ FunctionInterface BASICARITHSHARED_EXPORT Max_jmodule()
 
 std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Selection_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
 {
-    if (candidate.back() != ']') return nullptr;
+    if (candidate.back() != '}') return nullptr;
     int level = 0, i = candidate.size() - 2;
     for (; i != -1; i--) {
-        if (level == 0 && candidate.at(i) == '[') break;
+        if (level == 0 && candidate.at(i) == '{') break;
         else if (candidate.at(i) == '(' || candidate.at(i) == '[' || candidate.at(i) == '{')  level--;
         else if (candidate.at(i) == ')' || candidate.at(i) == ']' || candidate.at(i) == '}') level++;
     }

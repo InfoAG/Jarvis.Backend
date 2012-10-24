@@ -1,4 +1,4 @@
-#include "OperatorInterface.h"
+#include "BinaryOperatorInterface.h"
 #include "FunctionInterface.h"
 #include "Arithmetic/AbstractExpression.h"
 #include "Arithmetic/Variable.h"
@@ -29,9 +29,9 @@ FunctionInterface VARIABLESSHARED_EXPORT UserFunction_jmodule()
     return fi;
 }
 
-OperatorInterface VARIABLESSHARED_EXPORT Assignment_jmodule()
+BinaryOperatorInterface VARIABLESSHARED_EXPORT Assignment_jmodule()
 {
-    OperatorInterface oi;
+    BinaryOperatorInterface oi;
     oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
             bool assignableFunction = false;
             if (typeid(*first) == typeid(CAS::Function)) {

@@ -7,33 +7,31 @@
 #include <QString>
 #include "ParserModule.h"
 #include <QDataStream>
+#include <QTextStream>
 
+template <class InterfaceT, class StaticsT>
 class OperatorModule : public ParserModule
 {
-public:
-    struct StaticInfo {
-        std::shared_ptr<QString> matches;
-        unsigned int priority;
-        OperatorInterface::AssociativityType associativity;
-        bool needsParseForMatch;
-    };
-
-private:
-    OperatorInterface interface;
-    StaticInfo statics;
+protected:
+    InterfaceT interface;
+    StaticsT statics;
 
 public:
-    OperatorModule(const QString &name, const QString &description, const ModulePackage *parent_pkg, const OperatorInterface &interface, const StaticInfo &statics) : ParserModule(name, description, parent_pkg), interface(interface), statics(statics) {}
+    OperatorModule(const QString &name, const ModulePackage *parent_pkg) : ParserModule(name, parent_pkg) {}
+    OperatorModule(const QString &name, const QString &description, const ModulePackage *parent_pkg, const InterfaceT &interface, const StaticsT &statics) : ParserModule(name, description, parent_pkg), interface(interface), statics(statics) {}
 
-    bool matches(const std::string &input, size_t candidatePos, const ExpressionParser &parser) const;
     unsigned int priority() const;
-    OperatorInterface::AssociativityType associativity() const;
-    std::unique_ptr<CAS::AbstractExpression> parse(std::unique_ptr<CAS::AbstractExpression> left, std::unique_ptr<CAS::AbstractExpression> right) const { return interface.parse(std::move(left), std::move(right)); }
     bool needsParseForMatch() const { return statics.needsParseForMatch; }
 
-    friend QDataStream &operator<<(QDataStream &, const OperatorModule &);
+    template <class FInterfaceT, class FStaticsT>
+    friend QDataStream &operator<<(QDataStream &, const OperatorModule<FInterfaceT, FStaticsT> &);
 };
 
-QDataStream &operator<<(QDataStream &stream, const OperatorModule &module);
+/*
+template <class InterfaceT, class StaticsT>
+QDataStream &operator<<(QDataStream &stream, const OperatorModule<InterfaceT, StaticsT> &module);
+*/
+
+#include "OperatorModule.cpp"
 
 #endif //OPERATORMODULE_H

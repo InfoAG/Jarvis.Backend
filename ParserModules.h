@@ -4,18 +4,20 @@
 #include <QList>
 #include <QDataStream>
 #include "TerminalModule.h"
-#include "OperatorModule.h"
+#include "BinaryOperatorModule.h"
+#include "UnaryOperatorModule.h"
 #include "FunctionModule.h"
 
 struct ParserModules
 {
     QList<TerminalModule> terminals;
-    QList<OperatorModule> operators;
+    QList<BinaryOperatorModule> binaryOperators;
+    QList<UnaryOperatorModule> unaryOperators;
     QList<FunctionModule> functions;
 
     void removePkg(ModulePackage *pkg);
 
-    ParserModules &operator+=(const ParserModules &other) { terminals += other.terminals; operators += other.operators; functions += other.functions; return *this; }
+    ParserModules &operator+=(const ParserModules &other) { terminals += other.terminals; binaryOperators += other.binaryOperators; unaryOperators += other.unaryOperators; functions += other.functions; return *this; }
 };
 
 QDataStream &operator<<(QDataStream &stream, const ParserModules &modules);

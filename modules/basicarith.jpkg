@@ -1,56 +1,56 @@
-Addition : Operator
+Addition : BinaryOperator
 {
     description: adds things together
     lib: modules/basicarith
     matches: +
-    priority: 1
+    priority: 4
     associativity: left
     needsParseForMatch: false
 }
 
-Multiplication : Operator
+Multiplication : BinaryOperator
 {
     description: dude read the name
     lib: modules/basicarith
     matches: *
-    priority: 2
+    priority: 5
     associativity: left
     needsParseForMatch: false
 }
 
-Division : Operator
+Division : BinaryOperator
 {
     description: dude i'm serious
     lib: modules/basicarith
     matches: /
-    priority: 2
+    priority: 5
     associativity: left
     needsParseForMatch: false
 }
 
-Subtraction : Operator
+Subtraction : BinaryOperator
 {
     description: are you retarded or something?
     lib: modules/basicarith
     matches: -
-    priority: 1
+    priority: 4
     associativity: left
     needsParseForMatch: false
 }
 
-Exponentiation : Operator
+Exponentiation : BinaryOperator
 {
     description: -.-
     lib: modules/basicarith
     matches: ^
-    priority: 3
+    priority: 6
     associativity: right
     needsParseForMatch: false
 }
 
 Number : Terminal
 {
-    description: just integers
+    description: just numbers
     lib: modules/basicarith
 }
 
@@ -60,18 +60,18 @@ Pi : Terminal
     lib: modules/basicarith
 }
 
-Matrix : Terminal
+List : Terminal
 {
-    description: matrix with arbitrary dimensions
+    description: list
     lib: modules/basicarith
 }
 
-Modulo : Operator
+Modulo : BinaryOperator
 {
     description: modulo
     lib: modules/basicarith
     matches: %
-    priority: 2
+    priority: 5
     associativity: left
     needsParseForMatch: false
 }

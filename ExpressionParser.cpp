@@ -16,8 +16,12 @@ ExpressionParser::ExpressionParser(const QDir &module_dir)
         for (const auto &mod : modpkg->getModules().terminals) {
             qDebug() << "\t\t" << mod.name() << "\t" << mod.description() << "\t";
         }
-        qDebug() << "\tOperators:";
-        for (const auto &mod : modpkg->getModules().operators) {
+        qDebug() << "\tBinaryOperators:";
+        for (const auto &mod : modpkg->getModules().binaryOperators) {
+            qDebug() << "\t\t" << mod.name() << "\t" << mod.description() << "\t";
+        }
+        qDebug() << "\tUnaryOperators:";
+        for (const auto &mod : modpkg->getModules().unaryOperators) {
             qDebug() << "\t\t" << mod.name() << "\t" << mod.description() << "\t";
         }
         qDebug() << "\tFunctions:";
@@ -58,7 +62,8 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
     int level;
     bool deleted;
     do {
-        input.erase(std::remove_if(begin(input), end(input), isspace), end(input));
+        input.erase(begin(input), std::find_if_not(begin(input), end(input), isspace));
+        input.erase(std::find_if_not(input.rbegin(), input.rend(), isspace).base(), end(input));
         if (input.empty()) throw "Error: Could not parse input.";
         deleted = false;
         if (input.at(0) == '(' && input.at(input.length() - 1) == ')') {
@@ -77,30 +82,33 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
 
     std::unique_ptr<CAS::AbstractExpression> result;
     for (const auto &terminal : modules.terminals) {
-        result = terminal.parse(input, std::bind(&ExpressionParser::parse, this, std::placeholders::_1));
-        if (result) return result;
+        try {
+            result = terminal.parse(input, std::bind(&ExpressionParser::parse, this, std::placeholders::_1));
+            if (result) return result;
+        } catch (const char*) {}
     }
 
     level = 0;
-    unsigned int foundPos = 0;
-    const OperatorModule *best_op_match = nullptr;
+    std::string::const_iterator foundPos = input.cend();
+    std::pair<const BinaryOperatorModule*, size_t> bestBinOpMatch{nullptr, 0};
     std::unique_ptr<CAS::AbstractExpression> parseForMatchResult;
 
-    for (std::string::iterator i = input.begin(); i != input.end(); ++i) {
+    for (auto i = input.cbegin(); i != input.cend(); ++i) {
         if (*i == '(' || *i == '[' || *i == '{')  level--;
         else if (*i == ')' || *i == ']' || *i == '}') level++;
         else if (level == 0) {
-            for (const auto &it_op : modules.operators) {
-                if (it_op.matches(input, i - input.begin(), *this) && (best_op_match == nullptr || it_op.priority() < best_op_match->priority() || (it_op.priority() == best_op_match->priority() && it_op.associativity() == OperatorInterface::LEFT))) {
+            for (const auto &it_op : modules.binaryOperators) {
+                auto candidate = it_op.matches(input, i - input.begin(), *this);
+                if (candidate.first && (bestBinOpMatch.first == nullptr || it_op.priority() < bestBinOpMatch.first->priority() || (it_op.priority() == bestBinOpMatch.first->priority() && it_op.associativity() == BinaryOperatorInterface::LEFT))) {
                     if (! it_op.needsParseForMatch()) {
-                        foundPos = i - input.begin();
+                        foundPos = i;
                         parseForMatchResult.reset();
-                        best_op_match = &it_op;
+                        bestBinOpMatch = {&it_op, candidate.second};
                     } else {
                         try {
                             std::unique_ptr<CAS::AbstractExpression> tmpResult = it_op.parse(parse(input.substr(0, i - input.begin())), parse(input.substr(i - input.begin() + 1, input.length() - (i - input.begin()) - 1)));
                             if (tmpResult) {
-                                best_op_match = &it_op;
+                                bestBinOpMatch = {&it_op, candidate.second};
                                 parseForMatchResult = std::move(tmpResult);
                             }
                         } catch (const char *) {}
@@ -110,18 +118,64 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
         }
     }
 
-    if (best_op_match != nullptr) {
+    std::pair<const UnaryOperatorModule*, size_t> bestUnOpMatch{nullptr, 0};
+/*
+    for (auto i = input.cbegin(); i != input.cend(); ++i) {
+        if (*i == '(' || *i == '[' || *i == '{')  level--;
+        else if (*i == ')' || *i == ']' || *i == '}') level++;
+        else if (level == 0) {
+            for (const auto &it_op : modules.unaryOperators) {
+                auto candidate = it_op.matches(input, i - input.begin(), *this);
+                if (candidate.first && (bestBinOpMatch.first == nullptr || (bestUnOpMatch.first == nullptr && it_op.priority() < bestBinOpMatch.first->priority()) || (it_op.priority() < bestUnOpMatch.first->priority()))) {
+                    if (! it_op.needsParseForMatch()) {
+                        foundPos = i;
+                        parseForMatchResult.reset();
+                        bestUnOpMatch = {&it_op, candidate.second};
+                    } else {
+                        try {
+                            std::unique_ptr<CAS::AbstractExpression> tmpResult;
+                            if (it_op.alignment() == UnaryOperatorInterface::PRE)
+                                 tmpResult = it_op.parse(parse({i + candidate.second, input.cend()}));
+                            else
+                                tmpResult = it_op.parse(parse({input.cbegin(),i}));
+                            if (tmpResult) {
+                                bestUnOpMatch = {&it_op, candidate.second};
+                                parseForMatchResult = std::move(tmpResult);
+                            }
+                        } catch (const char *) {}
+                    }
+                }
+            }
+        }
+    }
+*/
+    for (const auto &it_op : modules.unaryOperators) {
+        auto candidate = it_op.matches(input);
+        if (candidate.first) {
+            if (bestBinOpMatch.first == nullptr) {
+                if (bestUnOpMatch.first == nullptr || it_op.priority() < bestUnOpMatch.first->priority())
+                    bestUnOpMatch = {&it_op, candidate.second};
+            } else if (it_op.priority() < bestBinOpMatch.first->priority())
+                bestUnOpMatch = {&it_op, candidate.second};
+        }
+    }
+    if (bestUnOpMatch.first != nullptr) {
+        if (bestUnOpMatch.first->alignment() == UnaryOperatorInterface::PRE)
+            return bestUnOpMatch.first->parse(parse({input.cbegin() + bestUnOpMatch.second, input.cend()}));
+        else
+            return bestUnOpMatch.first->parse(parse({input.cbegin(), input.cend() - bestUnOpMatch.second}));
+    } else if (bestBinOpMatch.first != nullptr) {
         if (parseForMatchResult != nullptr) return parseForMatchResult;
-        else return best_op_match->parse(parse(input.substr(0, foundPos)), parse(input.substr(foundPos + 1, input.length() - foundPos - 1)));
+        else return bestBinOpMatch.first->parse(parse({input.cbegin(), foundPos}), parse({foundPos + bestBinOpMatch.second, input.cend()}));
     }
     if (input.back() != ')') throw "Error: Could not parse input.";
     std::string::iterator itParenthesis = std::find_if_not(input.begin(), input.end(), isalpha);
     if (itParenthesis == input.begin() || itParenthesis == input.end() || *itParenthesis != '(') throw "Error: Could not parse input.";
-    foundPos = itParenthesis - input.begin();
-    std::string identifier = input.substr(0, foundPos);
+    foundPos = itParenthesis;
+    std::string identifier{input.cbegin(), foundPos};
     //std::string argString = input.substr(foundPos + 1, input.length() - foundPos - 2);
     std::vector<std::unique_ptr<CAS::AbstractExpression>> arguments;
-    auto argString = tokenize(input.substr(foundPos + 1, input.length() - foundPos - 2), ",");
+    auto argString = tokenize({foundPos + 1, input.cend() - 1}, ",");
     for (const auto &arg : argString) arguments.emplace_back(parse(arg));
     /*std::string::const_iterator lastPos = argString.begin();
     level = 0;

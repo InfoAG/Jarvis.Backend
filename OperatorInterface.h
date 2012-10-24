@@ -10,12 +10,7 @@ class ExpressionParser;
 
 struct OperatorInterface
 {
-    enum AssociativityType { LEFT, RIGHT };
-
-    std::function<bool(const std::string&, size_t, const ExpressionParser&)> matches;
     std::function<unsigned int()> priority;
-    std::function<AssociativityType()> associativity;
-    std::function<std::unique_ptr<CAS::AbstractExpression>(std::unique_ptr<CAS::AbstractExpression>, std::unique_ptr<CAS::AbstractExpression>)> parse;
 };
 
 #endif // OPERATORINTERFACE_H

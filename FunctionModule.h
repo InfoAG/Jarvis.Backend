@@ -8,6 +8,8 @@
 #include "ParserModule.h"
 #include <QDataStream>
 #include <QPair>
+#include <QTextStream>
+#include <QStringList>
 
 class FunctionModule : public ParserModule
 {
@@ -22,6 +24,7 @@ private:
     StaticInfo statics;
 
 public:
+    FunctionModule(const QString &name, const ModulePackage *parent_pkg) : ParserModule(name, parent_pkg) {}
     FunctionModule(const QString &name, const QString &description, const ModulePackage *parent_pkg, const FunctionInterface &interface, const StaticInfo &statics) : ParserModule(name, description, parent_pkg), interface(interface), statics(statics) {}
 
     bool matches(const std::string &candidate, unsigned int argCount) const;
@@ -29,8 +32,10 @@ public:
     unsigned int priority() const;
 
     friend QDataStream &operator<<(QDataStream &, const FunctionModule &);
+    friend QTextStream &operator>>(QTextStream &stream, FunctionModule &module);
 };
 
 QDataStream &operator<<(QDataStream &stream, const FunctionModule &module);
+QTextStream &operator>>(QTextStream &stream, FunctionModule &module);
 
 #endif //FUNCTIONMODULE_H

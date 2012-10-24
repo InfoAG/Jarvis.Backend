@@ -2,8 +2,8 @@
 #define PARSERMODULE_H
 
 #include <QFile>
-//#include <QDataStream>
-//#include "ModulePackage.h"
+#include <QTextStream>
+#include <QLibrary>
 
 class ModulePackage;
 
@@ -13,6 +13,7 @@ class ModulePackage;
 class ParserModule
 {
 public:
+    ParserModule(const QString &name, const ModulePackage *parent_pkg) : name_(name), parent_pkg(parent_pkg) {}
     ParserModule(const QString &name, const QString &description, const ModulePackage *parent_pkg) : name_(name), description_(description), parent_pkg(parent_pkg) {};
 
     bool inPkg(ModulePackage *pkg) const { return parent_pkg == pkg; }
@@ -21,10 +22,12 @@ public:
 
     ParserModule &operator=(const ParserModule &other) { name_ = other.name_; description_ = other.description_; parent_pkg = other.parent_pkg; return *this; }
 
-private:
+protected:
     QString name_;
     QString description_;
     const ModulePackage *parent_pkg;
+
+    std::pair<QString, QString> readProperty(QTextStream &stream);
 };
 
 QDataStream &operator<<(QDataStream &stream, const ParserModule &module);

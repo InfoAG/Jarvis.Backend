@@ -3,3 +3,71 @@ Scope : Terminal
     description: scopes
     lib: modules/flowcontrol
 }
+
+Bool : Terminal
+{
+    description: bool true
+    lib: modules/flowcontrol
+}
+
+If : Terminal
+{
+    description: if else if
+    lib: modules/flowcontrol
+}
+
+Equality : BinaryOperator
+{
+    description: ==
+    lib: modules/flowcontrol
+    matches: ==
+    priority: 3
+    associativity: left
+    needsParseForMatch: false
+}
+
+Negation : UnaryOperator
+{
+    description: !
+    lib: modules/flowcontrol
+    matches: !
+    priority: 7
+    alignment: pre
+    needsParseForMatch: false
+}
+
+Inequality : BinaryOperator
+{
+    description: !=
+    lib: modules/flowcontrol
+    matches: !=
+    priority: 3
+    associativity: left
+    needsParseForMatch: false
+}
+
+LogicalAnd : BinaryOperator
+{
+    description: &&
+    lib: modules/flowcontrol
+    matches: &&
+    priority: 2
+    associativity: left
+    needsParseForMatch: false
+}
+
+LogicalOr : BinaryOperator
+{
+    description: &&
+    lib: modules/flowcontrol
+    matches: ||
+    priority: 1
+    associativity: left
+    needsParseForMatch: false
+}
+
+VariableDeclaration : Terminal
+{
+    description: types n stuff
+    lib: modules/flowcontrol
+}

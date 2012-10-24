@@ -11,7 +11,7 @@ UserFunction : Function
     priority: 0
 }
 
-Assignment : Operator
+Assignment : BinaryOperator
 {
     description: assigns stuff
     lib: modules/variables

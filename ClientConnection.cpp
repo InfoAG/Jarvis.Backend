@@ -154,3 +154,8 @@ void ClientConnection::timeout()
         inactivityTimer.start(5000);
     }
 }
+
+void ClientConnection::newFunction(const QString &room, const QString &identifier, const QList<QPair<QString, QString>> &arguments, const QString &definition)
+{
+    oStream << static_cast<quint8>(1) << room << identifier << arguments << definition;
+}

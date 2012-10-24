@@ -22,7 +22,7 @@ TARGET = Jarvis-Backend
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TEMPLATE = app
+TEMPLATE = lib
 
 QMAKE_CXXFLAGS += -std=c++11
 
@@ -31,7 +31,7 @@ INCLUDEPATH += .. \
 
 VPATH += ../
 
-SOURCES += main.cpp \
+SOURCES += \
     JarvisService.cpp \
     JarvisServer.cpp \
     ExpressionParser.cpp \
