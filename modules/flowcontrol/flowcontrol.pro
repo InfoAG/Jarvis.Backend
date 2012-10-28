@@ -20,7 +20,11 @@ SOURCES += flowcontrol.cpp \
     NegationExpression.cpp \
     LogicalAndExpression.cpp \
     LogicalOrExpression.cpp \
-    VariableDeclarationExpression.cpp
+    LessExpression.cpp \
+    LessOrEqualExpression.cpp \
+    GreaterExpression.cpp \
+    GreaterOrEqualExpression.cpp \
+    RangedForExpression.cpp
 
 HEADERS +=\
         flowcontrol_global.h \
@@ -33,4 +37,8 @@ HEADERS +=\
     NegationExpression.h \
     LogicalAndExpression.h \
     LogicalOrExpression.h \
-    VariableDeclarationExpression.h
+    LessExpression.h \
+    LessOrEqualExpression.h \
+    GreaterExpression.h \
+    GreaterOrEqualExpression.h \
+    RangedForExpression.h

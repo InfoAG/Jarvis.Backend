@@ -31,7 +31,7 @@ Negation : UnaryOperator
     description: !
     lib: modules/flowcontrol
     matches: !
-    priority: 7
+    priority: 8
     alignment: pre
     needsParseForMatch: false
 }
@@ -58,7 +58,7 @@ LogicalAnd : BinaryOperator
 
 LogicalOr : BinaryOperator
 {
-    description: &&
+    description: ||
     lib: modules/flowcontrol
     matches: ||
     priority: 1
@@ -66,8 +66,48 @@ LogicalOr : BinaryOperator
     needsParseForMatch: false
 }
 
-VariableDeclaration : Terminal
+Less : BinaryOperator
 {
-    description: types n stuff
+    description: <
+    lib: modules/flowcontrol
+    matches: <
+    priority: 4
+    associativity: left
+    needsParseForMatch: false
+}
+
+LessOrEqual : BinaryOperator
+{
+    description: <=
+    lib: modules/flowcontrol
+    matches: <=
+    priority: 4
+    associativity: left
+    needsParseForMatch: false
+}
+
+Greater : BinaryOperator
+{
+    description: >
+    lib: modules/flowcontrol
+    matches: >
+    priority: 4
+    associativity: left
+    needsParseForMatch: false
+}
+
+GreaterOrEqual : BinaryOperator
+{
+    description: >=
+    lib: modules/flowcontrol
+    matches: >=
+    priority: 4
+    associativity: left
+    needsParseForMatch: false
+}
+
+RangedFor : Terminal
+{
+    description: ranged for
     lib: modules/flowcontrol
 }

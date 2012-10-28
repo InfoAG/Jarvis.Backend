@@ -8,7 +8,11 @@
 #include "NegationExpression.h"
 #include "LogicalAndExpression.h"
 #include "LogicalOrExpression.h"
-#include "VariableDeclarationExpression.h"
+#include "LessExpression.h"
+#include "LessOrEqualExpression.h"
+#include "GreaterExpression.h"
+#include "GreaterOrEqualExpression.h"
+#include "RangedForExpression.h"
 
 extern "C" {
 
@@ -49,7 +53,7 @@ std::unique_ptr<CAS::AbstractExpression> FLOWCONTROLSHARED_EXPORT Scope_jmodule(
         token.erase(begin(token), std::find_if_not(begin(token), end(token), isspace));
         token.erase(std::find_if_not(token.rbegin(), token.rend(), isspace).base(), end(token));
         if (! token.empty()) tokens.emplace_back(make_unique<OutputExpression>(parseFunc(token)));
-    } else tokens.emplace_back(make_unique<OutputExpression>(parseFunc(candidate)));
+    } else tokens.emplace_back(make_unique<OutputExpression>(parseFunc({candidate.cbegin() + 1, candidate.cend() - 1})));
     return make_unique<ScopeExpression>(std::move(tokens));
 }
 
@@ -144,16 +148,57 @@ BinaryOperatorInterface FLOWCONTROLSHARED_EXPORT LogicalOr_jmodule()
     return oi;
 }
 
-std::unique_ptr<CAS::AbstractExpression> FLOWCONTROLSHARED_EXPORT VariableDeclaration_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
+BinaryOperatorInterface FLOWCONTROLSHARED_EXPORT Less_jmodule()
 {
-    auto spaceIt = candidate.find_first_of(' ');
-    std::string type = candidate.substr(0, spaceIt), id = candidate.substr(spaceIt + 1, std::string::npos);
-    if (! (isalpha(id.front()) && std::find_if(id.begin(), id.end(), std::not1(std::pointer_to_unary_function<int, int>(isalnum))) == candidate.end()))
-        return nullptr;
-    if (type == "number") return make_unique<VariableDeclarationExpression>(CAS::AbstractExpression::NUMBER, std::move(id));
-    else if (type == "bool") return make_unique<VariableDeclarationExpression>(CAS::AbstractExpression::BOOL, std::move(id));
-    else if (type == "list") return make_unique<VariableDeclarationExpression>(CAS::AbstractExpression::LIST, std::move(id));
-    else return nullptr;
+    BinaryOperatorInterface oi;
+    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
+        return make_unique<LessExpression>(std::move(first), std::move(second));
+    };
+    return oi;
+}
+
+BinaryOperatorInterface FLOWCONTROLSHARED_EXPORT LessOrEqual_jmodule()
+{
+    BinaryOperatorInterface oi;
+    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
+        return make_unique<LessOrEqualExpression>(std::move(first), std::move(second));
+    };
+    return oi;
+}
+
+BinaryOperatorInterface FLOWCONTROLSHARED_EXPORT Greater_jmodule()
+{
+    BinaryOperatorInterface oi;
+    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
+        return make_unique<GreaterExpression>(std::move(first), std::move(second));
+    };
+    return oi;
+}
+
+BinaryOperatorInterface FLOWCONTROLSHARED_EXPORT GreaterOrEqual_jmodule()
+{
+    BinaryOperatorInterface oi;
+    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
+        return make_unique<GreaterOrEqualExpression>(std::move(first), std::move(second));
+    };
+    return oi;
+}
+
+std::unique_ptr<CAS::AbstractExpression> FLOWCONTROLSHARED_EXPORT RangedFor_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
+{
+    if (candidate.substr(0, 5) != "for (") return nullptr;
+    int level = 0;
+    auto sepPos = candidate.cend();
+    for (auto it = candidate.cbegin() + 5; it != candidate.cend(); ++it) {
+        if (*it == '(' || *it == '[' || *it == '{')  level--;
+        else if (*it == ']' || *it == '}') level++;
+        else if (level == 0 && *it == ':') sepPos = it;
+        else if (*it == ')' && ++level == 1) {
+            if (sepPos == candidate.cend()) return nullptr;
+            return make_unique<RangedForExpression>(parseFunc({candidate.cbegin() + 5, sepPos}), parseFunc({sepPos + 1, it}), parseFunc({it + 1, candidate.cend()}));
+        }
+    }
+    return nullptr;
 }
 
 }

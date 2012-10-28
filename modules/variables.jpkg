@@ -28,3 +28,9 @@ LazyEval : Function
     matches: lazy, 1
     priority: 1
 }
+
+VariableDeclaration : Terminal
+{
+    description: types n stuff
+    lib: modules/variables
+}

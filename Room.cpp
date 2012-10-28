@@ -33,12 +33,11 @@ void Room::sendMsg(const QString &sender, const QString &msg)
 {
     for (const auto &client : clients) client->sendMsg(name, sender, msg);
     try {
-        std::string dbg = msg.toStdString();
         auto result = parser->parse(msg.toStdString())->eval(*roomScope).second;
         auto resultString = QString::fromStdString(result->toString());
         for (const auto &client : clients) client->sendMsg(name, "Jarvis", resultString);
-    } catch (const char *) {
-        for (const auto &client : clients) client->sendMsg(name, "Jarvis", "error bro");
+    } catch (const char *s) {
+        for (const auto &client : clients) client->sendMsg(name, "Jarvis", s);
     }
 }
 

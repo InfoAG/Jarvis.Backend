@@ -14,19 +14,19 @@ ExpressionParser::ExpressionParser(const QDir &module_dir)
         qDebug() << modpkg->name();
         qDebug() << "\tTerminals:";
         for (const auto &mod : modpkg->getModules().terminals) {
-            qDebug() << "\t\t" << mod.name() << "\t" << mod.description() << "\t";
+            qDebug() << "\t\t" << mod->name() << "\t" << mod->description() << "\t";
         }
         qDebug() << "\tBinaryOperators:";
         for (const auto &mod : modpkg->getModules().binaryOperators) {
-            qDebug() << "\t\t" << mod.name() << "\t" << mod.description() << "\t";
+            qDebug() << "\t\t" << mod->name() << "\t" << mod->description() << "\t";
         }
         qDebug() << "\tUnaryOperators:";
         for (const auto &mod : modpkg->getModules().unaryOperators) {
-            qDebug() << "\t\t" << mod.name() << "\t" << mod.description() << "\t";
+            qDebug() << "\t\t" << mod->name() << "\t" << mod->description() << "\t";
         }
         qDebug() << "\tFunctions:";
         for (const auto &mod : modpkg->getModules().functions) {
-            qDebug() << "\t\t" << mod.name() << "\t" << mod.description() << "\t";
+            qDebug() << "\t\t" << mod->name() << "\t" << mod->description() << "\t";
         }
     }
 }
@@ -83,7 +83,7 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
     std::unique_ptr<CAS::AbstractExpression> result;
     for (const auto &terminal : modules.terminals) {
         try {
-            result = terminal.parse(input, std::bind(&ExpressionParser::parse, this, std::placeholders::_1));
+            result = terminal->parse(input, std::bind(&ExpressionParser::parse, this, std::placeholders::_1));
             if (result) return result;
         } catch (const char*) {}
     }
@@ -98,17 +98,17 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
         else if (*i == ')' || *i == ']' || *i == '}') level++;
         else if (level == 0) {
             for (const auto &it_op : modules.binaryOperators) {
-                auto candidate = it_op.matches(input, i - input.begin(), *this);
-                if (candidate.first && (bestBinOpMatch.first == nullptr || it_op.priority() < bestBinOpMatch.first->priority() || (it_op.priority() == bestBinOpMatch.first->priority() && it_op.associativity() == BinaryOperatorInterface::LEFT))) {
-                    if (! it_op.needsParseForMatch()) {
+                auto candidate = it_op->matches(input, i - input.begin(), *this);
+                if (candidate.first && (bestBinOpMatch.first == nullptr || it_op->priority() < bestBinOpMatch.first->priority() || (it_op->priority() == bestBinOpMatch.first->priority() && it_op->associativity() == BinaryOperatorInterface::LEFT))) {
+                    if (! it_op->needsParseForMatch()) {
                         foundPos = i;
                         parseForMatchResult.reset();
-                        bestBinOpMatch = {&it_op, candidate.second};
+                        bestBinOpMatch = {it_op.get(), candidate.second};
                     } else {
                         try {
-                            std::unique_ptr<CAS::AbstractExpression> tmpResult = it_op.parse(parse(input.substr(0, i - input.begin())), parse(input.substr(i - input.begin() + 1, input.length() - (i - input.begin()) - 1)));
+                            std::unique_ptr<CAS::AbstractExpression> tmpResult = it_op->parse(parse(input.substr(0, i - input.begin())), parse(input.substr(i - input.begin() + 1, input.length() - (i - input.begin()) - 1)));
                             if (tmpResult) {
-                                bestBinOpMatch = {&it_op, candidate.second};
+                                bestBinOpMatch = {it_op.get(), candidate.second};
                                 parseForMatchResult = std::move(tmpResult);
                             }
                         } catch (const char *) {}
@@ -150,13 +150,13 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
     }
 */
     for (const auto &it_op : modules.unaryOperators) {
-        auto candidate = it_op.matches(input);
+        auto candidate = it_op->matches(input);
         if (candidate.first) {
             if (bestBinOpMatch.first == nullptr) {
-                if (bestUnOpMatch.first == nullptr || it_op.priority() < bestUnOpMatch.first->priority())
-                    bestUnOpMatch = {&it_op, candidate.second};
-            } else if (it_op.priority() < bestBinOpMatch.first->priority())
-                bestUnOpMatch = {&it_op, candidate.second};
+                if (bestUnOpMatch.first == nullptr || it_op->priority() < bestUnOpMatch.first->priority())
+                    bestUnOpMatch = {it_op.get(), candidate.second};
+            } else if (it_op->priority() < bestBinOpMatch.first->priority())
+                bestUnOpMatch = {it_op.get(), candidate.second};
         }
     }
     if (bestUnOpMatch.first != nullptr) {
@@ -193,8 +193,8 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
     const FunctionModule *best_func_match = nullptr;
 
     for (const auto &it_func : modules.functions) {
-        if (it_func.matches(identifier, arguments.size()) && (best_func_match == nullptr || it_func.priority() > best_func_match->priority()))
-            best_func_match = &it_func;
+        if (it_func->matches(identifier, arguments.size()) && (best_func_match == nullptr || it_func->priority() > best_func_match->priority()))
+            best_func_match = it_func.get();
     }
     if (best_func_match != nullptr)
         return best_func_match->parse(identifier, arguments);

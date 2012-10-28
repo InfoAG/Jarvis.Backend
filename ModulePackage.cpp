@@ -12,20 +12,20 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
         fileStream >> type >> buf;
         if (buf != "{") throw "failer{";
         if (type == "BinaryOperator") {
-            BinaryOperatorModule module(name, this);
-            fileStream >> module;
+            auto module = std::make_shared<BinaryOperatorModule>(name, this);
+            fileStream >> *module;
             modules.binaryOperators.append(module);
         } else if (type == "UnaryOperator") {
-            UnaryOperatorModule module(name, this);
-            fileStream >> module;
+            auto module = std::make_shared<UnaryOperatorModule>(name, this);
+            fileStream >> *module;
             modules.unaryOperators.append(module);
         } else if (type == "Function") {
-            FunctionModule module(name, this);
-            fileStream >> module;
+            auto module = std::make_shared<FunctionModule>(name, this);
+            fileStream >> *module;
             modules.functions.append(module);
         } else if (type == "Terminal") {
-            TerminalModule module(name, this);
-            fileStream >> module;
+            auto module = std::make_shared<TerminalModule>(name, this);
+            fileStream >> *module;
             modules.terminals.append(module);
         } else throw "failer";
         fileStream.skipWhiteSpace();

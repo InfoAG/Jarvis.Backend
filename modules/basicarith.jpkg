@@ -3,7 +3,7 @@ Addition : BinaryOperator
     description: adds things together
     lib: modules/basicarith
     matches: +
-    priority: 4
+    priority: 5
     associativity: left
     needsParseForMatch: false
 }
@@ -13,7 +13,7 @@ Multiplication : BinaryOperator
     description: dude read the name
     lib: modules/basicarith
     matches: *
-    priority: 5
+    priority: 6
     associativity: left
     needsParseForMatch: false
 }
@@ -23,7 +23,7 @@ Division : BinaryOperator
     description: dude i'm serious
     lib: modules/basicarith
     matches: /
-    priority: 5
+    priority: 6
     associativity: left
     needsParseForMatch: false
 }
@@ -33,7 +33,7 @@ Subtraction : BinaryOperator
     description: are you retarded or something?
     lib: modules/basicarith
     matches: -
-    priority: 4
+    priority: 5
     associativity: left
     needsParseForMatch: false
 }
@@ -43,7 +43,7 @@ Exponentiation : BinaryOperator
     description: -.-
     lib: modules/basicarith
     matches: ^
-    priority: 6
+    priority: 7
     associativity: right
     needsParseForMatch: false
 }
@@ -71,7 +71,7 @@ Modulo : BinaryOperator
     description: modulo
     lib: modules/basicarith
     matches: %
-    priority: 5
+    priority: 6
     associativity: left
     needsParseForMatch: false
 }

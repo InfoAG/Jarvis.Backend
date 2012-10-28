@@ -28,7 +28,7 @@ BinaryOperatorInterface BASICARITHSHARED_EXPORT Addition_jmodule()
     oi.matches = [](const std::string &input, size_t candidatePos, const ExpressionParser &parser) {
         if (input.at(candidatePos) == '+' && candidatePos != 0) {
             for (const auto &opModule : parser.getParserModules().binaryOperators)
-                if (opModule.matches(input, candidatePos - 1, parser).first) return std::make_pair(false, 0);
+                if (opModule->matches(input, candidatePos - 1, parser).first) return std::make_pair(false, 0);
             return std::make_pair(true, 1);
         } else return std::make_pair(false, 0);
     };
@@ -45,7 +45,7 @@ BinaryOperatorInterface BASICARITHSHARED_EXPORT Subtraction_jmodule()
     oi.matches = [](const std::string &input, size_t candidatePos, const ExpressionParser &parser) {
         if (input.at(candidatePos) == '-' && candidatePos != 0) {
             for (const auto &opModule : parser.getParserModules().binaryOperators)
-                if (opModule.matches(input, candidatePos - 1, parser).first) return std::make_pair(false, 0);
+                if (opModule->matches(input, candidatePos - 1, parser).first) return std::make_pair(false, 0);
             return std::make_pair(true, 1);
         } else return std::make_pair(false, 0);
     };

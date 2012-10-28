@@ -11,7 +11,7 @@ public:
     virtual ExpressionP copy() const { return make_unique<LogicalOrExpression>(*this); }
 
     virtual EvalRes eval(CAS::Scope &scope, bool lazy) const;
-    virtual std::string toString() const { return first_op->toString() + "&&" + second_op->toString(); }
+    virtual std::string toString() const { return first_op->toString() + "||" + second_op->toString(); }
     virtual bool equals(const AbstractExpression *other) const;
 };
 

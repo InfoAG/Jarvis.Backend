@@ -29,9 +29,10 @@ QTextStream &operator>>(QTextStream &stream, FunctionModule &module)
         auto nextProperty = module.readProperty(stream);
         if (nextProperty.first == "description")
             module.description_ = nextProperty.second;
-        else if (nextProperty.first == "lib")
-            module.interface = ((FunctionInterface(*)())QLibrary::resolve(nextProperty.second, (module.name_ + "_jmodule").toLatin1().data()))();
-        else if (nextProperty.first == "matches") {
+        else if (nextProperty.first == "lib") {
+            module.lib.setFileName(nextProperty.second);
+            module.interface = ((FunctionInterface(*)())module.lib.resolve((module.name_ + "_jmodule").toLatin1().data()))();
+        } else if (nextProperty.first == "matches") {
             auto matchPair = nextProperty.second.split(',');
             module.statics.matches = std::make_shared<QPair<QString, unsigned int>>(matchPair.front(), matchPair.back().toUInt());
         } else if (nextProperty.first == "priority")

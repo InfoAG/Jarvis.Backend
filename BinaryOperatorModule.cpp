@@ -27,9 +27,10 @@ QTextStream &operator>>(QTextStream &stream, BinaryOperatorModule &module)
         auto nextProperty = module.readProperty(stream);
         if (nextProperty.first == "description")
             module.description_ = nextProperty.second;
-        else if (nextProperty.first == "lib")
-            module.interface = ((BinaryOperatorInterface(*)())QLibrary::resolve(nextProperty.second, (module.name_ + "_jmodule").toLatin1().data()))();
-        else if (nextProperty.first == "matches")
+        else if (nextProperty.first == "lib") {
+            module.lib.setFileName(nextProperty.second);
+            module.interface = ((BinaryOperatorInterface(*)())module.lib.resolve((module.name_ + "_jmodule").toLatin1().data()))();
+        } else if (nextProperty.first == "matches")
             module.statics.matches = std::make_shared<QString>(nextProperty.second);
         else if (nextProperty.first == "priority")
             module.statics.priority = nextProperty.second.toUInt();

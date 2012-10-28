@@ -10,10 +10,10 @@
 
 struct ParserModules
 {
-    QList<TerminalModule> terminals;
-    QList<BinaryOperatorModule> binaryOperators;
-    QList<UnaryOperatorModule> unaryOperators;
-    QList<FunctionModule> functions;
+    QList<std::shared_ptr<TerminalModule>> terminals;
+    QList<std::shared_ptr<BinaryOperatorModule>> binaryOperators;
+    QList<std::shared_ptr<UnaryOperatorModule>> unaryOperators;
+    QList<std::shared_ptr<FunctionModule>> functions;
 
     void removePkg(ModulePackage *pkg);
 
