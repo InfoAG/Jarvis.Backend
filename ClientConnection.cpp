@@ -155,7 +155,12 @@ void ClientConnection::timeout()
     }
 }
 
-void ClientConnection::newFunction(const QString &room, const QString &identifier, const QList<QPair<QString, QString>> &arguments, const QString &definition)
+void ClientConnection::declaredFunc(const QString &room, const QString &identifier, const QStringList &argumentTypes, const QString &returnType)
 {
-    oStream << static_cast<quint8>(1) << room << identifier << arguments << definition;
+    oStream << static_cast<quint8>(1) << room << identifier << argumentTypes << returnType;
+}
+
+void ClientConnection::definedFunc(const QString &room, const QString &identifier, const QList<QPair<QString, QString>> &arguments, const QString &definition)
+{
+    oStream << static_cast<quint8>(12) << room << identifier << arguments << definition;
 }

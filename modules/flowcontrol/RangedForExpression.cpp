@@ -3,9 +3,12 @@
 CAS::AbstractExpression::EvalRes RangedForExpression::eval(CAS::Scope &scope, bool lazy) const
 {
     auto listRes = list->eval(scope, lazy);
-    if (typeid(*declaration) != typeid(VariableDeclarationExpression) || listRes.first != LIST) throw "herp";
+    if ((typeid(*declaration) != typeid(VariableDeclarationExpression) && typeid(*declaration) != typeid(CAS::Variable)) || listRes.first != LIST) throw "herp";
     else if (typeid(*(listRes.second)) == typeid(CAS::List)) {
-        auto varID = static_cast<VariableDeclarationExpression*>(declaration.get())->getID();
+        std::string varID;
+        if (typeid(*declaration) == typeid(CAS::Variable))
+            varID = static_cast<CAS::Variable*>(declaration.get())->getIdentifier();
+        else varID = static_cast<VariableDeclarationExpression*>(declaration.get())->getID();
         CAS::Scope forScope(&scope);
         declaration->eval(forScope, lazy);
         Operands result;

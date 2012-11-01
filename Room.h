@@ -33,7 +33,8 @@ public:
 private slots:
     void declaredVar(CAS::AbstractExpression::ReturnType type, const std::string &id);
     void definedVar(const std::string &id, const CAS::VariableDefinition &var);
-    void newFunction(const CAS::FunctionSignature &sig, const CAS::FunctionDefinition &def);
+    void declaredFunc(const CAS::FunctionSignature &sig, CAS::AbstractExpression::ReturnType returnType);
+    void definedFunc(const CAS::FunctionSignature &sig, const CAS::FunctionDefinition &def);
 };
 
 #endif //ROOM_H

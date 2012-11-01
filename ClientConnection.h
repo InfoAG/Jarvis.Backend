@@ -93,7 +93,8 @@ public:
     void loadPkg(const ModulePackage &pkg) { oStream << static_cast<quint8>(6) << pkg; }
     void declaredVar(const QString &room, const QString &type, const QString &id) { oStream << static_cast<quint8>(2) << room << type << id; }
     void definedVar(const QString &room, const QString &id, const QString &definition) { oStream << static_cast<quint8>(11) << room << id << definition; }
-    void newFunction(const QString &room, const QString &identifier, const QList<QPair<QString, QString>> &arguments, const QString &definition);
+    void declaredFunc(const QString &room, const QString &identifier, const QStringList &argumentTypes, const QString &returnType);
+    void definedFunc(const QString &room, const QString &identifier, const QList<QPair<QString, QString>> &arguments, const QString &definition);
     QHostAddress getAddress() const { return socket.peerAddress(); } //!< @return Client address
 
 private slots:

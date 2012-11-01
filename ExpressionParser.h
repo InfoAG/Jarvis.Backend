@@ -38,6 +38,14 @@ public:
     QVector<ModulePackage> getModulePkgs() const; //!< @return QVector of all module packages
     const ParserModules &getParserModules() const { return modules; }
 
+    static inline std::string trim(const std::string &input)
+    {
+        std::string result(input);
+        result.erase(begin(result), std::find_if_not(begin(result), end(result), isspace));
+        result.erase(std::find_if_not(result.rbegin(), result.rend(), isspace).base(), end(result));
+        return result;
+    }
+
     static std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters)
     {
         std::vector<std::string> tokens;

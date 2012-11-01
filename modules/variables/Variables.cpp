@@ -8,6 +8,8 @@
 #include <memory>
 #include "variables_global.h"
 #include "VariableDeclarationExpression.h"
+#include "ExpressionParser.h"
+#include "FunctionDeclarationExpression.h"
 
 extern "C" {
 
@@ -56,8 +58,7 @@ FunctionInterface VARIABLESSHARED_EXPORT LazyEval_jmodule()
     return fi;
 }
 
-std::unique_ptr<CAS::AbstractExpression> VARIABLESSHARED_EXPORT VariableDeclaration_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
-{
+std::unique_ptr<VariableDeclarationExpression> doParseVariableDeclaration(const std::string &candidate) {
     auto spaceIt = candidate.find_first_of(' ');
     std::string type = candidate.substr(0, spaceIt), id = candidate.substr(spaceIt + 1, std::string::npos);
     if (! (isalpha(id.front()) && std::find_if(id.begin(), id.end(), std::not1(std::pointer_to_unary_function<int, int>(isalnum))) == id.end()))
@@ -65,6 +66,37 @@ std::unique_ptr<CAS::AbstractExpression> VARIABLESSHARED_EXPORT VariableDeclarat
     if (type == "number") return make_unique<VariableDeclarationExpression>(CAS::AbstractExpression::NUMBER, std::move(id));
     else if (type == "bool") return make_unique<VariableDeclarationExpression>(CAS::AbstractExpression::BOOL, std::move(id));
     else if (type == "list") return make_unique<VariableDeclarationExpression>(CAS::AbstractExpression::LIST, std::move(id));
+    else return nullptr;
+}
+
+inline std::unique_ptr<CAS::AbstractExpression> VARIABLESSHARED_EXPORT VariableDeclaration_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
+{
+    return doParseVariableDeclaration(candidate);
+}
+
+std::unique_ptr<CAS::AbstractExpression> VARIABLESSHARED_EXPORT FunctionDeclaration_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
+{
+    if (candidate.back() != ')') return nullptr;
+    auto spaceIt = candidate.find_first_of(' '), parenthesisIt = candidate.find_first_of('(');
+    std::string type = candidate.substr(0, spaceIt), id = candidate.substr(spaceIt + 1, parenthesisIt - spaceIt - 1);
+    if (! (isalpha(id.front()) && std::find_if(id.begin(), id.end(), std::not1(std::pointer_to_unary_function<int, int>(isalnum))) == id.end()))
+        return nullptr;
+    std::vector<CAS::AbstractExpression::ReturnType> argTypes;
+    std::vector<std::string> argNames;
+    if (parenthesisIt + 2 != candidate.length()) {
+        auto argTokens = ExpressionParser::tokenize(candidate.substr(parenthesisIt + 1, candidate.length() - parenthesisIt - 2), ",");
+        for (const auto &token : argTokens) {
+            auto tokenRes = doParseVariableDeclaration(ExpressionParser::trim(token));
+            if (tokenRes == nullptr) return nullptr;
+            else {
+                argTypes.emplace_back(tokenRes->getType());
+                argNames.emplace_back(tokenRes->getID());
+            }
+        }
+    }
+    if (type == "number") return make_unique<FunctionDeclarationExpression>(CAS::AbstractExpression::NUMBER, std::move(id), std::move(argTypes), std::move(argNames));
+    else if (type == "bool") return make_unique<FunctionDeclarationExpression>(CAS::AbstractExpression::BOOL, std::move(id), std::move(argTypes), std::move(argNames));
+    else if (type == "list") return make_unique<FunctionDeclarationExpression>(CAS::AbstractExpression::LIST, std::move(id), std::move(argTypes), std::move(argNames));
     else return nullptr;
 }
 

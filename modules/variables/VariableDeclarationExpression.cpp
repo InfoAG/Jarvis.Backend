@@ -3,11 +3,7 @@
 std::string VariableDeclarationExpression::toString() const
 {
     std::string result;
-    switch (type) {
-    case NUMBER: result = "number"; break;
-    case BOOL: result = "bool"; break;
-    case LIST: result = "list"; break;
-    }
+
     return result + " " + id;
 }
 

@@ -62,8 +62,7 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
     int level;
     bool deleted;
     do {
-        input.erase(begin(input), std::find_if_not(begin(input), end(input), isspace));
-        input.erase(std::find_if_not(input.rbegin(), input.rend(), isspace).base(), end(input));
+        input = trim(input);
         if (input.empty()) throw "Error: Could not parse input.";
         deleted = false;
         if (input.at(0) == '(' && input.at(input.length() - 1) == ')') {

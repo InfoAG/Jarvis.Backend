@@ -34,3 +34,15 @@ VariableDeclaration : Terminal
     description: types n stuff
     lib: modules/variables
 }
+
+FunctionDeclaration : Terminal
+{
+    description: types n stuff
+    lib: modules/variables
+}
+
+FunctionDefinition : Terminal
+{
+    description: define functions
+    lib: modules/variabes
+}

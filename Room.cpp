@@ -4,7 +4,8 @@
 Room::Room(const QString &name, ExpressionParser *parser) : name(name), parser(parser), roomScope(new RoomScope)
 {
     connect(roomScope.get(), SIGNAL(declaredVar(CAS::AbstractExpression::ReturnType, const std::string &)), SLOT(declaredVar(CAS::AbstractExpression::ReturnType, const std::string &)));
-    connect(roomScope.get(), SIGNAL(newFunction(const CAS::FunctionSignature &, const CAS::FunctionDefinition &)), SLOT(newFunction(const CAS::FunctionSignature &, const CAS::FunctionDefinition &)));
+    connect(roomScope.get(), SIGNAL(declaredFunc(const CAS::FunctionSignature &, CAS::AbstractExpression::ReturnType)), SLOT(declaredFunc(const CAS::FunctionSignature &, CAS::AbstractExpression::ReturnType)));
+    connect(roomScope.get(), SIGNAL(definedFunc(const CAS::FunctionSignature &, const CAS::FunctionDefinition &)), SLOT(definedFunc(const CAS::FunctionSignature &, const CAS::FunctionDefinition &)));
     connect(roomScope.get(), SIGNAL(definedVar(const std::string &, const CAS::VariableDefinition &)), SLOT(definedVar(const std::string &, const CAS::VariableDefinition &)));
 }
 
@@ -50,7 +51,7 @@ void Room::addClient(ClientConnection *client)
 
 void Room::declaredVar(CAS::AbstractExpression::ReturnType type, const std::string &id)
 {
-    QString qID = QString::fromStdString(id), qType = RoomScope::expressionTypeToString(type);
+    QString qID = QString::fromStdString(id), qType = QString::fromStdString(CAS::AbstractExpression::typeToString(type));
     qDebug() << "DeclaredVar(" << qType << ", " << qID << ")";
     for (const auto &client : clients)
         client->declaredVar(name, qType, qID);
@@ -65,14 +66,23 @@ void Room::definedVar(const std::string &id, const CAS::VariableDefinition &var)
         client->definedVar(name, qID, defStr);
 }
 
-void Room::newFunction(const CAS::FunctionSignature &sig, const CAS::FunctionDefinition &def)
+void Room::declaredFunc(const CAS::FunctionSignature &sig, CAS::AbstractExpression::ReturnType returnType)
+{
+    QString qID = QString::fromStdString(sig.id), qReturnType = QString::fromStdString(CAS::AbstractExpression::typeToString(returnType));
+    QStringList qArgTypes;
+    for (const auto &arg : sig.argumentTypes) qArgTypes.append(QString::fromStdString(CAS::AbstractExpression::typeToString(arg)));
+    qDebug() << "FunctionDeclaration(" << qID << ", (" << qArgTypes.join(", ") << "), " << qReturnType;
+    for (const auto &client : clients) client->declaredFunc(name, qID, qArgTypes, qReturnType);
+}
+
+void Room::definedFunc(const CAS::FunctionSignature &sig, const CAS::FunctionDefinition &def)
 {
     QString qID = QString::fromStdString(sig.id);
     qDebug() << "NewFunction(" << qID << ", (";
     auto itArgStrs = def.arguments.cbegin();
     QList<QPair<QString, QString>> arguments;
     for (const auto &argType : sig.argumentTypes) {
-        auto qArgStr = QString::fromStdString(*(itArgStrs++)), qArgType = RoomScope::expressionTypeToString(argType);
+        auto qArgStr = QString::fromStdString(*(itArgStrs++)), qArgType = QString::fromStdString(CAS::AbstractExpression::typeToString(argType));
         arguments.append(qMakePair(qArgType, qArgStr));
         qDebug() << qArgType << " " << qArgStr;
         if (itArgStrs != def.arguments.cend()) qDebug() << ", ";
@@ -80,5 +90,6 @@ void Room::newFunction(const CAS::FunctionSignature &sig, const CAS::FunctionDef
     QString defStr = QString::fromStdString(def.definition->toString());
     qDebug() << "), " << defStr << ")";
     for (const auto &client : clients)
-        client->newFunction(name, qID, arguments, defStr);
+        client->definedFunc(name, qID, arguments, defStr);
 }
+

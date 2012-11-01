@@ -6,6 +6,7 @@
 #include "../variables/VariableDeclarationExpression.h"
 #include "Arithmetic/List.h"
 #include "OutputExpression.h"
+#include "Arithmetic/Variable.h"
 
 class RangedForExpression : public CAS::AbstractExpression
 {

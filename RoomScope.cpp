@@ -6,10 +6,10 @@ void RoomScope::declareVar(CAS::AbstractExpression::ReturnType type, std::string
     emit declaredVar(type, id);
 }
 
-void RoomScope::declareFunc(CAS::FunctionSignature sig, CAS::FunctionDefinition def)
+void RoomScope::declareFunc(CAS::FunctionSignature sig, CAS::AbstractExpression::ReturnType returnType)
 {
-    CAS::Scope::declareFunc(sig, def);
-    emit newFunction(sig, def);
+    CAS::Scope::declareFunc(sig, returnType);
+    emit declaredFunc(sig, returnType);
 }
 
 void RoomScope::defineVar(const std::string &id, CAS::VariableDefinition var)
@@ -18,30 +18,26 @@ void RoomScope::defineVar(const std::string &id, CAS::VariableDefinition var)
     emit definedVar(id, var);
 }
 
-QString RoomScope::expressionTypeToString(CAS::AbstractExpression::ReturnType type)
+void RoomScope::defineFunc(const CAS::FunctionSignature &sig, CAS::FunctionDefinition def)
 {
-    switch (type) {
-    case CAS::AbstractExpression::NUMBER: return "number";
-    case CAS::AbstractExpression::BOOL: return "bool";
-    case CAS::AbstractExpression::LIST: return "list";
-    }
-    return "fsda";
+    CAS::Scope::defineFunc(sig, def);
+    emit definedFunc(sig, def);
 }
 
 QDataStream &operator<<(QDataStream &stream, const RoomScope &roomScope)
 {
     stream << static_cast<quint32>(roomScope.variables.size());
     for (const auto &item : roomScope.variables)
-        stream << QString::fromStdString(item.first) << RoomScope::expressionTypeToString(item.second.type) << (item.second.definition == nullptr ? QString() : QString::fromStdString(item.second.definition->toString()));
+        stream << QString::fromStdString(item.first) << QString::fromStdString(CAS::AbstractExpression::typeToString(item.second.type)) << (item.second.definition == nullptr ? QString() : QString::fromStdString(item.second.definition->toString()));
     stream << static_cast<quint32>(roomScope.functions.size());
     for (const auto &item : roomScope.functions) {
         stream << QString::fromStdString(item.first.id) << static_cast<quint32>(item.first.argumentTypes.size());
         for (const auto &argType : item.first.argumentTypes)
-            stream << RoomScope::expressionTypeToString(argType);
-        stream << static_cast<quint32>(item.second.arguments.size());
+            stream << QString::fromStdString(CAS::AbstractExpression::typeToString(argType));
+        stream << QString::fromStdString(CAS::AbstractExpression::typeToString(item.second.returnType)) << static_cast<quint32>(item.second.arguments.size());
         for (const auto &argStr : item.second.arguments)
             stream << QString::fromStdString(argStr);
-        stream << QString::fromStdString(item.second.definition->toString());
+        stream << (item.second.definition == nullptr ? QString() : QString::fromStdString(item.second.definition->toString()));
     }
     return stream;
 }
