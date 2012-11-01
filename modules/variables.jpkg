@@ -44,5 +44,5 @@ FunctionDeclaration : Terminal
 FunctionDefinition : Terminal
 {
     description: define functions
-    lib: modules/variabes
+    lib: modules/variables
 }

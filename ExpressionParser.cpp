@@ -118,36 +118,6 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
     }
 
     std::pair<const UnaryOperatorModule*, size_t> bestUnOpMatch{nullptr, 0};
-/*
-    for (auto i = input.cbegin(); i != input.cend(); ++i) {
-        if (*i == '(' || *i == '[' || *i == '{')  level--;
-        else if (*i == ')' || *i == ']' || *i == '}') level++;
-        else if (level == 0) {
-            for (const auto &it_op : modules.unaryOperators) {
-                auto candidate = it_op.matches(input, i - input.begin(), *this);
-                if (candidate.first && (bestBinOpMatch.first == nullptr || (bestUnOpMatch.first == nullptr && it_op.priority() < bestBinOpMatch.first->priority()) || (it_op.priority() < bestUnOpMatch.first->priority()))) {
-                    if (! it_op.needsParseForMatch()) {
-                        foundPos = i;
-                        parseForMatchResult.reset();
-                        bestUnOpMatch = {&it_op, candidate.second};
-                    } else {
-                        try {
-                            std::unique_ptr<CAS::AbstractExpression> tmpResult;
-                            if (it_op.alignment() == UnaryOperatorInterface::PRE)
-                                 tmpResult = it_op.parse(parse({i + candidate.second, input.cend()}));
-                            else
-                                tmpResult = it_op.parse(parse({input.cbegin(),i}));
-                            if (tmpResult) {
-                                bestUnOpMatch = {&it_op, candidate.second};
-                                parseForMatchResult = std::move(tmpResult);
-                            }
-                        } catch (const char *) {}
-                    }
-                }
-            }
-        }
-    }
-*/
     for (const auto &it_op : modules.unaryOperators) {
         auto candidate = it_op->matches(input);
         if (candidate.first) {

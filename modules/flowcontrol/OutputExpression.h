@@ -1,18 +1,17 @@
 #ifndef OUTPUTEXPRESSION_H
 #define OUTPUTEXPRESSION_H
 
-#include "Arithmetic/AbstractLevelingOperation.h"
+#include "Arithmetic/AbstractUnaryOperation.h"
 
-class OutputExpression : public CAS::AbstractLevelingOperation
+class OutputExpression : public CAS::AbstractUnaryOperation
 {
 public:
-    OutputExpression() {}
-    OutputExpression(CAS::AbstractExpression::ExpressionP operand) { operands.emplace_back(std::move(operand)); }
-    OutputExpression(Operands operands) : AbstractLevelingOperation(std::move(operands)) {}
+    OutputExpression() {};
+    OutputExpression(ExpressionP operand) : AbstractUnaryOperation(std::move(operand)) {}
     virtual ExpressionP copy() const { return make_unique<OutputExpression>(*this); }
 
-    virtual EvalRes eval(CAS::Scope &, bool) const { return std::make_pair(UNKNOWN, copy()); }
-    virtual std::string toString() const;
+    virtual EvalRes eval(CAS::Scope &scope, bool  lazy) const { return std::make_pair(UNKNOWN, make_unique<OutputExpression>(operand->eval(scope, lazy).second)); }
+    virtual std::string toString() const { if (operand == nullptr) return std::string(); else return operand->toString(); }
     virtual bool equals(const AbstractExpression *other) const;
 };
 

@@ -48,6 +48,7 @@ public:
 
     static std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters)
     {
+        if (str.empty()) return std::vector<std::string>();
         std::vector<std::string> tokens;
         int level = 0;
         auto lastPos = str.cbegin();

@@ -13,48 +13,14 @@
 #include "GreaterExpression.h"
 #include "GreaterOrEqualExpression.h"
 #include "RangedForExpression.h"
+#include "MultiLineExpression.h"
 
 extern "C" {
 
 std::unique_ptr<CAS::AbstractExpression> FLOWCONTROLSHARED_EXPORT Scope_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
 {
     if (candidate.front() != '{' || candidate.back() != '}') return nullptr;
-    int level = 0;
-    for (auto it = candidate.begin() + 1; it != candidate.end() - 1; ++it) {
-        if (*it == '{') level++;
-        else if (*it == '}' && --level == -1) return nullptr;
-    }
-
-    CAS::AbstractExpression::Operands tokens;
-    level = 0;
-    std::string token;
-    auto lastPos = candidate.cbegin() + 1;
-    for (auto it = candidate.cbegin() + 1; it != candidate.cend() - 1; ++it) {
-        if (*it == '(' || *it == '[' || *it == '{')  level--;
-        else if (*it == ')' || *it == ']' || *it == '}') level++;
-        else if (level == 0) {
-            if (*it == '\n') {
-                token = {lastPos, it};
-                token.erase(begin(token), std::find_if_not(begin(token), end(token), isspace));
-                token.erase(std::find_if_not(token.rbegin(), token.rend(), isspace).base(), end(token));
-                if (! token.empty()) tokens.emplace_back(make_unique<OutputExpression>(parseFunc(token)));
-                lastPos = it + 1;
-            } else if (*it == ';') {
-                token = {lastPos, it};
-                token.erase(begin(token), std::find_if_not(begin(token), end(token), isspace));
-                token.erase(std::find_if_not(token.rbegin(), token.rend(), isspace).base(), end(token));
-                if (! token.empty()) tokens.emplace_back(parseFunc(token));
-                lastPos = it + 1;
-            }
-        }
-    }
-    if (lastPos != candidate.cbegin() + 1) {
-        token = {lastPos, candidate.cend() - 1};
-        token.erase(begin(token), std::find_if_not(begin(token), end(token), isspace));
-        token.erase(std::find_if_not(token.rbegin(), token.rend(), isspace).base(), end(token));
-        if (! token.empty()) tokens.emplace_back(make_unique<OutputExpression>(parseFunc(token)));
-    } else tokens.emplace_back(make_unique<OutputExpression>(parseFunc({candidate.cbegin() + 1, candidate.cend() - 1})));
-    return make_unique<ScopeExpression>(std::move(tokens));
+    else return make_unique<ScopeExpression>(parseFunc({candidate.cbegin() + 1, candidate.cend() - 1}));
 }
 
 std::unique_ptr<CAS::AbstractExpression> FLOWCONTROLSHARED_EXPORT Bool_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
@@ -199,6 +165,46 @@ std::unique_ptr<CAS::AbstractExpression> FLOWCONTROLSHARED_EXPORT RangedFor_jmod
         }
     }
     return nullptr;
+}
+
+std::unique_ptr<CAS::AbstractExpression> FLOWCONTROLSHARED_EXPORT MultiLine_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
+{
+    CAS::AbstractExpression::Operands tokens;
+    int level = 0;
+    std::string token;
+    auto lastPos = candidate.cbegin();
+    for (auto it = candidate.cbegin(); it != candidate.cend(); ++it) {
+        if (*it == '(' || *it == '[' || *it == '{')  level--;
+        else if (*it == ')' || *it == ']' || *it == '}') level++;
+        else if (level == 0) {
+            if (*it == '\n') {
+                token = {lastPos, it};
+                token.erase(begin(token), std::find_if_not(begin(token), end(token), isspace));
+                token.erase(std::find_if_not(token.rbegin(), token.rend(), isspace).base(), end(token));
+                if (! token.empty()) tokens.emplace_back(make_unique<OutputExpression>(parseFunc(token)));
+                lastPos = it + 1;
+            } else if (*it == ';') {
+                token = {lastPos, it};
+                token.erase(begin(token), std::find_if_not(begin(token), end(token), isspace));
+                token.erase(std::find_if_not(token.rbegin(), token.rend(), isspace).base(), end(token));
+                if (! token.empty()) tokens.emplace_back(parseFunc(token));
+                lastPos = it + 1;
+            }
+        }
+    }
+    if (lastPos != candidate.cbegin()) {
+        token = {lastPos, candidate.cend()};
+        token.erase(begin(token), std::find_if_not(begin(token), end(token), isspace));
+        token.erase(std::find_if_not(token.rbegin(), token.rend(), isspace).base(), end(token));
+        if (! token.empty()) tokens.emplace_back(make_unique<OutputExpression>(parseFunc(token)));
+        return make_unique<MultiLineExpression>(std::move(tokens));
+    } else return nullptr;
+}
+
+std::unique_ptr<CAS::AbstractExpression> FLOWCONTROLSHARED_EXPORT Return_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
+{
+    if (candidate.substr(0, 7) != "return ") return nullptr;
+    return make_unique<ReturnExpression>(parseFunc({candidate.cbegin() + 7, candidate.cend()}));
 }
 
 }

@@ -10,9 +10,11 @@ DEFINES += VARIABLES_LIBRARY
 
 SOURCES += Variables.cpp \
         VariableDeclarationExpression.cpp \
-        FunctionDeclarationExpression.cpp
+        FunctionDeclarationExpression.cpp \
+    FunctionDefinitionExpression.cpp
 
 HEADERS +=\
         variables_global.h \
         VariableDeclarationExpression.h \
-        FunctionDeclarationExpression.h
+        FunctionDeclarationExpression.h \
+    FunctionDefinitionExpression.h

@@ -92,12 +92,6 @@ Max : Function
     priority: 1
 }
 
-Selection : Terminal
-{
-    description: select cell from matrix
-    lib: modules/basicarith
-}
-
 Range : Function
 {
     description: range with step 1

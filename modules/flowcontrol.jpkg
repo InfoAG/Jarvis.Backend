@@ -111,3 +111,15 @@ RangedFor : Terminal
     description: ranged for
     lib: modules/flowcontrol
 }
+
+MultiLine : Terminal
+{
+    description: \n or ;
+    lib: modules/flowcontrol
+}
+
+Return : Terminal
+{
+    description: return from function
+    lib: modules/flowcontrol
+}

@@ -24,7 +24,9 @@ SOURCES += flowcontrol.cpp \
     LessOrEqualExpression.cpp \
     GreaterExpression.cpp \
     GreaterOrEqualExpression.cpp \
-    RangedForExpression.cpp
+    RangedForExpression.cpp \
+    MultiLineExpression.cpp \
+    ReturnExpression.cpp
 
 HEADERS +=\
         flowcontrol_global.h \
@@ -41,4 +43,6 @@ HEADERS +=\
     LessOrEqualExpression.h \
     GreaterExpression.h \
     GreaterOrEqualExpression.h \
-    RangedForExpression.h
+    RangedForExpression.h \
+    MultiLineExpression.h \
+    ReturnExpression.h

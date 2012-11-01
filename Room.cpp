@@ -78,7 +78,7 @@ void Room::declaredFunc(const CAS::FunctionSignature &sig, CAS::AbstractExpressi
 void Room::definedFunc(const CAS::FunctionSignature &sig, const CAS::FunctionDefinition &def)
 {
     QString qID = QString::fromStdString(sig.id);
-    qDebug() << "NewFunction(" << qID << ", (";
+    qDebug() << "FunctionDefinition(" << qID << ", (";
     auto itArgStrs = def.arguments.cbegin();
     QList<QPair<QString, QString>> arguments;
     for (const auto &argType : sig.argumentTypes) {

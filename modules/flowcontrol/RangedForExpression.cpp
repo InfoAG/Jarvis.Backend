@@ -16,6 +16,6 @@ CAS::AbstractExpression::EvalRes RangedForExpression::eval(CAS::Scope &scope, bo
             forScope.defineVar(varID, item->eval(scope, lazy));
             result.emplace_back(instruction->eval(forScope, lazy).second);
         }
-        return std::make_pair(UNKNOWN, make_unique<OutputExpression>(std::move(result)));
+        return std::make_pair(UNKNOWN, make_unique<MultiLineExpression>(std::move(result)));
     } else return std::make_pair(UNKNOWN, make_unique<RangedForExpression>(declaration->copy(), std::move(listRes.second), instruction->copy()));
 }

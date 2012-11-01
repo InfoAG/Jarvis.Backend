@@ -1,18 +1,18 @@
 #ifndef SCOPEEXPRESSION_H
 #define SCOPEEXPRESSION_H
 
-#include "Arithmetic/AbstractLevelingOperation.h"
+#include "Arithmetic/AbstractUnaryOperation.h"
 #include "Arithmetic/Scope.h"
 #include "OutputExpression.h"
 
-class ScopeExpression : public CAS::AbstractLevelingOperation
+class ScopeExpression : public CAS::AbstractUnaryOperation
 {
 public:
-    ScopeExpression(Operands operands) : AbstractLevelingOperation(std::move(operands)) {}
+    ScopeExpression(ExpressionP operand) : AbstractUnaryOperation(std::move(operand)) {}
     virtual std::unique_ptr<AbstractExpression> copy() const { return make_unique<ScopeExpression>(*this); }
 
     virtual EvalRes eval(CAS::Scope &scope, bool lazy) const;
-    virtual std::string toString() const;
+    virtual std::string toString() const { return "{" + operand->toString() + "}"; }
     virtual bool equals(const AbstractExpression *other) const;
 };
 
