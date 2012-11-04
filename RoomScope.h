@@ -14,8 +14,8 @@ class RoomScope : public QObject, public CAS::Scope
 public:
     RoomScope() {}
 
-    virtual void declareVar(CAS::AbstractExpression::ReturnType type, std::string id);
-    virtual void declareFunc(CAS::FunctionSignature sig, CAS::AbstractExpression::ReturnType returnType);
+    virtual void declareVar(CAS::TypeInfo type, std::string id);
+    virtual void declareFunc(CAS::FunctionSignature sig, CAS::TypeInfo returnType);
     virtual void defineVar(const std::string &id, CAS::VariableDefinition var);
     virtual void defineFunc(const CAS::FunctionSignature &sig, CAS::FunctionDefinition def);
 
@@ -25,9 +25,9 @@ public:
     friend QDataStream &operator<<(QDataStream &stream, const RoomScope &roomScope);
 
 signals:
-    void declaredVar(CAS::AbstractExpression::ReturnType type, const std::string &id);
+    void declaredVar(const CAS::TypeInfo &type, const std::string &id);
     void definedVar(const std::string &id, const CAS::VariableDefinition &var);
-    void declaredFunc(const CAS::FunctionSignature &sig, CAS::AbstractExpression::ReturnType returnType);
+    void declaredFunc(const CAS::FunctionSignature &sig, const CAS::TypeInfo &returnType);
     void definedFunc(const CAS::FunctionSignature &sig, const CAS::FunctionDefinition &def);
 };
 

@@ -12,7 +12,7 @@ public:
     BoolValue(bool value) : value_(value) {}
 
     virtual ExpressionP copy() const { return make_unique<BoolValue>(*this); }
-    virtual EvalRes eval(CAS::Scope &, bool) const { return std::make_pair(BOOL, copy()); }
+    virtual EvalRes eval(CAS::Scope &, bool) const { return std::make_pair(CAS::TypeInfo::BOOL, copy()); }
     virtual std::string toString() const { return value_ ? "true" : "false"; }
     virtual bool equals(const AbstractExpression *other) const;
 

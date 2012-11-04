@@ -8,7 +8,7 @@ CAS::AbstractExpression::EvalRes MultiLineExpression::eval(CAS::Scope &scope, bo
         if (typeid(*(evalRes.second)) == typeid(OutputExpression)) result.emplace_back(std::move(evalRes.second));
         else if (typeid(*(evalRes.second)) == typeid(ReturnExpression)) return std::make_pair(evalRes.first, std::move(static_cast<ReturnExpression*>(evalRes.second.get())->getOperand()));
     }
-    return std::make_pair(UNKNOWN, make_unique<MultiLineExpression>(std::move(result)));
+    return std::make_pair(CAS::TypeInfo::VOID, make_unique<MultiLineExpression>(std::move(result)));
 }
 
 std::string MultiLineExpression::toString() const

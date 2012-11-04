@@ -12,7 +12,7 @@ CAS::AbstractExpression::EvalRes IfExpression::eval(CAS::Scope &scope, bool lazy
     auto it = conditionals.cbegin();
     for (; it != conditionals.cend(); ++it) {
         auto conditionResult = it->first->eval(scope, lazy);
-        if (conditionResult.first != BOOL) throw "wrong argument";
+        if (conditionResult.first != CAS::TypeInfo::BOOL) throw "wrong argument";
         else if (typeid(*(conditionResult.second)) == typeid(BoolValue)) {
             if (static_cast<BoolValue*>(conditionResult.second.get())->value())
                 return it->second->eval(scope, lazy);
@@ -26,12 +26,12 @@ CAS::AbstractExpression::EvalRes IfExpression::eval(CAS::Scope &scope, bool lazy
     if (it != conditionals.cend()) {
         for (; it != conditionals.cend(); ++it) {
             auto conditionResult = it->first->eval(scope, lazy);
-            if (conditionResult.first != BOOL) throw "wrong argument";
+            if (conditionResult.first != CAS::TypeInfo::BOOL) throw "wrong argument";
             evalRes.emplace_back(std::move(conditionResult.second), it->second->copy());
         }
     }
-    if (evalRes.empty()) return std::make_pair(UNKNOWN, make_unique<OutputExpression>());
-    else return std::make_pair(UNKNOWN, make_unique<IfExpression>(std::move(evalRes)));
+    if (evalRes.empty()) return std::make_pair(CAS::TypeInfo::VOID, make_unique<OutputExpression>());
+    else return std::make_pair(CAS::TypeInfo::VOID, make_unique<IfExpression>(std::move(evalRes)));
 }
 
 std::string IfExpression::toString() const

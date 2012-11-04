@@ -1,12 +1,12 @@
 #include "RoomScope.h"
 
-void RoomScope::declareVar(CAS::AbstractExpression::ReturnType type, std::string id)
+void RoomScope::declareVar(CAS::TypeInfo type, std::string id)
 {
     CAS::Scope::declareVar(type, id);
     emit declaredVar(type, id);
 }
 
-void RoomScope::declareFunc(CAS::FunctionSignature sig, CAS::AbstractExpression::ReturnType returnType)
+void RoomScope::declareFunc(CAS::FunctionSignature sig, CAS::TypeInfo returnType)
 {
     CAS::Scope::declareFunc(sig, returnType);
     emit declaredFunc(sig, returnType);
@@ -28,13 +28,13 @@ QDataStream &operator<<(QDataStream &stream, const RoomScope &roomScope)
 {
     stream << static_cast<quint32>(roomScope.variables.size());
     for (const auto &item : roomScope.variables)
-        stream << QString::fromStdString(item.first) << QString::fromStdString(CAS::AbstractExpression::typeToString(item.second.type)) << (item.second.definition == nullptr ? QString() : QString::fromStdString(item.second.definition->toString()));
+        stream << QString::fromStdString(item.first) << QString::fromStdString(item.second.type.toString()) << (item.second.definition == nullptr ? QString() : QString::fromStdString(item.second.definition->toString()));
     stream << static_cast<quint32>(roomScope.functions.size());
     for (const auto &item : roomScope.functions) {
         stream << QString::fromStdString(item.first.id) << static_cast<quint32>(item.first.argumentTypes.size());
         for (const auto &argType : item.first.argumentTypes)
-            stream << QString::fromStdString(CAS::AbstractExpression::typeToString(argType));
-        stream << QString::fromStdString(CAS::AbstractExpression::typeToString(item.second.returnType)) << static_cast<quint32>(item.second.arguments.size());
+            stream << QString::fromStdString(argType.toString());
+        stream << QString::fromStdString(item.second.returnType.toString()) << static_cast<quint32>(item.second.arguments.size());
         for (const auto &argStr : item.second.arguments)
             stream << QString::fromStdString(argStr);
         stream << (item.second.definition == nullptr ? QString() : QString::fromStdString(item.second.definition->toString()));

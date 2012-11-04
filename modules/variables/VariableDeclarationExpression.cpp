@@ -1,13 +1,14 @@
 #include "VariableDeclarationExpression.h"
 
-std::string VariableDeclarationExpression::toString() const
+CAS::AbstractExpression::EvalRes VariableDeclarationExpression::eval(CAS::Scope &scope, bool) const
 {
-    std::string result;
-
-    return result + " " + id;
+    for (const auto &id : ids) scope.declareVar(type, id);
+    return std::make_pair(CAS::TypeInfo::VOID, copy());
 }
 
-bool VariableDeclarationExpression::equals(const CAS::AbstractExpression *other) const
+std::string VariableDeclarationExpression::toString() const
 {
-    return typeid(*other) == typeid(VariableDeclarationExpression) && id == static_cast<const VariableDeclarationExpression*>(other)->getID() && type == static_cast<const VariableDeclarationExpression*>(other)->getType();
+    std::string result = type.toString() + " " + ids.front();
+    for (auto it = ids.cbegin() + 1; it != ids.cend(); ++it) result += ", " + *it;
+    return result;
 }

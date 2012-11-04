@@ -3,7 +3,7 @@
 CAS::AbstractExpression::EvalRes ReturnExpression::eval(CAS::Scope &scope, bool lazy) const
 {
     auto opRes = operand->eval(scope, lazy);
-    if (opRes.first == UNKNOWN) throw "return type";
+    if (opRes.first == CAS::TypeInfo::VOID) throw "return type";
     return std::make_pair(opRes.first, make_unique<ReturnExpression>(std::move(opRes.second)));
 }
 
