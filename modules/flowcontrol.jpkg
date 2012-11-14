@@ -123,3 +123,9 @@ Return : Terminal
     description: return from function
     lib: modules/flowcontrol
 }
+
+Import : Terminal
+{
+    description: import
+    lib: modules/flowcontrol
+}

@@ -2,7 +2,7 @@
 #define PARSER_H
 
 #include <string>
-#include "Arithmetic/AbstractExpression.h"
+#include "expression/AbstractExpression.h"
 #include <QDir>
 #include "ParserModules.h"
 #include "ModulePackage.h"

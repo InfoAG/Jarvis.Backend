@@ -1,7 +1,7 @@
 #ifndef TERMINALMODULE_H
 #define TERMINALMODULE_H
 
-#include "Arithmetic/AbstractExpression.h"
+#include "expression/AbstractExpression.h"
 #include <string>
 #include "ParserModule.h"
 #include <QTextStream>

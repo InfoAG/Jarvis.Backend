@@ -13,7 +13,7 @@ release {
     LIBS += -L../../Framework/release -lJarvis-Framework
 }
 debug {
-    DESTDIR = ../release/
+    DESTDIR = ../debug/
     LIBS += -L../../Framework/debug -lJarvis-Framework
 }
 

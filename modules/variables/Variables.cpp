@@ -1,22 +1,22 @@
 #include "BinaryOperatorInterface.h"
 #include "FunctionInterface.h"
-#include "Arithmetic/AbstractExpression.h"
-#include "Arithmetic/Variable.h"
-#include "Arithmetic/Assignment.h"
-#include "Arithmetic/Function.h"
-#include "Arithmetic/LazyEval.h"
+#include "expression/AbstractExpression.h"
+#include "expression/Variable.h"
+#include "expression/Assignment.h"
+#include "expression/Function.h"
+#include "expression/LazyEval.h"
 #include <memory>
 #include "variables_global.h"
-#include "VariableDeclarationExpression.h"
+#include "expression/VariableDeclarationExpression.h"
 #include "ExpressionParser.h"
-#include "FunctionDeclarationExpression.h"
-#include "FunctionDefinitionExpression.h"
+#include "expression/FunctionDeclarationExpression.h"
+#include "expression/FunctionDefinitionExpression.h"
 
 extern "C" {
 
 std::unique_ptr<CAS::AbstractExpression> VARIABLESSHARED_EXPORT Variable_jmodule(const std::string &candidate)
 {
-    if (candidate.find_first_not_of("abcdefghijklmnopqrstuvwxyz") == std::string::npos)
+    if (isalpha(candidate.front()) && std::find_if(candidate.begin() + 1, candidate.end(), std::not1(std::pointer_to_unary_function<int, int>(isalnum))) == candidate.end())
         return make_unique<CAS::Variable>(candidate);
     else return nullptr;
 }
@@ -43,7 +43,7 @@ BinaryOperatorInterface VARIABLESSHARED_EXPORT Assignment_jmodule()
                 for (const auto &arg : static_cast<CAS::Function*>(first.get())->getOperands())
                     if (typeid(*arg) != typeid(CAS::Variable)) assignableFunction = false;
             }
-            if (assignableFunction || typeid(*first) == typeid(CAS::Variable) || typeid(*first) == typeid(VariableDeclarationExpression))
+            if (assignableFunction || typeid(*first) == typeid(CAS::Variable) || typeid(*first) == typeid(CAS::VariableDeclarationExpression))
                 return make_unique<CAS::Assignment>(std::move(first), std::move(second));
             else return std::unique_ptr<CAS::Assignment>(nullptr);
         };
@@ -59,17 +59,17 @@ FunctionInterface VARIABLESSHARED_EXPORT LazyEval_jmodule()
     return fi;
 }
 
-std::unique_ptr<VariableDeclarationExpression> doParseVariableDeclaration(const std::string &candidate) {
+std::unique_ptr<CAS::VariableDeclarationExpression> doParseVariableDeclaration(const std::string &candidate) {
     auto spaceIt = candidate.find_first_of(' ');
     auto type = candidate.substr(0, spaceIt);
     auto ids = ExpressionParser::tokenize(candidate.substr(spaceIt + 1, std::string::npos), ",");
     for (auto &id : ids) {
         id = ExpressionParser::trim(id);
-        if (! (isalpha(id.front()) && std::find_if(id.begin(), id.end(), std::not1(std::pointer_to_unary_function<int, int>(isalnum))) == id.end()))
+        if (! (isalpha(id.front()) && std::find_if(id.begin() + 1, id.end(), std::not1(std::pointer_to_unary_function<int, int>(isalnum))) == id.end()))
             return nullptr;
     }
     try {
-        return make_unique<VariableDeclarationExpression>(CAS::TypeInfo::fromString(std::move(type)), std::move(ids));
+        return make_unique<CAS::VariableDeclarationExpression>(CAS::TypeInfo::fromString(std::move(type)), std::move(ids));
     } catch (const char *) {
         return nullptr;
     }
@@ -99,7 +99,7 @@ std::unique_ptr<CAS::AbstractExpression> doParseFunctionDeclaration(const std::s
         }
     }
     try {
-        return make_unique<FunctionDeclarationExpression>(CAS::FunctionSignature{std::move(id), std::move(argTypes)}, CAS::TypeInfo::fromString(type), std::move(argNames));
+        return make_unique<CAS::FunctionDeclarationExpression>(CAS::FunctionSignature{std::move(id), std::move(argTypes)}, CAS::TypeInfo::fromString(type), std::move(argNames));
     } catch (const char *) {
         return nullptr;
     }
@@ -122,7 +122,7 @@ std::unique_ptr<CAS::AbstractExpression> VARIABLESSHARED_EXPORT FunctionDefiniti
     }
     auto head = doParseFunctionDeclaration(ExpressionParser::trim({candidate.cbegin(), it}));
     if (head == nullptr) return nullptr;
-    return make_unique<FunctionDefinitionExpression>(*static_cast<FunctionDeclarationExpression*>(head.get()), parseFunc({it + 1, candidate.cend() - 1}));
+    return make_unique<CAS::FunctionDefinitionExpression>(*static_cast<CAS::FunctionDeclarationExpression*>(head.get()), parseFunc({it + 1, candidate.cend() - 1}));
 }
 
 }

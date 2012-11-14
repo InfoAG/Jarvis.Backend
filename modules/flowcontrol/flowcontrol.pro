@@ -10,39 +10,7 @@ TARGET = flowcontrol
 
 DEFINES += FLOWCONTROL_LIBRARY
 
-SOURCES += flowcontrol.cpp \
-    ScopeExpression.cpp \
-    OutputExpression.cpp \
-    BoolValue.cpp \
-    IfExpression.cpp \
-    EmptyExpression.cpp \
-    EqualityExpression.cpp \
-    NegationExpression.cpp \
-    LogicalAndExpression.cpp \
-    LogicalOrExpression.cpp \
-    LessExpression.cpp \
-    LessOrEqualExpression.cpp \
-    GreaterExpression.cpp \
-    GreaterOrEqualExpression.cpp \
-    RangedForExpression.cpp \
-    MultiLineExpression.cpp \
-    ReturnExpression.cpp
+SOURCES += flowcontrol.cpp
 
 HEADERS +=\
-        flowcontrol_global.h \
-    ScopeExpression.h \
-    OutputExpression.h \
-    BoolValue.h \
-    IfExpression.h \
-    EmptyExpression.h \
-    EqualityExpression.h \
-    NegationExpression.h \
-    LogicalAndExpression.h \
-    LogicalOrExpression.h \
-    LessExpression.h \
-    LessOrEqualExpression.h \
-    GreaterExpression.h \
-    GreaterOrEqualExpression.h \
-    RangedForExpression.h \
-    MultiLineExpression.h \
-    ReturnExpression.h
+        flowcontrol_global.h

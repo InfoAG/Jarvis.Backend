@@ -75,35 +75,3 @@ Modulo : BinaryOperator
     associativity: left
     needsParseForMatch: false
 }
-
-Min : Function
-{
-    description: minimum of values
-    lib: modules/basicarith
-    matches: min, 2
-    priority: 1
-}
-
-Max : Function
-{
-    description: maximum of values
-    lib: modules/basicarith
-    matches: max, 2
-    priority: 1
-}
-
-Range : Function
-{
-    description: range with step 1
-    lib: modules/basicarith
-    matches: range, 2
-    priority: 1
-}
-
-RangeCStep : Function
-{
-    description: range with custom step
-    lib: modules/basicarith
-    matches: range, 3
-    priority: 1
-}

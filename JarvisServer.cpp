@@ -18,7 +18,7 @@ JarvisServer::JarvisServer() : settings("InfoAG", "Jarvis.Server")
 const Room *JarvisServer::enterRoom(ClientConnection *client, QString room)
 {
     if (! rooms.contains(room)) {
-        rooms.insert(room, make_unique<Room>(room, parser.get()));
+        rooms.insert(room, make_unique<Room>(room, parser.get(), *this));
         for (const auto &it_client: clients) {
             if (it_client.get() != client) it_client->newRoom(room);
         }

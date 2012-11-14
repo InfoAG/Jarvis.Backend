@@ -1,20 +1,17 @@
 #include "BinaryOperatorInterface.h"
 #include "basicarith_global.h"
-#include "Arithmetic/Addition.h"
-#include "Arithmetic/Subtraction.h"
-#include "Arithmetic/BinaryMultiplication.h"
-#include "Arithmetic/Division.h"
-#include "Arithmetic/NumberArith.h"
-#include "Arithmetic/Exponentiation.h"
-#include "Arithmetic/List.h"
+#include "expression/Addition.h"
+#include "expression/Subtraction.h"
+#include "expression/BinaryMultiplication.h"
+#include "expression/Division.h"
+#include "expression/NumberArith.h"
+#include "expression/Exponentiation.h"
+#include "expression/List.h"
 #include "Integer.h"
-#include "Arithmetic/Min.h"
-#include "Arithmetic/Max.h"
 #include "ExpressionParser.h"
-#include "Arithmetic/Modulo.h"
-#include "Arithmetic/Selection.h"
-#include "Arithmetic/Range.h"
-#include "BinaryOperatorModule.h" //wut
+#include "expression/Modulo.h"
+#include "expression/Selection.h"
+#include "BinaryOperatorModule.h"
 
 #include <string>
 #include <iostream>
@@ -140,24 +137,6 @@ BinaryOperatorInterface BASICARITHSHARED_EXPORT Modulo_jmodule()
     return oi;
 }
 
-FunctionInterface BASICARITHSHARED_EXPORT Min_jmodule()
-{
-    FunctionInterface fi;
-    fi.parse = [](const std::string &, std::vector<std::unique_ptr<CAS::AbstractExpression>> &arguments) {
-            return make_unique<CAS::Min>(std::move(arguments.front()), std::move(arguments.at(1)));
-        };
-    return fi;
-}
-
-FunctionInterface BASICARITHSHARED_EXPORT Max_jmodule()
-{
-    FunctionInterface fi;
-    fi.parse = [](const std::string &, std::vector<std::unique_ptr<CAS::AbstractExpression>> &arguments) {
-            return make_unique<CAS::Max>(std::move(arguments.front()), std::move(arguments.at(1)));
-        };
-    return fi;
-}
-
 std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Selection_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
 {
     if (candidate.back() != '}') return nullptr;
@@ -173,24 +152,6 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Selection_jmodu
     for (const auto &token : ExpressionParser::tokenize(candidate.substr(i + 1, candidate.length() - i - 2), ","))
         if (tmpToken = parseFunc(token)) selectTokens.emplace_back(std::move(tmpToken));
     return make_unique<CAS::Selection>(parseFunc(candidate.substr(0, i)), std::move(selectTokens));
-}
-
-FunctionInterface BASICARITHSHARED_EXPORT Range_jmodule()
-{
-    FunctionInterface fi;
-    fi.parse = [](const std::string &, std::vector<std::unique_ptr<CAS::AbstractExpression>> &arguments) {
-            return make_unique<CAS::Range>(std::move(arguments.front()), std::move(arguments.at(1)), make_unique<CAS::NumberArith>(1));
-        };
-    return fi;
-}
-
-FunctionInterface BASICARITHSHARED_EXPORT RangeCStep_jmodule()
-{
-    FunctionInterface fi;
-    fi.parse = [](const std::string &, std::vector<std::unique_ptr<CAS::AbstractExpression>> &arguments) {
-            return make_unique<CAS::Range>(std::move(arguments.front()), std::move(arguments.at(1)), std::move(arguments.at(2)));
-        };
-    return fi;
 }
 
 }

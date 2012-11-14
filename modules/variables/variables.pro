@@ -8,13 +8,7 @@ include(../../common.pri)
 
 DEFINES += VARIABLES_LIBRARY
 
-SOURCES += Variables.cpp \
-        VariableDeclarationExpression.cpp \
-        FunctionDeclarationExpression.cpp \
-    FunctionDefinitionExpression.cpp
+SOURCES += Variables.cpp
 
 HEADERS +=\
-        variables_global.h \
-        VariableDeclarationExpression.h \
-        FunctionDeclarationExpression.h \
-    FunctionDefinitionExpression.h
+        variables_global.h

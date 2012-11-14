@@ -1,6 +1,7 @@
 TEMPLATE = subdirs
 
-SUBDIRS += build-lib
+SUBDIRS += build-lib \
+    cextensions/std
 
 CONFIG += ordered
 
@@ -12,4 +13,5 @@ SUBDIRS += modules/basicarith \
 OTHER_FILES += \
     modules/basicarith.jpkg \
     modules/variables.jpkg \
-    modules/flowcontrol.jpkg
+    modules/flowcontrol.jpkg \
+    debug/cextensions/std.jce

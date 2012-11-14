@@ -1,7 +1,8 @@
 #include "Room.h"
 #include "ClientConnection.h"
+#include "RoomScope.h"
 
-Room::Room(const QString &name, ExpressionParser *parser) : name(name), parser(parser), roomScope(new RoomScope)
+Room::Room(const QString &name, ExpressionParser *parser, const JarvisServer &server) : name(name), parser(parser), roomScope(std::make_shared<RoomScope>(server))
 {
     connect(roomScope.get(), SIGNAL(declaredVar(const CAS::TypeInfo &, const std::string &)), SLOT(declaredVar(const CAS::TypeInfo &, const std::string &)));
     connect(roomScope.get(), SIGNAL(declaredFunc(const CAS::FunctionSignature &, const CAS::TypeInfo &)), SLOT(declaredFunc(const CAS::FunctionSignature &, const CAS::TypeInfo &)));
@@ -34,7 +35,7 @@ void Room::sendMsg(const QString &sender, const QString &msg)
 {
     for (const auto &client : clients) client->sendMsg(name, sender, msg);
     try {
-        auto result = parser->parse(msg.toStdString())->eval(*roomScope).second;
+        auto result = parser->parse(msg.toStdString())->eval(*roomScope, std::bind(&RoomScope::load, roomScope.get(), std::placeholders::_1)).second;
         auto resultString = QString::fromStdString(result->toString());
         for (const auto &client : clients) client->sendMsg(name, "Jarvis", resultString);
     } catch (const char *s) {

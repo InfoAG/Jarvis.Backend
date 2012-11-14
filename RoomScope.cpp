@@ -41,3 +41,28 @@ QDataStream &operator<<(QDataStream &stream, const RoomScope &roomScope)
     }
     return stream;
 }
+
+
+void RoomScope::load(const std::string &fileName)
+{
+    auto files = server.resolveImport(QString::fromStdString(fileName));
+    files.first->open(QFile::ReadOnly);
+    QTextStream fileStream(files.first.get());
+    std::vector<CAS::TypeInfo> argTypes;
+    while (! fileStream.atEnd()) {
+        QString name, returnType, buf;
+        fileStream >> name >> buf;
+        if (buf != "{") throw "failer";
+        fileStream >> returnType;
+        if (returnType.endsWith(',')) returnType.chop(1);
+        for (;;) {
+            fileStream >> buf;
+            if (buf == "}") break;
+            else if (buf.endsWith(',')) buf.chop(1);
+            argTypes.emplace_back(CAS::TypeInfo::fromString(buf.toStdString()));
+        }
+        functions.insert(std::make_pair(CAS::FunctionSignature{name.toStdString(), std::move(argTypes)}, CAS::FunctionDefinition{make_unique<CAS::CFunctionBody>(CAS::TypeInfo::fromString(returnType.toStdString()), name.toStdString(), std::function<CAS::AbstractExpression::ExpressionP(const CAS::AbstractExpression::Operands &, Scope &, const std::function<void(const std::string &)> &, bool, bool)>{(CAS::AbstractExpression::ExpressionP(*)(const CAS::AbstractExpression::Operands &, Scope &, const std::function<void(const std::string &)> &, bool, bool))QLibrary::resolve(files.second, name.toLatin1().data())}), CAS::TypeInfo::fromString(returnType.toStdString())}));
+        argTypes.clear();
+        fileStream.skipWhiteSpace();
+    }
+}

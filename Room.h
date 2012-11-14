@@ -5,9 +5,10 @@
 #include <QList>
 #include <memory>
 #include "ExpressionParser.h"
-#include "RoomScope.h"
-#include "Arithmetic/Assignment.h"
+#include "expression/Assignment.h"
 
+class JarvisServer;
+class RoomScope;
 class ClientConnection;
 
 class Room : QObject
@@ -21,8 +22,8 @@ private:
     std::shared_ptr<RoomScope> roomScope;
 
 public:
-    Room() {};
-    Room(const QString &name, ExpressionParser *parser);
+    Room() {}
+    Room(const QString &name, ExpressionParser *parser, const JarvisServer &server);
 
     void getInitInfo(QDataStream &stream) const;
     void removeClient(ClientConnection *client);

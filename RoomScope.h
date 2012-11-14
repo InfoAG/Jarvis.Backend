@@ -1,23 +1,32 @@
 #ifndef ROOMSCOPE_H
 #define ROOMSCOPE_H
 
-#include "Arithmetic/Scope.h"
+#include "expression/Scope.h"
 #include <QString>
 #include <QObject>
 #include <QDataStream>
-#include "Arithmetic/AbstractExpression.h"
+#include "expression/AbstractExpression.h"
+#include <QFile>
+#include "JarvisServer.h"
+#include "expression/CFunctionBody.h"
+#include <QLibrary>
 
 class RoomScope : public QObject, public CAS::Scope
 {
     Q_OBJECT
 
+private:
+    const JarvisServer &server;
+
 public:
-    RoomScope() {}
+    RoomScope(const JarvisServer &server) : server(server) {}
 
     virtual void declareVar(CAS::TypeInfo type, std::string id);
     virtual void declareFunc(CAS::FunctionSignature sig, CAS::TypeInfo returnType);
     virtual void defineVar(const std::string &id, CAS::VariableDefinition var);
     virtual void defineFunc(const CAS::FunctionSignature &sig, CAS::FunctionDefinition def);
+
+    void load(const std::string &fileName);
 
     const VarDefs &getVars() const { return variables; }
     const FuncDefs &getFunc() const { return functions; }

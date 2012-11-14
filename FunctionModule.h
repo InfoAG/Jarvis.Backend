@@ -1,7 +1,7 @@
 #ifndef FUNCTIONMODULE_H
 #define FUNCTIONMODULE_H
 
-#include "Arithmetic/AbstractExpression.h"
+#include "expression/AbstractExpression.h"
 #include <string>
 #include "FunctionInterface.h"
 #include <QString>
