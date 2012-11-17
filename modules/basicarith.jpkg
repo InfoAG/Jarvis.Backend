@@ -75,3 +75,13 @@ Modulo : BinaryOperator
     associativity: left
     needsParseForMatch: false
 }
+
+Factorial : UnaryOperator
+{
+    description: factorial
+    lib: modules/basicarith
+    matches: !
+    priority: 8
+    alignment: post
+    needsParseForMatch: false
+}

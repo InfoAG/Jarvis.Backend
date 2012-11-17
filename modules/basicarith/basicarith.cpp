@@ -7,15 +7,16 @@
 #include "expression/NumberArith.h"
 #include "expression/Exponentiation.h"
 #include "expression/List.h"
-#include "Integer.h"
 #include "ExpressionParser.h"
 #include "expression/Modulo.h"
 #include "expression/Selection.h"
 #include "BinaryOperatorModule.h"
+#include "expression/FactorialExpression.h"
 
 #include <string>
 #include <iostream>
 #include <QString>
+#include <sstream>
 
 extern "C" {
 
@@ -83,13 +84,19 @@ BinaryOperatorInterface BASICARITHSHARED_EXPORT Exponentiation_jmodule()
 
 std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Number_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
 {
-    if (candidate.front() == '-' || candidate.front() == '+') {
+    /*if (candidate.front() == '-' || candidate.front() == '+') {
         if (candidate.size() == 1) return nullptr;
         else if ((candidate.size() != 2 && candidate.at(1) == '0') || candidate.find_first_not_of("0123456789", 1) != std::string::npos) return nullptr;
     } else if ((candidate.size() != 1 && candidate.front() == '0') || candidate.find_first_not_of("0123456789") != std::string::npos) return nullptr;
+    */
 
-    return make_unique<CAS::NumberArith>(CAS::Integer(candidate));
-
+    std::istringstream ss(candidate);
+    double value;
+    if (! (ss >> value)) return nullptr;
+    std::ostringstream os;
+    os << value;
+    if (os.str() != candidate) return nullptr;
+    return make_unique<CAS::NumberArith>(value);
 }
 
 std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Pi_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
@@ -152,6 +159,15 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Selection_jmodu
     for (const auto &token : ExpressionParser::tokenize(candidate.substr(i + 1, candidate.length() - i - 2), ","))
         if (tmpToken = parseFunc(token)) selectTokens.emplace_back(std::move(tmpToken));
     return make_unique<CAS::Selection>(parseFunc(candidate.substr(0, i)), std::move(selectTokens));
+}
+
+UnaryOperatorInterface BASICARITHSHARED_EXPORT Factorial_jmodule()
+{
+    UnaryOperatorInterface oi;
+    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> operand) {
+        return make_unique<CAS::FactorialExpression>(std::move(operand));
+    };
+    return oi;
 }
 
 }

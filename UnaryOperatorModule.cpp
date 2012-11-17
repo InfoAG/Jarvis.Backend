@@ -5,7 +5,7 @@ std::pair<bool, size_t> UnaryOperatorModule::matches(const std::string &input) c
     if (interface.matches == nullptr) {
         auto staticStr = statics.matches->toStdString();
         if (alignment() == UnaryOperatorInterface::PRE) return std::make_pair(std::equal(staticStr.cbegin(), staticStr.cend(), input.cbegin()), staticStr.size());
-        else return std::make_pair(std::equal(staticStr.crend(), staticStr.crbegin(), input.crbegin()), staticStr.size());
+        else return std::make_pair(std::equal(staticStr.cbegin(), staticStr.cend(), input.crbegin()), staticStr.size());
     } else return interface.matches(input);
 }
 
