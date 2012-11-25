@@ -4,6 +4,7 @@
 #include "expression/Function.h"
 #include "expression/List.h"
 #include "expression/Addition.h"
+#include "expression/BinaryMultiplication.h"
 
 extern "C" {
 
@@ -79,6 +80,30 @@ CAS::AbstractExpression::ExpressionP binomcdf(const CAS::AbstractExpression::Ope
         result += doBinomPDF(static_cast<CAS::NumberArith*>(args.front().get())->getValue(), static_cast<CAS::NumberArith*>(args.at(1).get())->getValue(), start);
     } while (start--);
     return make_unique<CAS::NumberArith>(result);
+}
+
+CAS::AbstractExpression::ExpressionP crossProduct(const CAS::AbstractExpression::Operands &args, CAS::Scope &scope, const std::function<void(const std::string &)> &load, bool lazy, bool direct)
+{
+    if (typeid(*(args.front())) != typeid(CAS::VectorExpression) || typeid(*(args.back())) != typeid(CAS::VectorExpression)) return nullptr;
+    return CAS::VectorExpression(make_unique<CAS::Subtraction>(make_unique<CAS::BinaryMultiplication>(static_cast<const CAS::VectorExpression*>(args.front().get())->getY()->copy(), static_cast<const CAS::VectorExpression*>(args.back().get())->getZ()->copy()), make_unique<CAS::BinaryMultiplication>(static_cast<const CAS::VectorExpression*>(args.front().get())->getZ()->copy(), static_cast<const CAS::VectorExpression*>(args.back().get())->getY()->copy())), make_unique<CAS::Subtraction>(make_unique<CAS::BinaryMultiplication>(static_cast<const CAS::VectorExpression*>(args.front().get())->getZ()->copy(), static_cast<const CAS::VectorExpression*>(args.back().get())->getX()->copy()), make_unique<CAS::BinaryMultiplication>(static_cast<const CAS::VectorExpression*>(args.front().get())->getX()->copy(), static_cast<const CAS::VectorExpression*>(args.back().get())->getZ()->copy())), make_unique<CAS::Subtraction>(make_unique<CAS::BinaryMultiplication>(static_cast<const CAS::VectorExpression*>(args.front().get())->getX()->copy(), static_cast<const CAS::VectorExpression*>(args.back().get())->getY()->copy()), make_unique<CAS::BinaryMultiplication>(static_cast<const CAS::VectorExpression*>(args.front().get())->getY()->copy(), static_cast<const CAS::VectorExpression*>(args.back().get())->getX()->copy()))).eval(scope, load, lazy, direct).second;
+}
+
+CAS::AbstractExpression::ExpressionP x(const CAS::AbstractExpression::Operands &args, CAS::Scope &, const std::function<void(const std::string &)> &, bool, bool)
+{
+    if (typeid(*(args.front())) != typeid(CAS::VectorExpression)) return nullptr;
+    return static_cast<const CAS::VectorExpression*>(args.front().get())->getX()->copy();
+}
+
+CAS::AbstractExpression::ExpressionP y(const CAS::AbstractExpression::Operands &args, CAS::Scope &, const std::function<void(const std::string &)> &, bool, bool)
+{
+    if (typeid(*(args.front())) != typeid(CAS::VectorExpression)) return nullptr;
+    return static_cast<const CAS::VectorExpression*>(args.front().get())->getY()->copy();
+}
+
+CAS::AbstractExpression::ExpressionP z(const CAS::AbstractExpression::Operands &args, CAS::Scope &, const std::function<void(const std::string &)> &, bool, bool)
+{
+    if (typeid(*(args.front())) != typeid(CAS::VectorExpression)) return nullptr;
+    return static_cast<const CAS::VectorExpression*>(args.front().get())->getZ()->copy();
 }
 
 }

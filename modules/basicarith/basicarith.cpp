@@ -12,6 +12,7 @@
 #include "expression/Selection.h"
 #include "BinaryOperatorModule.h"
 #include "expression/FactorialExpression.h"
+#include "expression/VectorExpression.h"
 
 #include <string>
 #include <iostream>
@@ -168,6 +169,21 @@ UnaryOperatorInterface BASICARITHSHARED_EXPORT Factorial_jmodule()
         return make_unique<CAS::FactorialExpression>(std::move(operand));
     };
     return oi;
+}
+
+std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Vector_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
+{
+    if (candidate.front() != '(' || candidate.back() != ')') return nullptr;
+
+    auto tokens = ExpressionParser::tokenize({candidate.cbegin() + 1, candidate.cend() - 1}, ",");
+    if (tokens.size() != 3) return nullptr;
+    return make_unique<CAS::VectorExpression>(parseFunc(tokens.front()), parseFunc(tokens[1]), parseFunc(tokens.back()));
+}
+
+std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Parenthesis_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
+{
+    if (candidate.front() != '(' || candidate.back() != ')') return nullptr;
+    return parseFunc({candidate.cbegin() + 1, candidate.cend() - 1});
 }
 
 }

@@ -15,6 +15,7 @@
 #include "expression/RangedForExpression.h"
 #include "expression/MultiLineExpression.h"
 #include "expression/ImportExpression.h"
+#include "expression/Function.h"
 
 extern "C" {
 
@@ -212,6 +213,17 @@ std::unique_ptr<CAS::AbstractExpression> FLOWCONTROLSHARED_EXPORT Import_jmodule
 {
     if (candidate.substr(0, 7) != "import ") return nullptr;
     return make_unique<CAS::ImportExpression>(std::string{candidate.cbegin() + 7, candidate.cend()});
+}
+
+BinaryOperatorInterface FLOWCONTROLSHARED_EXPORT Dot_jmodule()
+{
+    BinaryOperatorInterface oi;
+    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) -> CAS::AbstractExpression::ExpressionP {
+        if (typeid(*second) != typeid(CAS::Function)) return nullptr;
+        static_cast<CAS::Function*>(second.get())->getOperands().emplace(static_cast<CAS::Function*>(second.get())->getOperands().begin(), std::move(first));
+        return second;
+    };
+    return oi;
 }
 
 }

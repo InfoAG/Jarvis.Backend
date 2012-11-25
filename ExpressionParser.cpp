@@ -60,7 +60,8 @@ QVector<ModulePackage> ExpressionParser::getModulePkgs() const
 std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string input)
 {
     int level;
-    bool deleted;
+    input = trim(input);
+    /*bool deleted;
     do {
         input = trim(input);
         if (input.empty()) throw "Error: Could not parse input.";
@@ -77,7 +78,7 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
                 deleted = true;
             }
         }
-    } while (deleted);
+    } while (deleted);*/
 
     std::unique_ptr<CAS::AbstractExpression> result;
     for (const auto &terminal : modules.terminals) {
@@ -97,7 +98,7 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
         else if (*i == ')' || *i == ']' || *i == '}') level++;
         else if (level == 0) {
             for (const auto &it_op : modules.binaryOperators) {
-                auto candidate = it_op->matches(input, i - input.begin(), *this);
+                auto candidate = it_op->matches(input, i - input.cbegin(), *this);
                 if (candidate.first && (bestBinOpMatch.first == nullptr || it_op->priority() < bestBinOpMatch.first->priority() || (it_op->priority() == bestBinOpMatch.first->priority() && it_op->associativity() == BinaryOperatorInterface::LEFT))) {
                     if (! it_op->needsParseForMatch()) {
                         foundPos = i;

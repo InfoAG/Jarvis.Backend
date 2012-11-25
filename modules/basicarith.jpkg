@@ -85,3 +85,15 @@ Factorial : UnaryOperator
     alignment: post
     needsParseForMatch: false
 }
+
+Vector : Terminal
+{
+    description: vector
+    lib: modules/basicarith
+}
+
+Parenthesis : Terminal
+{
+    description: ()
+    lib: modules/basicarith
+}

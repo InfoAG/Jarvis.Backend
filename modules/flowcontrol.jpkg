@@ -129,3 +129,13 @@ Import : Terminal
     description: import
     lib: modules/flowcontrol
 }
+
+Dot : BinaryOperator
+{
+    description: member access
+    lib: modules/flowcontrol
+    matches: .
+    priority: 8
+    associativity: left
+    needsParseForMatch: true
+}
