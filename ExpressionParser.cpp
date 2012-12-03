@@ -138,8 +138,8 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
         if (parseForMatchResult != nullptr) return parseForMatchResult;
         else return bestBinOpMatch.first->parse(parse({input.cbegin(), foundPos}), parse({foundPos + bestBinOpMatch.second, input.cend()}));
     }
-    if (input.back() != ')') throw "Error: Could not parse input.";
-    std::string::iterator itParenthesis = std::find_if_not(input.begin(), input.end(), isalpha);
+    if (input.back() != ')' || ! isalpha(input.front())) throw "Error: Could not parse input.";
+    std::string::iterator itParenthesis = std::find_if_not(input.begin() + 1, input.end(), isalnum);
     if (itParenthesis == input.begin() || itParenthesis == input.end() || *itParenthesis != '(') throw "Error: Could not parse input.";
     foundPos = itParenthesis;
     std::string identifier{input.cbegin(), foundPos};

@@ -1,0 +1,21 @@
+max { number, list<number> }
+min { number, list<number> }
+range { list<number>, number, number, number }
+sum { number, list<number> }
+binom { number, number, number }
+binompdf { number, number, number, number }
+binomcdf { number, number, number, number }
+crossProduct { vector, vector, vector }
+x { number, vector }
+y { number, vector }
+z { number, vector }
+sqrt { number, number }
+length { number, vector }
+sin { number, number }
+cos { number, number }
+tan { number, number }
+asin { number, number }
+acos { number, number }
+atan { number, number }
+angle { number, vector, vector }
+zero2d { list<number>, number, number, number }

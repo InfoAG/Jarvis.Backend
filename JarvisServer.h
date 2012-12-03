@@ -74,7 +74,7 @@ public:
      * @param pkgName Package name
      */
     void load(const QString &pkgName);
-    std::pair<std::unique_ptr<QFile>, QString> resolveImport(const QString &fileName) const { return std::make_pair(make_unique<QFile>(fileName + ".jce"), fileName); }
+    std::pair<std::unique_ptr<QFile>, QString> resolveImport(const QString &fileName) const { return std::make_pair(make_unique<QFile>("../cextensions/" + fileName + ".jce"), "cextensions/" + fileName); }
 
 protected:
     /**

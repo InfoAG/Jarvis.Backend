@@ -2,7 +2,7 @@
 #include "ExpressionParser.h"
 #include "expression/ScopeExpression.h"
 #include "expression/BoolValue.h"
-#include "expression/NumberArith.h"
+#include "expression/NumberValue.h"
 #include "expression/IfExpression.h"
 #include "expression/EqualityExpression.h"
 #include "expression/NegationExpression.h"

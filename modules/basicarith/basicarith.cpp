@@ -4,12 +4,11 @@
 #include "expression/Subtraction.h"
 #include "expression/BinaryMultiplication.h"
 #include "expression/Division.h"
-#include "expression/NumberArith.h"
+#include "expression/NumberValue.h"
 #include "expression/Exponentiation.h"
 #include "expression/List.h"
 #include "ExpressionParser.h"
 #include "expression/Modulo.h"
-#include "expression/Selection.h"
 #include "BinaryOperatorModule.h"
 #include "expression/FactorialExpression.h"
 #include "expression/VectorExpression.h"
@@ -97,12 +96,12 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Number_jmodule(
     std::ostringstream os;
     os << value;
     if (os.str() != candidate) return nullptr;
-    return make_unique<CAS::NumberArith>(value);
+    return make_unique<CAS::NumberValue>(value);
 }
 
 std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Pi_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
 {
-    if (candidate == "pi") return make_unique<CAS::NumberArith>(3);
+    if (candidate == "pi") return make_unique<CAS::NumberValue>(3);
     else return nullptr;
 }
 
@@ -144,7 +143,7 @@ BinaryOperatorInterface BASICARITHSHARED_EXPORT Modulo_jmodule()
     };
     return oi;
 }
-
+/*
 std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Selection_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
 {
     if (candidate.back() != '}') return nullptr;
@@ -161,7 +160,7 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Selection_jmodu
         if (tmpToken = parseFunc(token)) selectTokens.emplace_back(std::move(tmpToken));
     return make_unique<CAS::Selection>(parseFunc(candidate.substr(0, i)), std::move(selectTokens));
 }
-
+*/
 UnaryOperatorInterface BASICARITHSHARED_EXPORT Factorial_jmodule()
 {
     UnaryOperatorInterface oi;

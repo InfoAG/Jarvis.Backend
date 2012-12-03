@@ -14,4 +14,4 @@ OTHER_FILES += \
     modules/basicarith.jpkg \
     modules/variables.jpkg \
     modules/flowcontrol.jpkg \
-    debug/cextensions/std.jce
+    cextensions/std.jce

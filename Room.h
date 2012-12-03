@@ -5,7 +5,10 @@
 #include <QList>
 #include <memory>
 #include "ExpressionParser.h"
-#include "expression/Assignment.h"
+#include "expression/TypeCollection.h"
+#include "expression/VariableDefinition.h"
+#include "expression/FunctionSignature.h"
+#include "expression/FunctionDefinition.h"
 
 class JarvisServer;
 class RoomScope;
@@ -33,7 +36,7 @@ public:
 
 private slots:
     void declaredVar(const CAS::TypeInfo &type, const std::string &id);
-    void definedVar(const std::string &id, const CAS::VariableDefinition &var);
+    void definedVar(const std::string &id, const CAS::AbstractExpression::ExpressionP &definition);
     void declaredFunc(const CAS::FunctionSignature &sig, const CAS::TypeInfo &returnType);
     void definedFunc(const CAS::FunctionSignature &sig, const CAS::FunctionDefinition &def);
 };

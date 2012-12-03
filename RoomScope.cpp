@@ -12,10 +12,10 @@ void RoomScope::declareFunc(CAS::FunctionSignature sig, CAS::TypeInfo returnType
     emit declaredFunc(sig, returnType);
 }
 
-void RoomScope::defineVar(const std::string &id, CAS::VariableDefinition var)
+void RoomScope::defineVar(const std::string &id, CAS::AbstractExpression::ExpressionP definition, bool recursion)
 {
-    CAS::Scope::defineVar(id, var);
-    emit definedVar(id, var);
+    emit definedVar(id, definition);
+    CAS::Scope::defineVar(id, std::move(definition), recursion);
 }
 
 void RoomScope::defineFunc(const CAS::FunctionSignature &sig, CAS::FunctionDefinition def)
@@ -61,7 +61,10 @@ void RoomScope::load(const std::string &fileName)
             else if (buf.endsWith(',')) buf.chop(1);
             argTypes.emplace_back(CAS::TypeInfo::fromString(buf.toStdString()));
         }
-        functions.insert(std::make_pair(CAS::FunctionSignature{name.toStdString(), std::move(argTypes)}, CAS::FunctionDefinition{make_unique<CAS::CFunctionBody>(CAS::TypeInfo::fromString(returnType.toStdString()), name.toStdString(), std::function<CAS::AbstractExpression::ExpressionP(const CAS::AbstractExpression::Operands &, Scope &, const std::function<void(const std::string &)> &, bool, bool)>{(CAS::AbstractExpression::ExpressionP(*)(const CAS::AbstractExpression::Operands &, Scope &, const std::function<void(const std::string &)> &, bool, bool))QLibrary::resolve(files.second, name.toLatin1().data())}), CAS::TypeInfo::fromString(returnType.toStdString())}));
+        CAS::FunctionSignature sig{name.toStdString(), std::move(argTypes)};
+        auto type = CAS::TypeInfo::fromString(returnType.toStdString());
+        libScope->declareFunc(sig, type);
+        libScope->defineFunc(sig, CAS::FunctionDefinition{make_unique<CAS::CFunctionBody>(CAS::TypeInfo::fromString(returnType.toStdString()), name.toStdString(), std::function<CAS::AbstractExpression::ExpressionP(const CAS::AbstractExpression::Operands &, Scope &, const std::function<void(const std::string &)> &, bool, bool)>{(CAS::AbstractExpression::ExpressionP(*)(const CAS::AbstractExpression::Operands &, Scope &, const std::function<void(const std::string &)> &, bool, bool))QLibrary::resolve(files.second, (name + "_jce").toLatin1().data())}), std::move(type)});
         argTypes.clear();
         fileStream.skipWhiteSpace();
     }

@@ -7,7 +7,7 @@ Room::Room(const QString &name, ExpressionParser *parser, const JarvisServer &se
     connect(roomScope.get(), SIGNAL(declaredVar(const CAS::TypeInfo &, const std::string &)), SLOT(declaredVar(const CAS::TypeInfo &, const std::string &)));
     connect(roomScope.get(), SIGNAL(declaredFunc(const CAS::FunctionSignature &, const CAS::TypeInfo &)), SLOT(declaredFunc(const CAS::FunctionSignature &, const CAS::TypeInfo &)));
     connect(roomScope.get(), SIGNAL(definedFunc(const CAS::FunctionSignature &, const CAS::FunctionDefinition &)), SLOT(definedFunc(const CAS::FunctionSignature &, const CAS::FunctionDefinition &)));
-    connect(roomScope.get(), SIGNAL(definedVar(const std::string &, const CAS::VariableDefinition &)), SLOT(definedVar(const std::string &, const CAS::VariableDefinition &)));
+    connect(roomScope.get(), SIGNAL(definedVar(const std::string &, const CAS::AbstractExpression::ExpressionP &)), SLOT(definedVar(const std::string &, const CAS::AbstractExpression::ExpressionP &)));
 }
 
 void Room::getInitInfo(QDataStream &stream) const
@@ -35,7 +35,9 @@ void Room::sendMsg(const QString &sender, const QString &msg)
 {
     for (const auto &client : clients) client->sendMsg(name, sender, msg);
     try {
-        auto result = parser->parse(msg.toStdString())->eval(*roomScope, std::bind(&RoomScope::load, roomScope.get(), std::placeholders::_1)).second;
+        auto result = parser->parse(msg.toStdString());
+        result->typeCheck(CAS::TypeCollection::all(), *roomScope);
+        result = result->eval(*roomScope, std::bind(&RoomScope::load, roomScope.get(), std::placeholders::_1));
         auto resultString = QString::fromStdString(result->toString());
         for (const auto &client : clients) client->sendMsg(name, "Jarvis", resultString);
     } catch (const char *s) {
@@ -58,9 +60,9 @@ void Room::declaredVar(const CAS::TypeInfo &type, const std::string &id)
         client->declaredVar(name, qType, qID);
 }
 
-void Room::definedVar(const std::string &id, const CAS::VariableDefinition &var)
+void Room::definedVar(const std::string &id, const CAS::AbstractExpression::ExpressionP &definition)
 {
-    QString defStr = QString::fromStdString(var.definition->toString());
+    QString defStr = QString::fromStdString(definition->toString());
     QString qID = QString::fromStdString(id);
     qDebug() << "DefinedVar(" << qID << ", " << defStr << ")";
     for (const auto &client : clients)
