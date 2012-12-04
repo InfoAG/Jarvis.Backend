@@ -85,7 +85,7 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
         try {
             result = terminal->parse(input, std::bind(&ExpressionParser::parse, this, std::placeholders::_1));
             if (result) return result;
-        } catch (const char*) {}
+        } catch (ParserException &) {}
     }
 
     level = 0;
@@ -111,7 +111,7 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
                                 bestBinOpMatch = {it_op.get(), candidate.second};
                                 parseForMatchResult = std::move(tmpResult);
                             }
-                        } catch (const char *) {}
+                        } catch (ParserException) {}
                     }
                 }
             }
@@ -138,9 +138,9 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
         if (parseForMatchResult != nullptr) return parseForMatchResult;
         else return bestBinOpMatch.first->parse(parse({input.cbegin(), foundPos}), parse({foundPos + bestBinOpMatch.second, input.cend()}));
     }
-    if (input.back() != ')' || ! isalpha(input.front())) throw "Error: Could not parse input.";
+if (input.back() != ')' || ! isalpha(input.front())) throw ParserException(std::move(input));
     std::string::iterator itParenthesis = std::find_if_not(input.begin() + 1, input.end(), isalnum);
-    if (itParenthesis == input.begin() || itParenthesis == input.end() || *itParenthesis != '(') throw "Error: Could not parse input.";
+    if (itParenthesis == input.begin() || itParenthesis == input.end() || *itParenthesis != '(') throw ParserException(std::move(input));
     foundPos = itParenthesis;
     std::string identifier{input.cbegin(), foundPos};
     //std::string argString = input.substr(foundPos + 1, input.length() - foundPos - 2);
@@ -168,5 +168,5 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
     }
     if (best_func_match != nullptr)
         return best_func_match->parse(identifier, arguments);
-    throw "Error: Could not parse input.";
+    throw ParserException(std::move(input));
 }

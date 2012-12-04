@@ -38,7 +38,7 @@ private slots:
     void declaredVar(const CAS::TypeInfo &type, const std::string &id);
     void definedVar(const std::string &id, const CAS::AbstractExpression::ExpressionP &definition);
     void declaredFunc(const CAS::FunctionSignature &sig, const CAS::TypeInfo &returnType);
-    void definedFunc(const CAS::FunctionSignature &sig, const CAS::FunctionDefinition &def);
+    void definedFunc(const CAS::FunctionSignature &sig, const std::vector<std::string> &args, const CAS::AbstractExpression::ExpressionP &def);
 };
 
 #endif //ROOM_H

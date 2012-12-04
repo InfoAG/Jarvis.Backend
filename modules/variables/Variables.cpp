@@ -70,7 +70,7 @@ std::unique_ptr<CAS::VariableDeclarationExpression> doParseVariableDeclaration(c
     }
     try {
         return make_unique<CAS::VariableDeclarationExpression>(CAS::TypeInfo::fromString(std::move(type)), std::move(ids));
-    } catch (const char *) {
+    } catch (const CAS::FatalTypeException &) {
         return nullptr;
     }
 }
@@ -100,7 +100,7 @@ std::unique_ptr<CAS::AbstractExpression> doParseFunctionDeclaration(const std::s
     }
     try {
         return make_unique<CAS::FunctionDeclarationExpression>(CAS::FunctionSignature{std::move(id), std::move(argTypes)}, CAS::TypeInfo::fromString(type), std::move(argNames));
-    } catch (const char *) {
+    } catch (CAS::FatalTypeException &) {
         return nullptr;
     }
 }

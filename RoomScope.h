@@ -25,7 +25,7 @@ public:
     virtual void declareVar(CAS::TypeInfo type, std::string id);
     virtual void declareFunc(CAS::FunctionSignature sig, CAS::TypeInfo returnType);
     virtual void defineVar(const std::string &id, CAS::AbstractExpression::ExpressionP definition, bool recursion = false);
-    virtual void defineFunc(const CAS::FunctionSignature &sig, CAS::FunctionDefinition def);
+    virtual void defineFunc(const CAS::FunctionSignature &sig, std::vector<std::string> args, CAS::AbstractExpression::ExpressionP def);
 
     void load(const std::string &fileName);
 
@@ -38,7 +38,7 @@ signals:
     void declaredVar(const CAS::TypeInfo &type, const std::string &id);
     void definedVar(const std::string &id, const CAS::AbstractExpression::ExpressionP &definition);
     void declaredFunc(const CAS::FunctionSignature &sig, const CAS::TypeInfo &returnType);
-    void definedFunc(const CAS::FunctionSignature &sig, const CAS::FunctionDefinition &def);
+    void definedFunc(const CAS::FunctionSignature &sig, const std::vector<std::string> &args, const CAS::AbstractExpression::ExpressionP &def);
 };
 
 QDataStream &operator<<(QDataStream &stream, const RoomScope &roomScope);

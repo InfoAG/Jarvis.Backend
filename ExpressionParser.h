@@ -6,6 +6,7 @@
 #include <QDir>
 #include "ParserModules.h"
 #include "ModulePackage.h"
+#include "ParserException.h"
 
 /**
  * Parser with dynamic modules

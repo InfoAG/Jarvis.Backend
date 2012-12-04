@@ -6,7 +6,7 @@ Room::Room(const QString &name, ExpressionParser *parser, const JarvisServer &se
 {
     connect(roomScope.get(), SIGNAL(declaredVar(const CAS::TypeInfo &, const std::string &)), SLOT(declaredVar(const CAS::TypeInfo &, const std::string &)));
     connect(roomScope.get(), SIGNAL(declaredFunc(const CAS::FunctionSignature &, const CAS::TypeInfo &)), SLOT(declaredFunc(const CAS::FunctionSignature &, const CAS::TypeInfo &)));
-    connect(roomScope.get(), SIGNAL(definedFunc(const CAS::FunctionSignature &, const CAS::FunctionDefinition &)), SLOT(definedFunc(const CAS::FunctionSignature &, const CAS::FunctionDefinition &)));
+    connect(roomScope.get(), SIGNAL(definedFunc(const CAS::FunctionSignature &, const std::vector<std::string> &, const CAS::AbstractExpression::ExpressionP &)), SLOT(definedFunc(const CAS::FunctionSignature &, const std::vector<std::string> &, const CAS::AbstractExpression::ExpressionP &)));
     connect(roomScope.get(), SIGNAL(definedVar(const std::string &, const CAS::AbstractExpression::ExpressionP &)), SLOT(definedVar(const std::string &, const CAS::AbstractExpression::ExpressionP &)));
 }
 
@@ -35,13 +35,10 @@ void Room::sendMsg(const QString &sender, const QString &msg)
 {
     for (const auto &client : clients) client->sendMsg(name, sender, msg);
     try {
-        auto result = parser->parse(msg.toStdString());
-        result->typeCheck(CAS::TypeCollection::all(), *roomScope);
-        result = result->eval(*roomScope, std::bind(&RoomScope::load, roomScope.get(), std::placeholders::_1));
-        auto resultString = QString::fromStdString(result->toString());
+        auto resultString = QString::fromStdString(parser->parse(msg.toStdString())->eval(*roomScope, std::bind(&RoomScope::load, roomScope.get(), std::placeholders::_1))->toString());
         for (const auto &client : clients) client->sendMsg(name, "Jarvis", resultString);
-    } catch (const char *s) {
-        for (const auto &client : clients) client->sendMsg(name, "Jarvis", s);
+    } catch (CAS::JarvisException &e) {
+        for (const auto &client : clients) client->sendMsg(name, "Jarvis", "Error: " + QString::fromStdString(e.what()));
     }
 }
 
@@ -78,19 +75,19 @@ void Room::declaredFunc(const CAS::FunctionSignature &sig, const CAS::TypeInfo &
     for (const auto &client : clients) client->declaredFunc(name, qID, qArgTypes, qReturnType);
 }
 
-void Room::definedFunc(const CAS::FunctionSignature &sig, const CAS::FunctionDefinition &def)
+void Room::definedFunc(const CAS::FunctionSignature &sig, const std::vector<std::string> &args, const CAS::AbstractExpression::ExpressionP &def)
 {
     QString qID = QString::fromStdString(sig.id);
     qDebug() << "FunctionDefinition(" << qID << ", (";
-    auto itArgStrs = def.arguments.cbegin();
+    auto itArgStrs = args.cbegin();
     QList<QPair<QString, QString>> arguments;
     for (const auto &argType : sig.argumentTypes) {
         auto qArgStr = QString::fromStdString(*(itArgStrs++)), qArgType = QString::fromStdString(argType.toString());
         arguments.append(qMakePair(qArgType, qArgStr));
         qDebug() << qArgType << " " << qArgStr;
-        if (itArgStrs != def.arguments.cend()) qDebug() << ", ";
+        if (itArgStrs != args.cend()) qDebug() << ", ";
     }
-    QString defStr = QString::fromStdString(def.definition->toString());
+    QString defStr = QString::fromStdString(def->toString());
     qDebug() << "), " << defStr << ")";
     for (const auto &client : clients)
         client->definedFunc(name, qID, arguments, defStr);

@@ -67,6 +67,7 @@ HEADERS += \
     ../UnaryOperatorModule.h \
     ../BinaryOperatorStatics.h \
     ../UnaryOperatorStatics.h \
-    ../OperatorStatics.h
+    ../OperatorStatics.h \
+    ../ParserException.h
 
 OTHER_FILES +=  OperatorModule.cpp
