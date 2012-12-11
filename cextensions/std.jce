@@ -19,3 +19,4 @@ acos { number, number }
 atan { number, number }
 angle { number, vector, vector }
 zero2d { list<number>, number, number, number }
+differentiate { number, number, number }

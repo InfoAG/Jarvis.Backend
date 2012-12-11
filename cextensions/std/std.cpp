@@ -5,6 +5,7 @@
 #include "expression/List.h"
 #include "expression/Addition.h"
 #include "expression/BinaryMultiplication.h"
+#include "expression/Variable.h"
 #include <math.h>
 
 extern "C" {
@@ -195,6 +196,12 @@ CAS::AbstractExpression::ExpressionP STDSHARED_EXPORT zero2d_jce(const CAS::Abst
     listOps.emplace_back(make_unique<CAS::Division>(make_unique<CAS::Subtraction>(make_unique<CAS::Function>("sqrt", std::move(sqrtOps)), args.at(1)->copy()), make_unique<CAS::LevelMultiplication>(make_unique<CAS::NumberValue>(2), args.front()->copy())));
     listOps.emplace_back(make_unique<CAS::Division>(make_unique<CAS::Subtraction>(make_unique<CAS::LevelMultiplication>(make_unique<CAS::NumberValue>(-1), make_unique<CAS::Function>("sqrt", std::move(sqrtOps2))), args.at(1)->copy()), make_unique<CAS::LevelMultiplication>(make_unique<CAS::NumberValue>(2), args.front()->copy())));
     return CAS::List(std::move(listOps)).eval(scope, load, execOption);
+}
+
+CAS::AbstractExpression::ExpressionP STDSHARED_EXPORT differentiate_jce(const CAS::AbstractExpression::Operands &args, CAS::Scope &scope, const std::function<void(const std::string &)> &load, CAS::AbstractExpression::ExecOption execOption)
+{
+    if (typeid(*(args.back())) != typeid(CAS::Variable)) return nullptr;
+    return args.front()->differentiate(static_cast<const CAS::Variable*>(args.back().get())->getIdentifier())->execute(scope, load, execOption);
 }
 
 }

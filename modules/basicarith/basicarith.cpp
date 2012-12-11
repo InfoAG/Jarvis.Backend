@@ -12,6 +12,8 @@
 #include "BinaryOperatorModule.h"
 #include "expression/FactorialExpression.h"
 #include "expression/VectorExpression.h"
+#include "FunctionInterface.h"
+#include "expression/NaturalLogarithm.h"
 
 #include <string>
 #include <iostream>
@@ -101,7 +103,13 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Number_jmodule(
 
 std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Pi_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
 {
-    if (candidate == "pi") return make_unique<CAS::NumberValue>(3);
+    if (candidate == "pi") return make_unique<CAS::Constant>(CAS::Constant::PI);
+    else return nullptr;
+}
+
+std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Euler_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
+{
+    if (candidate == "e") return make_unique<CAS::Constant>(CAS::Constant::EULER);
     else return nullptr;
 }
 
@@ -183,6 +191,15 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Parenthesis_jmo
 {
     if (candidate.front() != '(' || candidate.back() != ')') return nullptr;
     return parseFunc({candidate.cbegin() + 1, candidate.cend() - 1});
+}
+
+FunctionInterface BASICARITHSHARED_EXPORT NaturalLogarithm_jmodule()
+{
+    FunctionInterface fi;
+    fi.parse = [](const std::string &, std::vector<std::unique_ptr<CAS::AbstractExpression>> &arguments) {
+            return make_unique<CAS::NaturalLogarithm>(std::move(arguments.front()));
+        };
+    return fi;
 }
 
 }

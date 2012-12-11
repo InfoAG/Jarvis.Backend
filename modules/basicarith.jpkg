@@ -60,6 +60,12 @@ Pi : Terminal
     lib: modules/basicarith
 }
 
+Euler : Terminal
+{
+    description: e
+    lib: modules/basicarith
+}
+
 List : Terminal
 {
     description: list
@@ -96,4 +102,12 @@ Parenthesis : Terminal
 {
     description: ()
     lib: modules/basicarith
+}
+
+NaturalLogarithm : Function
+{
+    description: ln
+    lib: modules/basicarith
+    matches: ln,1
+    priority: 1
 }
