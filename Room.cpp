@@ -6,7 +6,7 @@ Room::Room(const QString &name, ExpressionParser *parser, const JarvisServer &se
 {
     connect(roomScope.get(), SIGNAL(declaredVar(const CAS::TypeInfo &, const std::string &)), SLOT(declaredVar(const CAS::TypeInfo &, const std::string &)));
     connect(roomScope.get(), SIGNAL(declaredFunc(const CAS::FunctionSignature &, const CAS::TypeInfo &)), SLOT(declaredFunc(const CAS::FunctionSignature &, const CAS::TypeInfo &)));
-    connect(roomScope.get(), SIGNAL(definedFunc(const CAS::FunctionSignature &, const std::vector<std::string> &, const CAS::AbstractExpression::ExpressionP &)), SLOT(definedFunc(const CAS::FunctionSignature &, const std::vector<std::string> &, const CAS::AbstractExpression::ExpressionP &)));
+    connect(roomScope.get(), SIGNAL(definedFunc(const CAS::FunctionSignature &, const std::vector<std::string> &, const CAS::AbstractStatement::StatementP &)), SLOT(definedFunc(const CAS::FunctionSignature &, const std::vector<std::string> &, const CAS::AbstractStatement::StatementP &)));
     connect(roomScope.get(), SIGNAL(definedVar(const std::string &, const CAS::AbstractExpression::ExpressionP &)), SLOT(definedVar(const std::string &, const CAS::AbstractExpression::ExpressionP &)));
 }
 
@@ -35,11 +35,17 @@ void Room::sendMsg(const QString &sender, const QString &msg)
 {
     for (const auto &client : clients) client->sendMsg(name, sender, msg);
     try {
-        auto resultString = QString::fromStdString(parser->parse(msg.toStdString())->eval(*roomScope, std::bind(&RoomScope::load, roomScope.get(), std::placeholders::_1))->toString());
+        auto resultString = QString::fromStdString(parser->parseStatement(msg.toStdString())->eval(*roomScope, std::bind(&RoomScope::load, roomScope.get(), std::placeholders::_1), std::bind(&Room::printJarvis, this, std::placeholders::_1))->toString());
         for (const auto &client : clients) client->sendMsg(name, "Jarvis", resultString);
     } catch (CAS::JarvisException &e) {
         for (const auto &client : clients) client->sendMsg(name, "Jarvis", "Error: " + QString::fromStdString(e.what()));
     }
+}
+
+void Room::printJarvis(const std::string &output)
+{
+    auto QOutStr = QString::fromStdString(output);
+    for (const auto &client : clients) client->sendMsg(name, "Jarvis", QOutStr);
 }
 
 void Room::addClient(ClientConnection *client)
@@ -75,7 +81,7 @@ void Room::declaredFunc(const CAS::FunctionSignature &sig, const CAS::TypeInfo &
     for (const auto &client : clients) client->declaredFunc(name, qID, qArgTypes, qReturnType);
 }
 
-void Room::definedFunc(const CAS::FunctionSignature &sig, const std::vector<std::string> &args, const CAS::AbstractExpression::ExpressionP &def)
+void Room::definedFunc(const CAS::FunctionSignature &sig, const std::vector<std::string> &args, const CAS::AbstractStatement::StatementP &def)
 {
     QString qID = QString::fromStdString(sig.id);
     qDebug() << "FunctionDefinition(" << qID << ", (";
@@ -92,4 +98,3 @@ void Room::definedFunc(const CAS::FunctionSignature &sig, const std::vector<std:
     for (const auto &client : clients)
         client->definedFunc(name, qID, arguments, defStr);
 }
-

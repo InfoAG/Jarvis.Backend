@@ -23,10 +23,14 @@ ModulePackage::ModulePackage(std::unique_ptr<QFile> file)
             auto module = std::make_shared<FunctionModule>(name, this);
             fileStream >> *module;
             modules.functions.append(module);
-        } else if (type == "Terminal") {
-            auto module = std::make_shared<TerminalModule>(name, this);
+        } else if (type == "TerminalExpression") {
+            auto module = std::make_shared<TerminalExpressionModule>(name, this);
             fileStream >> *module;
-            modules.terminals.append(module);
+            modules.terminalExpressions.append(module);
+        } else if (type == "TerminalStatement") {
+            auto module = std::make_shared<TerminalStatementModule>(name, this);
+            fileStream >> *module;
+            modules.terminalStatements.append(module);
         } else throw "failer";
         fileStream.skipWhiteSpace();
     }

@@ -14,11 +14,11 @@ void RoomScope::declareFunc(CAS::FunctionSignature sig, CAS::TypeInfo returnType
 
 void RoomScope::defineVar(const std::string &id, CAS::AbstractExpression::ExpressionP definition, bool recursion)
 {
-    CAS::Scope::defineVar(id, definition->copy(), recursion);
+    CAS::Scope::defineVar(id, definition->copyEx(), recursion);
     emit definedVar(id, definition);
 }
 
-void RoomScope::defineFunc(const CAS::FunctionSignature &sig, std::vector<std::string> args, CAS::AbstractExpression::ExpressionP def)
+void RoomScope::defineFunc(const CAS::FunctionSignature &sig, std::vector<std::string> args, CAS::AbstractStatement::StatementP def)
 {
     CAS::Scope::defineFunc(sig, args, def->copy());
     emit definedFunc(sig, args, def);
@@ -64,7 +64,7 @@ void RoomScope::load(const std::string &fileName)
         CAS::FunctionSignature sig{name.toStdString(), std::move(argTypes)};
         auto type = CAS::TypeInfo::fromString(returnType.toStdString());
         libScope->declareFunc(sig, std::move(type));
-        libScope->defineFunc(sig, std::vector<std::string>(), make_unique<CAS::CFunctionBody>(CAS::TypeInfo::fromString(returnType.toStdString()), name.toStdString(), std::function<CAS::AbstractExpression::ExpressionP(const CAS::AbstractExpression::Operands &, Scope &, const std::function<void(const std::string &)> &, CAS::AbstractExpression::ExecOption)>{(CAS::AbstractExpression::ExpressionP(*)(const CAS::AbstractExpression::Operands &, Scope &, const std::function<void(const std::string &)> &, CAS::AbstractExpression::ExecOption))QLibrary::resolve(files.second, (name + "_jce").toLatin1().data())}));
+        libScope->defineFunc(sig, std::vector<std::string>(), make_unique<CAS::CFunctionBody>(CAS::TypeInfo::fromString(returnType.toStdString()), name.toStdString(), std::function<CAS::AbstractExpression::ExpressionP(const CAS::AbstractExpression::Expressions &, Scope &, const CAS::AbstractStatement::LoadFunc &, const CAS::AbstractStatement::PrintFunc, CAS::AbstractExpression::ExecOption)>{(CAS::AbstractExpression::ExpressionP(*)(const CAS::AbstractExpression::Expressions &, Scope &, const CAS::AbstractStatement::LoadFunc &, const CAS::AbstractStatement::PrintFunc, CAS::AbstractExpression::ExecOption))QLibrary::resolve(files.second, (name + "_jce").toLatin1().data())}));
         argTypes.clear();
         fileStream.skipWhiteSpace();
     }

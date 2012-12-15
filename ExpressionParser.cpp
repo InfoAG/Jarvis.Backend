@@ -13,7 +13,7 @@ ExpressionParser::ExpressionParser(const QDir &module_dir)
     for (const auto &modpkg : modulePkgs) {
         qDebug() << modpkg->name();
         qDebug() << "\tTerminals:";
-        for (const auto &mod : modpkg->getModules().terminals) {
+        for (const auto &mod : modpkg->getModules().terminalExpressions) {
             qDebug() << "\t\t" << mod->name() << "\t" << mod->description() << "\t";
         }
         qDebug() << "\tBinaryOperators:";
@@ -57,9 +57,8 @@ QVector<ModulePackage> ExpressionParser::getModulePkgs() const
     return result;
 }
 
-std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string input)
+CAS::AbstractStatement::StatementP ExpressionParser::parseStatement(std::string input) const
 {
-    int level;
     input = trim(input);
     /*bool deleted;
     do {
@@ -80,18 +79,33 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
         }
     } while (deleted);*/
 
-    std::unique_ptr<CAS::AbstractExpression> result;
-    for (const auto &terminal : modules.terminals) {
+    CAS::AbstractStatement::StatementP result;
+    for (const auto &terminal : modules.terminalStatements) {
         try {
-            result = terminal->parse(input, std::bind(&ExpressionParser::parse, this, std::placeholders::_1));
+            result = terminal->parse(input, std::bind(&ExpressionParser::parseStatement, this, std::placeholders::_1), std::bind(&ExpressionParser::parseExpression, this, std::placeholders::_1));
             if (result) return result;
         } catch (ParserException &) {}
     }
 
-    level = 0;
+    return parseExpression(std::move(input));
+}
+
+
+CAS::AbstractExpression::ExpressionP ExpressionParser::parseExpression(std::string input) const
+{
+    CAS::AbstractExpression::ExpressionP result;
+    for (const auto &terminal : modules.terminalExpressions) {
+        try {
+            result = terminal->parse(input, std::bind(&ExpressionParser::parseExpression, this, std::placeholders::_1));
+            if (result) return result;
+        } catch (ParserException &) {}
+    }
+
+    auto level = 0;
+    input = trim(input);
     std::string::const_iterator foundPos = input.cend();
     std::pair<const BinaryOperatorModule*, size_t> bestBinOpMatch{nullptr, 0};
-    std::unique_ptr<CAS::AbstractExpression> parseForMatchResult;
+    CAS::AbstractExpression::ExpressionP parseForMatchResult;
 
     for (auto i = input.cbegin(); i != input.cend(); ++i) {
         if (*i == '(' || *i == '[' || *i == '{')  level--;
@@ -106,7 +120,7 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
                         bestBinOpMatch = {it_op.get(), candidate.second};
                     } else {
                         try {
-                            std::unique_ptr<CAS::AbstractExpression> tmpResult = it_op->parse(parse(input.substr(0, i - input.begin())), parse(input.substr(i - input.begin() + 1, input.length() - (i - input.begin()) - 1)));
+                            auto tmpResult = it_op->parse(parseExpression(input.substr(0, i - input.begin())), parseExpression(input.substr(i - input.begin() + 1, input.length() - (i - input.begin()) - 1)));
                             if (tmpResult) {
                                 bestBinOpMatch = {it_op.get(), candidate.second};
                                 parseForMatchResult = std::move(tmpResult);
@@ -131,12 +145,12 @@ std::unique_ptr<CAS::AbstractExpression> ExpressionParser::parse(std::string inp
     }
     if (bestUnOpMatch.first != nullptr) {
         if (bestUnOpMatch.first->alignment() == UnaryOperatorInterface::PRE)
-            return bestUnOpMatch.first->parse(parse({input.cbegin() + bestUnOpMatch.second, input.cend()}));
+            return bestUnOpMatch.first->parse(parseExpression({input.cbegin() + bestUnOpMatch.second, input.cend()}));
         else
-            return bestUnOpMatch.first->parse(parse({input.cbegin(), input.cend() - bestUnOpMatch.second}));
+            return bestUnOpMatch.first->parse(parseExpression({input.cbegin(), input.cend() - bestUnOpMatch.second}));
     } else if (bestBinOpMatch.first != nullptr) {
         if (parseForMatchResult != nullptr) return parseForMatchResult;
-        else return bestBinOpMatch.first->parse(parse({input.cbegin(), foundPos}), parse({foundPos + bestBinOpMatch.second, input.cend()}));
+        else return bestBinOpMatch.first->parse(parseExpression({input.cbegin(), foundPos}), parseExpression({foundPos + bestBinOpMatch.second, input.cend()}));
     }
 if (input.back() != ')' || ! isalpha(input.front())) throw ParserException(std::move(input));
     std::string::iterator itParenthesis = std::find_if_not(input.begin() + 1, input.end(), isalnum);
@@ -144,9 +158,9 @@ if (input.back() != ')' || ! isalpha(input.front())) throw ParserException(std::
     foundPos = itParenthesis;
     std::string identifier{input.cbegin(), foundPos};
     //std::string argString = input.substr(foundPos + 1, input.length() - foundPos - 2);
-    std::vector<std::unique_ptr<CAS::AbstractExpression>> arguments;
+    CAS::AbstractExpression::Expressions arguments;
     auto argString = tokenize({foundPos + 1, input.cend() - 1}, ",");
-    for (const auto &arg : argString) arguments.emplace_back(parse(arg));
+    for (const auto &arg : argString) arguments.emplace_back(parseExpression(arg));
     /*std::string::const_iterator lastPos = argString.begin();
     level = 0;
     for (std::string::const_iterator it = argString.begin(); it != argString.end(); ++it) {
@@ -170,3 +184,4 @@ if (input.back() != ')' || ! isalpha(input.front())) throw ParserException(std::
         return best_func_match->parse(identifier, arguments);
     throw ParserException(std::move(input));
 }
+

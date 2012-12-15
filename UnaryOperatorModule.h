@@ -12,7 +12,7 @@ public:
 
     std::pair<bool, size_t> matches(const std::string &input) const;
     UnaryOperatorInterface::Alignment alignment() const;
-    std::unique_ptr<CAS::AbstractExpression> parse(std::unique_ptr<CAS::AbstractExpression> operand) const { return interface.parse(std::move(operand)); }
+    CAS::AbstractExpression::ExpressionP parse(CAS::AbstractExpression::ExpressionP operand) const { return interface.parse(std::move(operand)); }
 
     friend QDataStream &operator<<(QDataStream &, const UnaryOperatorModule &);
     friend QTextStream &operator>>(QTextStream &stream, UnaryOperatorModule &module);

@@ -1,16 +1,16 @@
-Scope : Terminal
+Scope : TerminalStatement
 {
     description: scopes
     lib: modules/flowcontrol
 }
 
-Bool : Terminal
+Bool : TerminalExpression
 {
     description: bool true
     lib: modules/flowcontrol
 }
 
-If : Terminal
+If : TerminalStatement
 {
     description: if else if
     lib: modules/flowcontrol
@@ -106,25 +106,25 @@ GreaterOrEqual : BinaryOperator
     needsParseForMatch: false
 }
 
-RangedFor : Terminal
+RangedFor : TerminalStatement
 {
     description: ranged for
     lib: modules/flowcontrol
 }
 
-MultiLine : Terminal
+MultiLine : TerminalStatement
 {
     description: \n or ;
     lib: modules/flowcontrol
 }
 
-Return : Terminal
+Return : TerminalStatement
 {
     description: return from function
     lib: modules/flowcontrol
 }
 
-Import : Terminal
+Import : TerminalStatement
 {
     description: import
     lib: modules/flowcontrol

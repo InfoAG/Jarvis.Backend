@@ -3,6 +3,7 @@
 
 #include "OperatorModule.h"
 #include "BinaryOperatorStatics.h"
+#include "lang/AbstractExpression.h"
 
 class BinaryOperatorModule : public OperatorModule<BinaryOperatorInterface, BinaryOperatorStatics>
 {
@@ -12,7 +13,7 @@ public:
 
     std::pair<bool, size_t> matches(const std::string &input, size_t candidatePos, const ExpressionParser &parser) const;
     BinaryOperatorInterface::AssociativityType associativity() const;
-    std::unique_ptr<CAS::AbstractExpression> parse(std::unique_ptr<CAS::AbstractExpression> left, std::unique_ptr<CAS::AbstractExpression> right) const { return interface.parse(std::move(left), std::move(right)); }
+    CAS::AbstractExpression::ExpressionP parse(CAS::AbstractExpression::ExpressionP left, CAS::AbstractExpression::ExpressionP right) const { return interface.parse(std::move(left), std::move(right)); }
 
     friend QDataStream &operator<<(QDataStream &, const BinaryOperatorModule &);
     friend QTextStream &operator>>(QTextStream &stream, BinaryOperatorModule &module);

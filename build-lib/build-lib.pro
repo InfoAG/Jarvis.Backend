@@ -44,14 +44,15 @@ SOURCES += \
     RoomScope.cpp \
     ../BinaryOperatorModule.cpp \
     ../UnaryOperatorModule.cpp \
-    ../TerminalModule.cpp
+    ../TerminalExpressionModule.cpp \
+    ../TerminalStatementModule.cpp
 
 HEADERS += \
     JarvisService.h \
     JarvisServer.h \
     ExpressionParser.h \
     FunctionModule.h \
-    TerminalModule.h \
+    TerminalExpressionModule.h \
     OperatorModule.h \
     OperatorInterface.h \
     FunctionInterface.h \
@@ -67,6 +68,8 @@ HEADERS += \
     ../UnaryOperatorModule.h \
     ../BinaryOperatorStatics.h \
     ../UnaryOperatorStatics.h \
-    ../OperatorStatics.h
+    ../OperatorStatics.h \
+    ../ParserException.h \
+    ../TerminalStatementModule.h
 
 OTHER_FILES +=  OperatorModule.cpp

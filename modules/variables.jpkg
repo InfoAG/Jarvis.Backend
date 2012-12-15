@@ -1,4 +1,4 @@
-Variable : Terminal
+Variable : TerminalExpression
 {
     description: variables
     lib: modules/variables
@@ -29,19 +29,19 @@ LazyEval : Function
     priority: 1
 }
 
-VariableDeclaration : Terminal
+VariableDeclaration : TerminalStatement
 {
     description: types n stuff
     lib: modules/variables
 }
 
-FunctionDeclaration : Terminal
+FunctionDeclaration : TerminalStatement
 {
     description: types n stuff
     lib: modules/variables
 }
 
-FunctionDefinition : Terminal
+FunctionDefinition : TerminalStatement
 {
     description: define functions
     lib: modules/variables

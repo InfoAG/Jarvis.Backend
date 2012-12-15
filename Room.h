@@ -5,10 +5,10 @@
 #include <QList>
 #include <memory>
 #include "ExpressionParser.h"
-#include "expression/TypeCollection.h"
-#include "expression/VariableDefinition.h"
-#include "expression/FunctionSignature.h"
-#include "expression/FunctionDefinition.h"
+#include "lang/TypeCollection.h"
+#include "lang/VariableDefinition.h"
+#include "lang/FunctionSignature.h"
+#include "lang/FunctionDefinition.h"
 
 class JarvisServer;
 class RoomScope;
@@ -31,6 +31,7 @@ public:
     void getInitInfo(QDataStream &stream) const;
     void removeClient(ClientConnection *client);
     void sendMsg(const QString &sender, const QString &msg);
+    void printJarvis(const std::string &output);
     void addClient(ClientConnection *client);
     bool hasClient(ClientConnection *candidate) { return clients.contains(candidate); }
 
@@ -38,7 +39,7 @@ private slots:
     void declaredVar(const CAS::TypeInfo &type, const std::string &id);
     void definedVar(const std::string &id, const CAS::AbstractExpression::ExpressionP &definition);
     void declaredFunc(const CAS::FunctionSignature &sig, const CAS::TypeInfo &returnType);
-    void definedFunc(const CAS::FunctionSignature &sig, const std::vector<std::string> &args, const CAS::AbstractExpression::ExpressionP &def);
+    void definedFunc(const CAS::FunctionSignature &sig, const std::vector<std::string> &args, const CAS::AbstractStatement::StatementP &def);
 };
 
 #endif //ROOM_H

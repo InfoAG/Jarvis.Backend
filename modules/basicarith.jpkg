@@ -48,25 +48,25 @@ Exponentiation : BinaryOperator
     needsParseForMatch: false
 }
 
-Number : Terminal
+Number : TerminalExpression
 {
     description: just numbers
     lib: modules/basicarith
 }
 
-Pi : Terminal
+Pi : TerminalExpression
 {
     description: circles. many of them.
     lib: modules/basicarith
 }
 
-Euler : Terminal
+Euler : TerminalExpression
 {
     description: e
     lib: modules/basicarith
 }
 
-List : Terminal
+List : TerminalExpression
 {
     description: list
     lib: modules/basicarith
@@ -92,13 +92,13 @@ Factorial : UnaryOperator
     needsParseForMatch: false
 }
 
-Vector : Terminal
+Vector : TerminalExpression
 {
     description: vector
     lib: modules/basicarith
 }
 
-Parenthesis : Terminal
+Parenthesis : TerminalExpression
 {
     description: ()
     lib: modules/basicarith

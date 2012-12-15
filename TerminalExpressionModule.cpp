@@ -1,6 +1,6 @@
-#include "TerminalModule.h"
+#include "TerminalExpressionModule.h"
 
-QTextStream &operator>>(QTextStream &stream, TerminalModule &module)
+QTextStream &operator>>(QTextStream &stream, TerminalExpressionModule &module)
 {
     for (;;) {
         auto nextProperty = module.readProperty(stream);
@@ -8,7 +8,7 @@ QTextStream &operator>>(QTextStream &stream, TerminalModule &module)
             module.description_ = nextProperty.second;
         else if (nextProperty.first == "lib") {
             module.lib.setFileName(nextProperty.second);
-            module.parse_interface = (std::unique_ptr<CAS::AbstractExpression>(*)(const std::string &, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>))module.lib.resolve((module.name_ + "_jmodule").toLatin1().data());
+            module.parse_interface = (CAS::AbstractExpression::ExpressionP(*)(const std::string &, std::function<CAS::AbstractExpression::ExpressionP(std::string)>))module.lib.resolve((module.name_ + "_jmodule").toLatin1().data());
         } else if (nextProperty.first == QString()) break;
         else throw "nononot";
     }

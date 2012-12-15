@@ -2,7 +2,7 @@
 #define PARSER_H
 
 #include <string>
-#include "expression/AbstractExpression.h"
+#include "lang/AbstractStatement.h"
 #include <QDir>
 #include "ParserModules.h"
 #include "ModulePackage.h"
@@ -71,7 +71,8 @@ public:
      * @param input Input string
      * @return Pointer to the result tree's root
      */
-    std::unique_ptr<CAS::AbstractExpression> parse(std::string input);
+    CAS::AbstractStatement::StatementP parseStatement(std::string input) const;
+    CAS::AbstractExpression::ExpressionP parseExpression(std::string input) const;
 };
 
 #endif //PARSER_H

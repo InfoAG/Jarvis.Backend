@@ -1,7 +1,7 @@
 #ifndef OPERATORMODULE_H
 #define OPERATORMODULE_H
 
-#include "expression/AbstractExpression.h"
+#include "lang/AbstractStatement.h"
 #include <string>
 #include "OperatorInterface.h"
 #include <QString>

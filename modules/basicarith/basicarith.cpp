@@ -1,19 +1,19 @@
 #include "BinaryOperatorInterface.h"
 #include "basicarith_global.h"
-#include "expression/Addition.h"
-#include "expression/Subtraction.h"
-#include "expression/BinaryMultiplication.h"
-#include "expression/Division.h"
-#include "expression/NumberValue.h"
-#include "expression/Exponentiation.h"
-#include "expression/List.h"
+#include "lang/Addition.h"
+#include "lang/Subtraction.h"
+#include "lang/BinaryMultiplication.h"
+#include "lang/Division.h"
+#include "lang/NumberValue.h"
+#include "lang/Exponentiation.h"
+#include "lang/List.h"
 #include "ExpressionParser.h"
-#include "expression/Modulo.h"
+#include "lang/Modulo.h"
 #include "BinaryOperatorModule.h"
-#include "expression/FactorialExpression.h"
-#include "expression/VectorExpression.h"
+#include "lang/Factorial.h"
+#include "lang/Vector.h"
 #include "FunctionInterface.h"
-#include "expression/NaturalLogarithm.h"
+#include "lang/NaturalLogarithm.h"
 
 #include <string>
 #include <iostream>
@@ -33,7 +33,7 @@ BinaryOperatorInterface BASICARITHSHARED_EXPORT Addition_jmodule()
         } else return std::make_pair(false, 0);
     };
 
-    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
+    oi.parse = [](CAS::AbstractExpression::ExpressionP first, CAS::AbstractExpression::ExpressionP second) {
         return make_unique<CAS::Addition>(std::move(first), std::move(second));
     };
     return oi;
@@ -50,7 +50,7 @@ BinaryOperatorInterface BASICARITHSHARED_EXPORT Subtraction_jmodule()
         } else return std::make_pair(false, 0);
     };
 
-    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
+    oi.parse = [](CAS::AbstractExpression::ExpressionP first, CAS::AbstractExpression::ExpressionP second) {
         return make_unique<CAS::Subtraction>(std::move(first), std::move(second));
     };
     return oi;
@@ -59,7 +59,7 @@ BinaryOperatorInterface BASICARITHSHARED_EXPORT Subtraction_jmodule()
 BinaryOperatorInterface BASICARITHSHARED_EXPORT Multiplication_jmodule()
 {
     BinaryOperatorInterface oi;
-    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
+    oi.parse = [](CAS::AbstractExpression::ExpressionP first, CAS::AbstractExpression::ExpressionP second) {
         return make_unique<CAS::BinaryMultiplication>(std::move(first), std::move(second));
     };
     return oi;
@@ -68,7 +68,7 @@ BinaryOperatorInterface BASICARITHSHARED_EXPORT Multiplication_jmodule()
 BinaryOperatorInterface BASICARITHSHARED_EXPORT Division_jmodule()
 {
     BinaryOperatorInterface oi;
-    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
+    oi.parse = [](CAS::AbstractExpression::ExpressionP first, CAS::AbstractExpression::ExpressionP second) {
         return make_unique<CAS::Division>(std::move(first), std::move(second));
     };
     return oi;
@@ -78,13 +78,13 @@ BinaryOperatorInterface BASICARITHSHARED_EXPORT Division_jmodule()
 BinaryOperatorInterface BASICARITHSHARED_EXPORT Exponentiation_jmodule()
 {
     BinaryOperatorInterface oi;
-    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
+    oi.parse = [](CAS::AbstractExpression::ExpressionP first, CAS::AbstractExpression::ExpressionP second) {
         return make_unique<CAS::Exponentiation>(std::move(first), std::move(second));
     };
     return oi;
 }
 
-std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Number_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
+CAS::AbstractExpression::ExpressionP BASICARITHSHARED_EXPORT Number_jmodule(const std::string &candidate, const std::function<CAS::AbstractExpression::ExpressionP(std::string)> &)
 {
     /*if (candidate.front() == '-' || candidate.front() == '+') {
         if (candidate.size() == 1) return nullptr;
@@ -101,19 +101,19 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Number_jmodule(
     return make_unique<CAS::NumberValue>(value);
 }
 
-std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Pi_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
+CAS::AbstractExpression::ExpressionP BASICARITHSHARED_EXPORT Pi_jmodule(const std::string &candidate, const std::function<CAS::AbstractExpression::ExpressionP(std::string)> &)
 {
     if (candidate == "pi") return make_unique<CAS::Constant>(CAS::Constant::PI);
     else return nullptr;
 }
 
-std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Euler_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)>)
+CAS::AbstractExpression::ExpressionP BASICARITHSHARED_EXPORT Euler_jmodule(const std::string &candidate, const std::function<CAS::AbstractExpression::ExpressionP(std::string)> &)
 {
     if (candidate == "e") return make_unique<CAS::Constant>(CAS::Constant::EULER);
     else return nullptr;
 }
 
-std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT List_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
+CAS::AbstractExpression::ExpressionP BASICARITHSHARED_EXPORT List_jmodule(const std::string &candidate, const std::function<CAS::AbstractExpression::ExpressionP(std::string)> &parseExpressionFunc)
 {
     if (candidate.front() != '[' || candidate.back() != ']') return nullptr;
 
@@ -123,7 +123,7 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT List_jmodule(co
         else if (*it == ']' && --level == -1) return nullptr;
     }
 
-    std::vector<std::unique_ptr<CAS::AbstractExpression>> result;
+    std::vector<CAS::AbstractExpression::ExpressionP> result;
     if (candidate.at(1) == '[') {
         auto lastPos = candidate.cbegin();
         level = 0;
@@ -131,13 +131,13 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT List_jmodule(co
             if (*it == '(' || *it == '[' || *it == '{')  level--;
             else if (*it == ')' || *it == ']' || *it == '}') level++;
             if (level == 0) {
-                result.emplace_back(parseFunc(std::string{lastPos + 1, it + 1}));
+                result.emplace_back(parseExpressionFunc(std::string{lastPos + 1, it + 1}));
                 lastPos = it;
             }
         }
     } else {
         std::vector<std::string> tokens = ExpressionParser::tokenize(std::string{candidate.cbegin() + 1, candidate.cend() - 1}, ",");
-        for (const auto &token : tokens) result.emplace_back(parseFunc(token));
+        for (const auto &token : tokens) result.emplace_back(parseExpressionFunc(token));
     }
     if (result.empty()) return nullptr;
     else return make_unique<CAS::List>(std::move(result));
@@ -146,13 +146,13 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT List_jmodule(co
 BinaryOperatorInterface BASICARITHSHARED_EXPORT Modulo_jmodule()
 {
     BinaryOperatorInterface oi;
-    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> first, std::unique_ptr<CAS::AbstractExpression> second) {
+    oi.parse = [](CAS::AbstractExpression::ExpressionP first, CAS::AbstractExpression::ExpressionP second) {
         return make_unique<CAS::Modulo>(std::move(first), std::move(second));
     };
     return oi;
 }
 /*
-std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Selection_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
+CAS::AbstractExpression::ExpressionP BASICARITHSHARED_EXPORT Selection_jmodule(const std::string &candidate, std::function<CAS::AbstractExpression::ExpressionP(std::string)> parseFunc)
 {
     if (candidate.back() != '}') return nullptr;
     int level = 0, i = candidate.size() - 2;
@@ -163,7 +163,7 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Selection_jmodu
     }
     if (i == -1) return nullptr;
     CAS::AbstractExpression::Operands selectTokens;
-    std::unique_ptr<CAS::AbstractExpression> tmpToken;
+    CAS::AbstractExpression::ExpressionP tmpToken;
     for (const auto &token : ExpressionParser::tokenize(candidate.substr(i + 1, candidate.length() - i - 2), ","))
         if (tmpToken = parseFunc(token)) selectTokens.emplace_back(std::move(tmpToken));
     return make_unique<CAS::Selection>(parseFunc(candidate.substr(0, i)), std::move(selectTokens));
@@ -172,31 +172,31 @@ std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Selection_jmodu
 UnaryOperatorInterface BASICARITHSHARED_EXPORT Factorial_jmodule()
 {
     UnaryOperatorInterface oi;
-    oi.parse = [](std::unique_ptr<CAS::AbstractExpression> operand) {
-        return make_unique<CAS::FactorialExpression>(std::move(operand));
+    oi.parse = [](CAS::AbstractExpression::ExpressionP operand) {
+        return make_unique<CAS::Factorial>(std::move(operand));
     };
     return oi;
 }
 
-std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Vector_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
+CAS::AbstractExpression::ExpressionP BASICARITHSHARED_EXPORT Vector_jmodule(const std::string &candidate, const std::function<CAS::AbstractExpression::ExpressionP(std::string)> &parseExpressionFunc)
 {
     if (candidate.front() != '(' || candidate.back() != ')') return nullptr;
 
     auto tokens = ExpressionParser::tokenize({candidate.cbegin() + 1, candidate.cend() - 1}, ",");
     if (tokens.size() != 3) return nullptr;
-    return make_unique<CAS::VectorExpression>(parseFunc(tokens.front()), parseFunc(tokens[1]), parseFunc(tokens.back()));
+    return make_unique<CAS::Vector>(parseExpressionFunc(tokens.front()), parseExpressionFunc(tokens[1]), parseExpressionFunc(tokens.back()));
 }
 
-std::unique_ptr<CAS::AbstractExpression> BASICARITHSHARED_EXPORT Parenthesis_jmodule(const std::string &candidate, std::function<std::unique_ptr<CAS::AbstractExpression>(std::string)> parseFunc)
+CAS::AbstractExpression::ExpressionP BASICARITHSHARED_EXPORT Parenthesis_jmodule(const std::string &candidate, const std::function<CAS::AbstractExpression::ExpressionP(std::string)> &parseExpressionFunc)
 {
     if (candidate.front() != '(' || candidate.back() != ')') return nullptr;
-    return parseFunc({candidate.cbegin() + 1, candidate.cend() - 1});
+    return parseExpressionFunc({candidate.cbegin() + 1, candidate.cend() - 1});
 }
 
 FunctionInterface BASICARITHSHARED_EXPORT NaturalLogarithm_jmodule()
 {
     FunctionInterface fi;
-    fi.parse = [](const std::string &, std::vector<std::unique_ptr<CAS::AbstractExpression>> &arguments) {
+    fi.parse = [](std::string &, CAS::AbstractExpression::Expressions &arguments) {
             return make_unique<CAS::NaturalLogarithm>(std::move(arguments.front()));
         };
     return fi;
