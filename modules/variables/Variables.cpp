@@ -75,7 +75,7 @@ std::unique_ptr<CAS::VariableDeclaration> doParseVariableDeclaration(const std::
     }
 }
 
-inline CAS::AbstractStatement::StatementP VARIABLESSHARED_EXPORT VariableDeclaration_jmodule(const std::string &candidate, const std::function<CAS::AbstractStatement::StatementP(std::string)> &, const std::function<CAS::AbstractExpression::ExpressionP(std::string)> &)
+CAS::AbstractStatement::StatementP VARIABLESSHARED_EXPORT VariableDeclaration_jmodule(const std::string &candidate, const std::function<CAS::AbstractStatement::StatementP(std::string)> &, const std::function<CAS::AbstractExpression::ExpressionP(std::string)> &)
 {
     return doParseVariableDeclaration(candidate);
 }
@@ -105,7 +105,7 @@ std::unique_ptr<CAS::FunctionDeclaration> doParseFunctionDeclaration(const std::
     }
 }
 
-inline CAS::AbstractStatement::StatementP VARIABLESSHARED_EXPORT FunctionDeclaration_jmodule(const std::string &candidate, const std::function<CAS::AbstractStatement::StatementP(std::string)> &, const std::function<CAS::AbstractExpression::ExpressionP(std::string)> &)
+CAS::AbstractStatement::StatementP VARIABLESSHARED_EXPORT FunctionDeclaration_jmodule(const std::string &candidate, const std::function<CAS::AbstractStatement::StatementP(std::string)> &, const std::function<CAS::AbstractExpression::ExpressionP(std::string)> &)
 {
     return doParseFunctionDeclaration(candidate);
 }

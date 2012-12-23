@@ -11,8 +11,8 @@ JarvisServer::JarvisServer() : settings("InfoAG", "Jarvis.Server")
     QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath() + "/modules");
     qDebug() << QCoreApplication::libraryPaths();
     //settings.setValue("Version", 1);
-    listen(QHostAddress::Any, settings.value("Port").toUInt());
-    parser = std::unique_ptr<ExpressionParser>(new ExpressionParser(QDir(settings.value("ModulePath").toString())));
+    listen(QHostAddress::AnyIPv4, settings.value("Port").toUInt());
+    parser = make_unique<ExpressionParser>(QDir(settings.value("ModulePath").toString()));
 }
 
 const Room *JarvisServer::enterRoom(ClientConnection *client, QString room)
