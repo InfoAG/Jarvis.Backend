@@ -8,13 +8,12 @@ QT       += core network
 
 QT       -= gui
 
-release {
-    DESTDIR = ../release/
-    LIBS += -L../../Framework/release -lJarvis-Framework
-}
-debug {
+CONFIG(debug, debug|release) {
     DESTDIR = ../debug/
     LIBS += -L../../Framework/debug -lJarvis-Framework
+} else {
+    DESTDIR = ../release/
+    LIBS += -L../../Framework/release -lJarvis-Framework
 }
 
 TARGET = Jarvis-Backend

@@ -22,13 +22,12 @@ QMAKE_CXXFLAGS += -std=c++11
 
 INCLUDEPATH += ../../../Framework
 
-release {
-    DESTDIR = ../../release/cextensions/
-    LIBS += -L../../../Framework/release -lJarvis-Framework
-    LIBS += -L../../release -lJarvis-Backend
-}
-debug {
+CONFIG(debug, debug|release) {
     DESTDIR = ../../debug/cextensions/
     LIBS += -L../../../Framework/debug -lJarvis-Framework
     LIBS += -L../../debug -lJarvis-Backend
+} else {
+    DESTDIR = ../../release/cextensions/
+    LIBS += -L../../../Framework/release -lJarvis-Framework
+    LIBS += -L../../release -lJarvis-Backend
 }
