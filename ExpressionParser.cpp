@@ -93,6 +93,7 @@ CAS::AbstractStatement::StatementP ExpressionParser::parseStatement(std::string 
 
 CAS::AbstractExpression::ExpressionP ExpressionParser::parseExpression(std::string input) const
 {
+    input = trim(input);
     CAS::AbstractExpression::ExpressionP result;
     for (const auto &terminal : modules.terminalExpressions) {
         try {
@@ -102,7 +103,6 @@ CAS::AbstractExpression::ExpressionP ExpressionParser::parseExpression(std::stri
     }
 
     auto level = 0;
-    input = trim(input);
     std::string::const_iterator foundPos = input.cend();
     std::pair<const BinaryOperatorModule*, size_t> bestBinOpMatch{nullptr, 0};
     CAS::AbstractExpression::ExpressionP parseForMatchResult;
